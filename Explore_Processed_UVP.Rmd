@@ -1,0 +1,245 @@
+---
+title: "Exploring processed UVP-2017 data"
+output: html_notebook
+---
+
+There are binned and unbinned data that I would like to look at.
+
+First the unbinned data. I want for each, number, biovol, flux, psd,
+psd with confidence intervals.
+read_csv("dataOut/")
+
+```{r}
+library(tidyverse)
+library(cowplot)
+library(plotly)
+```
+
+
+# Load all data
+```{r}
+unbinned_DepthSummary <- read_csv("dataOut/unbinned_DepthSummary.csv")
+unbinned_EachSize <- read_csv("dataOut/unbinned_EachSize.csv")
+binned_DepthSummary <- read_csv("dataOut/binned_DepthSummary.csv")
+binned_EachSize <- read_csv("dataOut/binned_EachSize.csv")
+```
+
+# Summary
+
+## Binned
+```{r}
+plot_nparticles <- unbinned_DepthSummary %>% ggplot(aes(x = tot_nparticles, y = depth, colour = profile)) + geom_point(alpha = 0.5, size = 1) + scale_y_reverse() + scale_x_log10() + guides(colour = FALSE) + labs(x = "#Particles/L") + theme_cowplot()
+
+plot_biovolume <- unbinned_DepthSummary %>% ggplot(aes(x = tot_biovolume, y = depth, colour = profile)) + geom_point(alpha = 0.5, size = 1) + scale_y_reverse() + scale_x_log10() + guides(colour = FALSE) + labs(x = "Unadjusted Biovolume (mass units/L)")+ theme_cowplot()
+
+plot_flux <- unbinned_DepthSummary %>% ggplot(aes(x = tot_flux, y = depth, colour = profile)) + geom_point(alpha = 0.5, size = 1) + scale_y_reverse() + scale_x_log10() + guides(colour = FALSE) + labs(x = "Unadjusted Flux (units/m^2/day)")+
+   theme_cowplot()
+
+plot_psd <- unbinned_DepthSummary %>% ggplot(aes(x = psd, y = depth, colour = profile)) + geom_point(alpha = 0.5, size = 1, shape = 21, fill = "black", stroke = 1) + scale_y_reverse()  + guides(colour = FALSE) + labs(x = "Particle Size Distribution Slope") + theme_cowplot()
+
+plot_speed <- unbinned_DepthSummary %>% ggplot(aes(x = tot_speed, y = depth, colour = profile)) + geom_point(alpha = 0.5, size = 1) + scale_y_reverse() + scale_x_log10() + guides(colour = FALSE) + labs(x = "Unadjusted Flux Weighted Sinking Speed (m/d)") + theme_cowplot()
+
+
+ggplotly(plot_nparticles)
+ggplotly(plot_biovolume)
+ggplotly(plot_flux)
+ggplotly(plot_speed)
+ggplotly(plot_psd)
+
+cowplot::plot_grid(plot_nparticles,plot_biovolume, plot_flux, plot_speed, plot_psd) #%>% ggplotly()
+```
+
+```{r}
+plot_nparticles
+plot_psd + scale_x_continuous(limits = c(-4.6, -2.5))
+```
+
+## Binned
+```{r}
+plot_nparticles <- binned_DepthSummary %>% ggplot(aes(x = tot_nparticles, y = depth, colour = profile)) + geom_point(alpha = 0.5, size = 1) + scale_y_reverse(breaks = seq(from = 0, to = 2500, by = 100)) + scale_x_log10() + guides(colour = FALSE) + labs(x = "#Particles/L") + theme_cowplot()
+
+plot_biovolume <- binned_DepthSummary %>% ggplot(aes(x = tot_biovolume, y = depth, colour = profile)) + geom_point(alpha = 0.5, size = 1) + scale_y_reverse() + scale_x_log10() + guides(colour = FALSE) + labs(x = "Unadjusted Biovolume (mass units/L)")+ theme_cowplot()
+
+plot_flux <- binned_DepthSummary %>% ggplot(aes(x = tot_flux, y = depth, colour = profile)) + geom_point(alpha = 0.5, size = 1) + scale_y_reverse() + scale_x_log10() + guides(colour = FALSE) + labs(x = "Unadjusted Flux (units/m^2/day)")+
+   theme_cowplot()
+
+plot_psd <- binned_DepthSummary %>% ggplot(aes(x = psd, y = depth, colour = profile)) + geom_point(alpha = 0.5, size = 1, shape = 21, fill = "black") + scale_y_reverse()  + guides(colour = FALSE) + labs(x = "Particle Size Distribution Slope") + theme_cowplot()
+
+plot_speed <- binned_DepthSummary %>% ggplot(aes(x = tot_speed, y = depth, colour = profile)) + geom_point(alpha = 0.5, size = 1) + scale_y_reverse() + scale_x_log10() + guides(colour = FALSE) + labs(x = "Unadjusted Flux Weighted Sinking Speed (m/d)") + theme_cowplot()
+
+
+ggplotly(plot_nparticles)
+ggplotly(plot_biovolume)
+ggplotly(plot_flux)
+ggplotly(plot_speed)
+ggplotly(plot_psd)
+
+cowplot::plot_grid(plot_nparticles,plot_biovolume, plot_flux, plot_speed, plot_psd) #%>% ggplotly()
+
+```
+
+# Question about whether points fall within confidence intervals
+
+## Unbinned
+
+```{r}
+unbinned043 <- unbinned_DepthSummary %>% filter(profile == "stn_043") %>% arrange(depth)
+```
+
+
+```{r}
+plot_psd_2 <- unbinned_DepthSummary %>% ggplot(aes(x = psd, y = depth, colour = profile)) + geom_point(alpha = 0.5, size = 2, shape = 21, fill = "gray") + scale_y_reverse()  + guides(colour = FALSE) + labs(x = "Particle Size Distribution Slope", y = "Depth (m)") + theme_cowplot() + 
+  geom_path(aes(x = qpt05, y = depth), color = "blue", data = unbinned043) +
+  geom_path(aes(x = qpt95, y = depth), color = "blue", data = unbinned043) +
+  geom_path(aes(x = psd_gam, y = depth), color = "black", data = unbinned043)
+ggplotly(plot_psd_2)
+```
+Why is there noise in the quantiles again?
+
+```{r}
+plot_psd_2
+```
+
+```{r}
+plot_psd_2 <- unbinned_DepthSummary %>% ggplot(aes(x = psd, y = depth, colour = profile)) + geom_point(alpha = 0.5, size = 2, shape = 21, fill = "gray") + scale_y_reverse()  + guides(colour = FALSE) + labs(x = "Particle Size Distribution Slope", y = "Depth (m)") + theme_cowplot() + 
+  #geom_path(aes(x = qpt05, y = depth), color = "blue", data = unbinned043) +
+  #geom_path(aes(x = qpt95, y = depth), color = "blue", data = unbinned043) +
+  geom_path(aes(x = psd_gam, y = depth), color = "black", data = unbinned043)
+plot_psd_2
+#ggplotly(plot_psd_2)
+```
+
+## Binned
+```{r}
+binned043 <- binned_DepthSummary %>% filter(profile == "stn_043") %>% arrange(depth)
+plot_psd_2b <- binned_DepthSummary %>%
+  ggplot(aes(x = psd, y = depth, colour = profile)) + geom_point(alpha = 0.5, size = 2, shape = 21, fill = "black") +
+  scale_y_reverse(breaks = seq(from = 0, to = 2500, by = 500))  + guides(colour = FALSE) + labs(x = "Particle Size Distribution Slope", y = "Depth (m)") + theme_cowplot() + 
+  geom_path(aes(x = qpt05, y = depth), data = binned043, color = "blue")  + geom_path(aes(x = qpt95, y = depth), data = binned043, color = "blue")
+#ggplotly(plot_psd_2b)
+plot_psd_2b
+```
+
+```{r}
+plot_psd_2b
+```
+
+
+### Is the variance on the unbinned from low volume?
+
+```{r}
+unbinned_EachSize %>% select(profile:depth, vol) %>% group_by(profile,depth) %>% summarize(vol = first(vol)) %>% 
+  ggplot(aes(y = depth, x = vol, col = profile)) + scale_y_reverse() + geom_point() + theme_cowplot() -> pVol
+ggplotly(pVol)
+```
+Could be, there is variance in the actual observed volume. This goes away with binning.
+
+I notice the noise unexplained by the gam is generally where the ctd stopped, what if I look at the profile that doesn't really stop.
+
+```{r}
+plot_psd_2 <- binned_DepthSummary %>% filter(profile == "stn_043") %>%
+  ggplot(aes(x = psd, y = depth, colour = profile)) + geom_point(alpha = 0.5, size = 1) + scale_y_reverse()  + guides(colour = FALSE) + labs(x = "Particle Size Distribution Slope") + theme_cowplot() + 
+  geom_path(aes(x = qpt05, y = depth)) + geom_path(aes(x = qpt05, y = depth)) + geom_path(aes(x = qpt95, y = depth))
+plot_psd_2
+```
+
+Still quite some points that fall outside of the gam. So binning at this level doesn't really slay the variance.
+
+## Big particle question continued.
+For one/each depth, identify the non-zero points, fit a gam to those.
+Then see if we would predict zero particles in the next smallist bin.
+
+```{r}
+binned_DepthSummary %>% filter(profile == "stn_043", depth == 275)
+test_depth <- binned_EachSize %>% filter(profile == "stn_043", depth == 275)
+test_depth
+```
+
+
+```{r}
+fit_model = function(df) glm(TotalParticles ~ log(lb), offset = log(binsize * vol), data = df, family = "poisson")
+test_depth_sawParticles <- test_depth %>% filter(TotalParticles >= 1)
+test_depth_firstZero <- test_depth %>% filter(TotalParticles == 0) %>% filter(lb == max(lb))
+test_mod <- fit_model(test_depth_sawParticles)
+pred_firstZero <- predict(test_mod, test_depth_firstZero, type = "response")
+lower_pt05 <- qpois(0.05, lambda = pred_firstZero)
+pred_firstZero
+lower_pt05
+```
+
+So in this particular case, the first zero is totally expected. Are there exceptions?
+
+```{r}
+expected_firstZero <- function(df){
+  loc_depth_sawParticles <- df %>% filter(TotalParticles >= 1)
+  loc_depth_firstZero <- df %>% filter(TotalParticles == 0) %>% filter(lb == max(lb))
+  loc_mod <- fit_model(loc_depth_sawParticles)
+  loc_pred_firstZero <- predict(test_mod, test_depth_firstZero, type = "response")
+  loc_lower_pt05 <- qpois(0.05, lambda = pred_firstZero)
+  loc_lower_pt05
+}
+
+expected_firstZero(test_depth)
+```
+
+
+```{r}
+look_nz <- binned_EachSize %>% group_by(profile, time, depth) %>% nest() %>% 
+  mutate(fz = map_dbl(data, expected_firstZero))
+look_nz
+```
+
+```{r}
+ggplot(look_nz, aes(y = depth, x = fz)) + geom_point() + scale_y_reverse()
+```
+
+Ok. So, um. There don't appear to be cases where we would expect to see a non zero where we actually see a zero.
+This says to me that UVP is not a suitable way to define upper bounds of particle sizes.
+
+# For Talk
+## Stuff I want:
+ 1) Normalize flux to observed flux.
+ Plot both flux against eachother. Regress the sets of values. Convert UVP flux using regression slope to observed flux.
+ 2) Plot water masses, and POC. 
+ POC from Clara.
+ Water masses just manually enter from Zach.
+ 3) Batch P16 nearby site through.
+ 4) Make presentation.
+ 
+ 5) Quantify effective disaggregation
+ 
+## Presentation Outline
+Introduction
+ Stuff about POM flux.
+ What we expect particles to do if they just sink and remineralize.
+ Generally profiles don't flatten.
+ 
+ We wanted to see how particle size related to POM flux at an anoxic site. 
+ 
+ POM flux from traps.
+ 
+ Meh. I'll come back to this.
+ 
+ Stuff I want to sow though:
+ 
+ POC
+ Flux - traps
+ Water masses
+ 
+ Properties compared in each case to P16:
+ Numbers -- consistant between sites, variable. 
+ Biovolume
+ Non-normalized flux.
+ Normalized flux.
+ 
+ How I calculate PSD.
+ 
+ PSD
+ 
+ PSD vs water mass and oxygen.
+ 
+ Talk about variability.
+ 
+ Show binned data -- still variability.
+ 
+ 

@@ -1,0 +1,437 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+Goal here is to compare observed and normalized flux from the UVP.
+
+# Load libraries
+
+```{r}
+library(tidyverse)
+library(readxl)
+library(cowplot)
+```
+
+
+# Bring in all data.
+## UVP
+```{r}
+unbinned_DepthSummary <- read_csv("dataOut/unbinned_DepthSummary.csv")
+unbinned_EachSize <- read_csv("dataOut/unbinned_EachSize.csv")
+binned_DepthSummary <- read_csv("dataOut/binned_DepthSummary.csv")
+binned_EachSize <- read_csv("dataOut/binned_EachSize.csv")
+```
+
+## Flux
+```{r}
+fluxMS_distilled <- read_csv("dataOut/fluxMS_distilled")
+```
+
+# Redo Proctrap's power law
+
+# Power law flux model
+```{r}
+loglogCfluxmod <- glm(log10(C_flux_umol) ~ log10(Depth), data = fluxMS_distilled)
+summary(loglogCfluxmod)
+```
+
+
+# Interpolate predicted flux profile
+In non log space, added out of order on 06 December 2018
+
+```{r}
+CPred <- tibble(
+  Depth = c(seq(from = 30, to = 150, by = 0.1),
+            seq(from = 101, to = 1000, by = 1)
+  )
+) 
+CPred$C_flux_umol <- 10^predict(loglogCfluxmod, CPred)
+```
+
+## Flux profile for poster
+```{r}
+FDP1 <- fluxMS_distilled %>% ggplot(aes(y = Depth, x = C_flux_umol)) +
+    geom_point(data = CPred, aes(y = Depth, x = C_flux_umol), size = 0.1, colour = "gray30") +
+  geom_point(aes(color = SampleType, shape = TrapType), size = 5) +
+  scale_y_continuous(trans = "reverse") +
+  scale_x_continuous(limits = c(0, 200)) + 
+  theme_bw() 
+
+FDP1
+#ggsave("figures/CFlux.svg", width = 7, height = 7)
+```
+
+# Estimated flux
+
+```{r}
+plot_flux <- binned_DepthSummary %>% ggplot(aes(x = tot_flux, y = depth, colour = profile)) + geom_point(alpha = 0.5, size = 1) + scale_y_reverse(limits = c(1000,0)) + scale_x_log10() + guides(colour = FALSE) + labs(x = "Unadjusted Flux (units/m^2/day)")+
+   theme_cowplot()
+plot_flux
+```
+
+```{r}
+pre_flux_compare <- binned_DepthSummary %>% group_by(depth) %>% summarize(tot_flux = mean(tot_flux)) %>%
+  mutate(Depth = depth) %>% mutate(CFlux_trap_est = 10^predict(loglogCfluxmod, .))
+```
+
+```{r}
+pre_flux_compare %>% filter(Depth < 500) %>% ggplot(aes(x = tot_flux, y = CFlux_trap_est,  color = Depth)) + geom_point()  + scale_color_viridis_c(direction = -1) + scale_x_continuous() + scale_y_continuous()
+```
+
+```{r}
+pre_flux_compare %>% filter(Depth < 1000) %>% ggplot(aes(x = tot_flux, y = CFlux_trap_est,  color = Depth)) + geom_point()  + scale_color_viridis_c(direction = -1) + scale_x_log10() + scale_y_continuous()
+```
+
+These do not appear to be linearly related, at least for shallow depths. Total flux overestimates relative to trap flux.
+
+Which do I believe more?
+
+Lets say the trap flux. In that case, we could do a fit where total uvp flux is normalized to trap estimates, even in a non linear fashion.
+
+So I'd do a regression where CFlux_trap ~ log10(tot_flux), and then I'd plot the predicted CFlux trap from the actual total flux. Thats my new power law.
+
+```{r}
+mod1 <- lm(CFlux_trap_est ~ log10(tot_flux), data = pre_flux_compare)
+summary(mod1)
+plot(mod1)
+```
+
+```{r}
+#rmse(mod1)
+```
+
+
+```{r}
+flux_compare <- pre_flux_compare %>% mutate(tn_flux = predict(mod1, .))
+```
+
+```{r}
+flux_compare %>% ggplot(aes(y = Depth, x = tn_flux))  + scale_y_reverse() + geom_point(aes(x = Depth, y = CFlux_trap_est), shape = 2, size = 2)
+```
+
+```{r}
+flux_compare %>% ggplot(aes(y = Depth, x = CFlux_trap_est))  + scale_y_reverse() + geom_point()
+```
+
+```{r}
+binned_DepthSummary_01 <- binned_DepthSummary %>% mutate(tn_flux = predict(mod1, .))
+```
+
+
+FDP1 <- fluxMS_distilled %>% ggplot(aes(y = Depth, x = C_flux_umol)) +
+    geom_point(data = CPred, aes(y = Depth, x = C_flux_umol), size = 0.1, colour = "gray30") +
+  geom_point(aes(color = SampleType, shape = TrapType), size = 5) +
+
+```{r}
+plot_flux <- binned_DepthSummary_01 %>% rename(Depth = depth) %>% ggplot(aes(x = tn_flux, y = Depth)) + geom_point(alpha = 0.5, size = 1, aes(color = profile)) + scale_y_reverse(limits = c(1000,0)) + scale_x_log10()  + labs(x = "Adjusted Flux (microMoles/m^2/day)")+
+   theme_cowplot() + geom_point(aes(y = Depth, x = C_flux_umol, fill = SampleType, shape = TrapType), colour = "black", stroke = 1, size = 5, data = fluxMS_distilled) +
+  scale_shape_manual(values = c(25, 22))+
+  scale_size_manual(values = c(3, 4)) 
+plot_flux
+```
+This looks about an order of magnitude lowe rthan VanMooy 2002 or Harnett in that. Is it actually super low flux, or have I screwed up the math somewhere?
+Talk with Clara, and then Jacqui and Meg.
+
+Also, I'm having trouble with border color on the shapes. they are red. Fails if I don't specify a color.
+
+```{r}
+ggplot() + geom_point(aes(y = Depth, x = C_flux_umol), data = fluxMS_distilled)
+```
+
+I think that maybe the alpha + gamma term is wrong, and thats why we have a non linear fit. We could try to minimize the R^2 value of the fit, while choosing 
+C_f and alpha + gamma
+
+```{r}
+C_f_test <- 1
+ag_test <- 1.7 + 1.7 - 1
+
+fit_flux_es <- function( C_f, ag, ES1 = binned_EachSize){
+ES2 <- binned_EachSize %>% mutate(flux2 = C_f * nparticles * lb ^ ag)
+ES2
+}
+
+#ES2 <- fit_flux_es(C_f_test, ag_test) %>% select(profile:depth, flux, flux2) # flux == flux2
+
+ fit_flux_ds <- function(C_f, ag, ES2, DS1 = binned_DepthSummary_01){
+  DS2 <- ES2 %>%
+    group_by(profile, time, depth) %>%
+    summarize(tot_flux2 = sum(flux2))
+  
+  DS2 <- left_join(DS1, DS2, by = c("profile", "time", "depth"))
+}
+
+#DS2 <- fit_flux_ds(C_f_test, ag_test, ES2)
+
+#DS2 %>% select(profile:depth, tot_flux, tot_flux2) # flux == flux2
+
+fit_flux <- function(C_f, ag, ES1, DS1){
+  ES2 <- fit_flux_es(C_f, ag, ES1)
+  DS2 <- fit_flux_ds(C_f, ag, ES2, DS1)
+  return(list(ES = ES2, DS = DS2))
+}
+
+FFTest <- fit_flux(C_f_test, ag_test, binned_EachSize, binned_DepthSummary_01)
+
+# https://stackoverflow.com/questions/43123462/how-to-obtain-rmse-out-of-lm-result
+RMSE <- function(mod){
+  RSS <- c(crossprod(mod$residuals))
+  MSE = RSS/ length(mod$residuals)
+  RMSE = sqrt(MSE)
+}
+
+# Close, but too much weight on larger values
+flux_check <- function(DS){
+  #diff = log10(DS$tn_flux) - log10(DS$tot_flux2)
+  diff = log(DS$tn_flux) - log(DS$tot_flux2)
+  squares = diff ^2
+  rss = sum(squares)
+  mse = rss/length(rss)
+  rmse = sqrt(mse)
+  rmse
+}
+
+#flux_check(FFTest$DS)
+
+fit_check_flux <- function(C_f, ag, ES1, DS1){
+  FF <- fit_flux(C_f, ag, ES1, DS1)
+  FC <- flux_check(FF$DS)
+  FC
+}
+
+fit_check_flux(C_f_test, ag_test, binned_EachSize, binned_DepthSummary_01)
+
+fc_wrap <- function(x){
+  C_f <- x[1]
+  ag <- x[2]
+  FC <- fit_check_flux(C_f, ag, binned_EachSize, binned_DepthSummary_01)
+  FC
+}
+```
+I'm getting two f values for my tests. 248 and 306. Not sure what gives, but not going to dig right now. 02 Feb 2019
+
+Now iterate over all reasonable C_f and ag
+
+```{r}
+opt <- optim(c(C_f_test, ag_test), fc_wrap)
+opt
+```
+
+
+
+```{r}
+fit_alpha = (opt$par[2] +1)/2
+fit_alpha
+fit_gamma = fit_alpha - 1
+fit_gamma
+```
+
+So in this scenario, big particles sink slower than small particles.
+
+```{r}
+#opt <- optim(c(C_f_test, ag_test), fc_wrap, method = "L-BFGS-B", lower = c(0, 0), upper = c(Inf, 10))
+#opt
+```
+
+I don't get it. Why is ag so frigging high?
+Why does Cf try to zero out. Next step is to look at what happens if I use these values and investigate the output.
+Also the value parameters look bad, in general.
+
+```{r}
+OptFlux <- fit_flux(opt$par[1], opt$par[2], binned_EachSize, binned_DepthSummary_01)
+binned_EachSize_02 <- OptFlux$ES
+binned_DepthSummary_02 <- OptFlux$DS
+```
+
+This isn't working. Things don't actually fit well with this optimum fit.
+
+```{r}
+flux_check(binned_DepthSummary_02)
+```
+
+Changing the C_f parameter isn't improving the vit
+
+Debugging
+
+```{r}
+mod2 <- lm(tn_flux~tot_flux2, data = binned_DepthSummary_02)
+summary(mod2)
+```
+Oh. I don't want to do LM. It always rescales so C_f doesn't have any effect.
+I want to calculate RMSE by hand.
+EG. Get difference between each trap and predicted flux, square them, add them, devide by length, take the square root, or even just square and add.
+
+# Plot check
+
+```{r}
+binned_DepthSummary_02 %>% group_by(depth) %>% summarize(tot_flux2 = mean(tot_flux2)) %>% ggplot(aes(y = depth))  + scale_y_reverse(limits = c(1000, 0)) + scale_x_continuous(limits = c(0, 200)) +
+  geom_point(aes(y = Depth, x = C_flux_umol, fill = SampleType, shape = TrapType), colour = "black", stroke = 1, size = 5, data = fluxMS_distilled) +
+  geom_point(aes(x = tot_flux2)) +
+scale_shape_manual(values = c(25, 22))+
+  scale_size_manual(values = c(3, 4)) +
+  ylab("Depth (m)") + xlab("Flux micro-mol/m^2/day")
+  
+```
+
+```{r}
+binned_DepthSummary_02 %>% group_by(depth) %>% summarize(tot_flux2 = mean(tot_flux2)) %>% ggplot(aes(y = depth))  + scale_y_reverse(limits = c(2500, 0)) + scale_x_continuous(limits = c(0, 110)) +
+  geom_point(aes(y = Depth, x = C_flux_umol, fill = SampleType, shape = TrapType), colour = "black", stroke = 1, size = 5, data = fluxMS_distilled) +
+  geom_point(aes(x = tot_flux2)) +
+scale_shape_manual(values = c(25, 22))+
+  scale_size_manual(values = c(3, 4)) +
+  ylab("Depth (m)") + xlab("Flux micro-mol/m^2/day")
+  
+```
+
+binned_DepthSummary_02
+
+```{r}
+write_csv(binned_DepthSummary_02, "dataOut/binned_DepthSummary_02.csv")
+```
+
+# 02 April 2019
+# Fitting directly to traps
+Alternative approach. What if, instead of fitting a power law to flux and "up sampling" I instead down sample the UVP data to match the flux. I could do this, for instance by coursely binning and then just taking the nearist bin.
+
+```{r}
+trapDepths <- fluxMS_distilled  %>% pull(Depth) %>% unique
+trapDepths
+
+uvpDepths <- binned_EachSize %>% filter(profile == "stn_043") %>% pull(depth) %>% unique
+uvpDepths
+```
+
+```{r}
+nearist <- function(dep, dvec = uvpDepths){dvec[which.min(abs(dvec - dep))]}
+nearist(69)
+
+```
+
+```{r}
+fluxMS_distilled %>% mutate(NearistUVPDepth = map_dbl(Depth, nearist))
+```
+
+```{r}
+left_join(
+  fluxMS_distilled %>% mutate(NearistUVPDepth = map_dbl(Depth, nearist)),
+  binned_DepthSummary_02 %>% filter(profile == "stn_043") %>% select(depth, tot_flux2),
+  by = c("NearistUVPDepth" = "depth")
+)
+```
+
+BOOKMARK 02 April 2020
+```{r}
+
+fluxMS_distilled_connect <- fluxMS_distilled %>% mutate(NearistUVPDepth = map_dbl(Depth, nearist))
+
+flux_check_vs_traps <- function(DS, FLX = fluxMS_distilled_connect){
+  
+  thing <- left_join(
+    FLX,
+    DS %>% filter(profile == "stn_043") %>% select(depth, tot_flux2),
+    by = c("NearistUVPDepth" = "depth")
+                     )
+  
+  #diff = log10(DS$tn_flux) - log10(DS$tot_flux2)
+  diff = log(thing$C_flux_umol) - log(thing$tot_flux2)
+  squares = diff ^2
+  rss = sum(squares)
+  mse = rss/length(rss)
+  rmse = sqrt(mse)
+  rmse
+}
+
+flux_check_vs_traps(binned_DepthSummary_02, fluxMS_distilled_connect)
+```
+
+Note: I'd prefer to feature rebinning.
+Now I need to (1) 
+```{r}
+fit_check_flux_vstraps <- function(C_f, ag, ES1, DS1, FLX = fluxMS_distilled_connect){
+  FF <- fit_flux(C_f, ag, ES1, DS1)
+  FC <- flux_check_vs_traps(FF$DS, FLX)
+  FC
+}
+
+fit_check_flux_vstraps(C_f_test, ag_test, binned_EachSize, binned_DepthSummary, fluxMS_distilled_connect)
+
+fc_wrap_vstraps <- function(x){
+  C_f <- x[1]
+  ag <- x[2]
+  FC <- fit_check_flux_vstraps(C_f, ag, binned_EachSize, binned_DepthSummary)
+  FC
+}
+
+opt_vstraps <- optim(c(C_f_test, ag_test), fc_wrap_vstraps)
+opt_vstraps
+```
+
+Seriously. Now its negative?
+
+Post mortem
+
+```{r}
+negAlpha <- fit_flux(opt_vstraps$par[1], opt_vstraps$par[2], binned_EachSize, binned_DepthSummary)
+```
+
+```{r}
+negAlpha_ES <- negAlpha$ES
+negAlpha_DS <- negAlpha$DS
+```
+
+```{r}
+negAlpha_DS %>% group_by(depth) %>% summarize(tot_flux2 = mean(tot_flux2)) %>% ggplot(aes(y = depth))  + scale_y_reverse(limits = c(2500, 0)) + scale_x_log10(limits = c(1, 110)) +
+  geom_point(aes(y = Depth, x = C_flux_umol, fill = SampleType, shape = TrapType), colour = "black", stroke = 1, size = 5, data = fluxMS_distilled) +
+  geom_point(aes(x = tot_flux2)) +
+scale_shape_manual(values = c(25, 22))+
+  scale_size_manual(values = c(3, 4)) +
+  ylab("Depth (m)") + xlab("Flux micro-mol/m^2/day")
+```
+
+# If we don't optimize ag
+Use values from Alldredge and Gotschalk
+gamma = 0.26
+alpha = 0.52
+```{r}
+alldredge_alpha = 0.52 # alldredge
+alldredge_gamma = 0.26 # alldrege and gotschalk
+alldredge_ag = alldredge_alpha + alldredge_gamma # Alldredge
+fc_wrap_CfOnly <- function(x){
+  C_f <- x[1]
+  FC <- fit_check_flux(C_f, alldredge_ag, binned_EachSize, binned_DepthSummary_01)
+  FC
+}
+
+opt_alldredge <- optim(c(C_f_test), fc_wrap_CfOnly, method = "Brent", lower = 0, upper = 1000)
+
+opt_alldredge$par[2] <- alldredge_ag
+opt_alldredge
+```
+
+Now that I'm running this. Alpha + gamma looks a lot more reasonalbe as 0.26. I mean, here its only 0.78.
+
+More optomistic post mortem
+
+```{r}
+OptFlux_ald <- fit_flux(opt$par[1], opt$par[2], binned_EachSize, binned_DepthSummary_01)
+binned_EachSize_ald <- OptFlux_ald$ES
+binned_DepthSummary_ald <- OptFlux_ald$DS
+```
+
+```{r}
+binned_DepthSummary_ald %>% group_by(depth) %>% summarize(tot_flux2 = mean(tot_flux2)) %>% ggplot(aes(y = depth))  + scale_y_reverse(limits = c(1000, 0)) + scale_x_continuous(limits = c(0, 200)) +
+  geom_point(aes(y = Depth, x = C_flux_umol, fill = SampleType, shape = TrapType), colour = "black", stroke = 1, size = 5, data = fluxMS_distilled) +
+  geom_point(aes(x = tot_flux2)) +
+scale_shape_manual(values = c(25, 22))+
+  scale_size_manual(values = c(3, 4)) +
+  ylab("Depth (m)") + xlab("Flux micro-mol/m^2/day")
+  
+```
+
+I'm feeling ok with this. Lets feed the aldredge optimized data into the remin model with aldredge params.
+
+```{r}
+write_csv(binned_DepthSummary_ald, "dataOut/binned_DepthSummary_ald.csv")
+write_csv(binned_EachSize_ald, "dataOut/binned_EachSize_ald.csv")
+```
+
