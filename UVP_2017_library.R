@@ -136,6 +136,7 @@ calc_particle_parameters <- function(x, DepthSummary = NULL){
   list(ES = EachSize2, DS = DepthSummary2)
 }
 
+## Seperate parameters for small < 53 micron and big > 53 micron particles
 calc_small_and_big <- function(x, DepthSummary = NULL){
   #Allow passing in either a two elemet list of Eachsize and DepthSummary, or passing in as two variables.
   
@@ -262,6 +263,7 @@ quantilater <- function(df, niter = 10, q1 = 0.025, q2 = 0.975){
   t2Test04 <- t2Test03 %>% mutate(tidied = map(model, tidy))
   t2Test05 <- t2Test04 %>% select(iter,tidied)%>% unnest(tidied) %>% select(iter, estimate, term) %>% spread(value = "estimate", key = "term")
   t2Test06 <- t2Test05 %>% ungroup() %>% summarise(qpt05 = quantile(`log(lb)`, probs = 0.05), qpt95 = quantile(`log(lb)`, probs = .95))
+  t2Test06
 
   }
 
@@ -277,7 +279,11 @@ tp_quantiles <-  function(x, DepthSummary = NULL,  niter = 10){
     group_by(profile, time, depth) %>%
     nest(data = c(binsize, lb, vol, GamPredictTP))
   
-  t2Calc02 <- t2Calc01 %>% mutate(quantiles = future_map(data, quantilater, niter = niter))
+  #t2Calc02 <- t2Calc01 %>% mutate(quantiles = future_map(data, quantilater, niter = niter))
+  # the above doesn't work, trying an alternative
+  future_map(t2Calc01[["data"]][], quantilater, niter = niter) -> moo
+  t2Calc02 <- t2Calc01
+  t2Calc02$quantiles = moo
   
   t2Calc03 <- t2Calc02 %>% select(-data) %>% unnest(quantiles)
   
