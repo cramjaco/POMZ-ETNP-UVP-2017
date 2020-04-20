@@ -27,7 +27,7 @@ binned_EachSize <- read_csv("dataOut/binned_EachSize.csv")
 
 ```{r}
 binned_class_DepthSummary <- binned_DepthSummary %>%
-  select(depth, profile, tot_TotParticles:big_speed, small_icp:big_psd) %>%
+  select(depth, profile, tot_TotParticles:big_speed) %>%
   pivot_longer(cols = c(-depth, -profile)) %>%
   separate(name, c("class", "variable"), extra = "merge") %>%
   pivot_wider(names_from = variable)
@@ -63,7 +63,7 @@ head(long_binned)
 ```
 
 ```{r, fig.width=7, fig.height= 7}
-longPlt <- long_binned %>% ggplot(aes(x = value, y = depth, shape = class)) + geom_point(alpha = 0.5, size = 3) + scale_y_reverse(breaks = seq(from = 0, to = 2500, by = 200)) + scale_x_log10() + guides(colour = FALSE) + labs(x = "Value") + theme_cowplot() + facet_wrap(~variable, scales = "free_x", ncol = 2)
+longPlt <- long_binned %>% ggplot(aes(x = value, y = depth, shape = class, fill = class)) + geom_point(alpha = 0.5, size = 3) + scale_y_reverse(breaks = seq(from = 0, to = 2500, by = 200)) + scale_x_log10() + guides(colour = FALSE) + labs(x = "Value") + theme_cowplot() + facet_wrap(~variable, scales = "free_x", ncol = 2) + scale_shape_manual(values = c(21, 22)) + scale_fill_manual(values = c("small" = "red", "big" = "blue"))
 longPlt
 ```
 
@@ -73,18 +73,6 @@ Fun fact. The bulk of flux is from small particles.
 
 # PSD
 
-```{r}
-long_psd_binned <- binned_class_DepthSummary <- binned_DepthSummary %>%
-  select(depth, profile, small_icp:big_psd, psd, icp) %>%
-  pivot_longer(cols = c(-depth, -profile)) %>%
-  separate(name, c("class", "variable"), extra = "merge") %>%
-  filter(class != "tot", profile == "stn_043", !variable %in% c("nnparticles", "flux", "TotParticles"))
-```
-
-```{r}
-longPsdPlt <- long_psd_binned %>% ggplot(aes(x = value, y = depth, shape = class, col = class)) + geom_point(alpha = 0.5, size = 3) + scale_y_reverse(breaks = seq(from = 0, to = 2500, by = 200)) + scale_x_continuous() + guides(colour = FALSE) + labs(x = "Value") + theme_cowplot() + facet_wrap(~variable, scales = "free_x", ncol = 2)
-longPsdPlt
-```
 
 Huh. There is a general flattening of the curve. That is, the large particles generally have a steeper PSD than the smaller particles.
 
@@ -111,21 +99,3 @@ Something is screwing up my legend, but the fact is the small particles define t
 
 https://stackoverflow.com/questions/21865207/adding-legend-ggplot-doesnt-work
 
-# Debug
-
-```{r}
-test <- long_psd_binned %>% filter(depth < 200, variable == "psd") %>% select(-c(profile, variable))
-test %>% head
-```
-https://stackoverflow.com/questions/43266636/incorrect-shape-and-fill-of-ggplot-legend
-```{r}
-longPsdPlt <- test %>% ggplot(aes(x = value, y = depth, shape = class, fill = class)) + geom_point(alpha = 0.5, size = 3) + scale_y_reverse(breaks = seq(from = 0, to = 200, by = 50)) + scale_x_continuous()+ labs(x = "Value") + theme_cowplot()  + scale_shape_manual(values = 21:25) +
-scale_fill_manual(values = c("black", "blue", "red"), breaks = c("tot", "big", "small"), labels = c("tot", "big", "small"))
-longPsdPlt
-```
-
-```{r}
-longPsdPlt <- test %>% ggplot(aes(x = value, y = depth, shape = class, fill = class)) + geom_point(alpha = 0.5, size = 3) + scale_y_reverse(breaks = seq(from = 0, to = 200, by = 50)) + scale_x_continuous()+ labs(x = "Value") + theme_cowplot()  + scale_shape_manual(values = 21:25) +
-scale_fill_manual(values = c("tot" = "black", "big" = "blue", "small" = "red"))
-longPsdPlt
-```
