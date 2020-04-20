@@ -145,10 +145,10 @@ calc_small_and_big <- function(x, DepthSummary = NULL){
   DepthSummary = x2[[2]]
   
   small <- EachSize %>%
-    filter(lb <= 0.53)
+    filter(lb < 0.53)
   
   big <- EachSize %>%
-    filter(lb > 0.53)
+    filter(lb >= 0.53)
   
   small2 <- small %>%
     group_by(profile, time, depth) %>%
@@ -208,6 +208,56 @@ calc_psd <- function(x, DepthSummary = NULL){
   
   list(ES = EachSize, DS = DepthSummary2)
   
+}
+
+calc_small_psd <- function(x, DepthSummary = NULL){
+  
+  x2 <- parse_jac_input2(x, DepthSummary)
+  EachSize = x2[[1]]
+  DepthSummary = x2[[2]]
+  
+  fit_model = function(df) glm(TotalParticles ~ log(lb), offset = log(binsize * vol), data = df, family = "poisson")
+  
+  psdCalc01 <- EachSize %>% 
+    filter(lb < 0.53) %>%
+    group_by(profile, time, depth) %>%
+    nest() %>%
+    mutate(model = map(data, fit_model)) %>%
+    mutate(tidied = map(model, tidy)) %>%
+    select(-data, -model) %>%
+    unnest(tidied) %>%
+    select(profile:estimate) %>%
+    spread(key = "term", value = "estimate") %>%
+    rename(small_icp = `(Intercept)`, small_psd = `log(lb)`)
+  
+  DepthSummary2 <- left_join(DepthSummary, psdCalc01, by = c("profile", "time", "depth"))
+  
+  list(ES = EachSize, DS = DepthSummary2)
+}
+
+calc_big_psd <- function(x, DepthSummary = NULL){
+  
+  x2 <- parse_jac_input2(x, DepthSummary)
+  EachSize = x2[[1]]
+  DepthSummary = x2[[2]]
+  
+  fit_model = function(df) glm(TotalParticles ~ log(lb), offset = log(binsize * vol), data = df, family = "poisson")
+  
+  psdCalc01 <- EachSize %>% 
+    filter(lb >= 0.53) %>%
+    group_by(profile, time, depth) %>%
+    nest() %>%
+    mutate(model = map(data, fit_model)) %>%
+    mutate(tidied = map(model, tidy)) %>%
+    select(-data, -model) %>%
+    unnest(tidied) %>%
+    select(profile:estimate) %>%
+    spread(key = "term", value = "estimate") %>%
+    rename(big_icp = `(Intercept)`, big_psd = `log(lb)`)
+  
+  DepthSummary2 <- left_join(DepthSummary, psdCalc01, by = c("profile", "time", "depth"))
+  
+  list(ES = EachSize, DS = DepthSummary2)
 }
 
 calc_psd_gam <- function(x, DepthSummary = NULL){

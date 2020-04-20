@@ -1,0 +1,56 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+I moved some untargeted musings from other notebooks here.
+
+
+
+# For Talk
+## Stuff I want:
+ 1) Normalize flux to observed flux.
+ Plot both flux against eachother. Regress the sets of values. Convert UVP flux using regression slope to observed flux.
+ 2) Plot water masses, and POC. 
+ POC from Clara.
+ Water masses just manually enter from Zach.
+ 3) Batch P16 nearby site through.
+ 4) Make presentation.
+ 
+ 5) Quantify effective disaggregation
+ 
+## Presentation Outline
+Introduction
+ Stuff about POM flux.
+ What we expect particles to do if they just sink and remineralize.
+ Generally profiles don't flatten.
+ 
+ We wanted to see how particle size related to POM flux at an anoxic site. 
+ 
+ POM flux from traps.
+ 
+ Meh. I'll come back to this.
+ 
+ Stuff I want to sow though:
+ 
+ POC
+ Flux - traps
+ Water masses
+ 
+ Properties compared in each case to P16:
+ Numbers -- consistant between sites, variable. 
+ Biovolume
+ Non-normalized flux.
+ Normalized flux.
+ 
+ How I calculate PSD.
+ 
+ PSD
+ 
+ PSD vs water mass and oxygen.
+ 
+ Talk about variability.
+ 
+ Show binned data -- still variability.
+ 
+ 

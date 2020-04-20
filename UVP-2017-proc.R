@@ -13,7 +13,7 @@ DS01 <- twin01[[2]]
 ## Set up multicore operation
 
 no_cores <- availableCores() - 1
-plan(multiprocess, workers = no_cores)
+#plan(multiprocess, workers = no_cores)
 
 ## Process unbinned data
 
@@ -24,7 +24,9 @@ unbinned <- twin01 %>%
   calc_psd %>%
   calc_psd_gam %>%
   pred_tp_gam %>%
-  tp_quantiles(niter = 1000) %>%
+  calc_small_psd() %>%
+  calc_big_psd() %>%
+  #tp_quantiles(niter = 1000) %>%
   pass
 pt1 = proc.time()
 pt1 - pt0
@@ -47,7 +49,9 @@ binned02 <- binned01 %>%
   calc_psd %>%
   calc_psd_gam %>%
   pred_tp_gam %>%
-  tp_quantiles(niter = 1000) %>%
+  calc_small_psd() %>%
+  calc_big_psd() %>%
+  #tp_quantiles(niter = 1000) %>%
   pass
 pt1 = proc.time()
 pt1 - pt0
@@ -59,8 +63,5 @@ write_csv(binned02[["ES"]], "dataOut/binned_EachSize.csv")
 write_csv(binned02[["DS"]], "dataOut/binned_DepthSummary.csv")
 write_csv(unbinned[["ES"]], "dataOut/unbinned_EachSize.csv")
 write_csv(unbinned[["DS"]], "dataOut/unbinned_DepthSummary.csv")
-
-# I think I have regressed in quantilater to my original slow, O(n^2) non parallizable approach with quantilater.
-# I need to go back to the fast version.
 
 
