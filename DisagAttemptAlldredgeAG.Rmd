@@ -29,8 +29,8 @@ source("UVP_2017_library.R")
 # ES01 <- twin01[[1]] #%>% filter(depth <= 1000)
 # DS01 <- twin01[[2]] #%>% filter(depth <= 1000)
 
-ES01 <- read_csv("dataOut/binned_EachSize_ald.csv") %>% filter(depth <= 1000)
-DS01 <- read_csv("dataOut/binned_DepthSummary_ald.csv") %>% filter(depth <= 1000)
+ES01 <- read_csv("dataOut/binned_EachSize.csv") %>% filter(depth <= 1000)
+DS01 <- read_csv("dataOut/binned_DepthSummary.csv") %>% filter(depth <= 1000)
 twinS <- list(ES01, DS01)
 ```
 
@@ -95,10 +95,6 @@ testSpectrum <- make_spectrum( -2, -3.5)
 testSpectrum
 ```
 
-```{r}
-# glm(log(testSpectrum/binsize_vec)~ log(lb_vec))
-```
-
 # Post for Stack overflow, at least in thory
 
 ```{r}
@@ -109,12 +105,8 @@ library(cowplot)
 
 ```{r}
 particle_data <- ESS %>% select(-nparticles, -n_nparticles, -time, -binsize)
-particle_data
 ```
 
-```{r}
-#dput(particle_data)
-```
 
 I have a dataset in which I have measured particles of different sizes at different depths. Each depth has several size bins associated with it
 lb: lower bound of particle size (mm)
@@ -527,5 +519,27 @@ I'd also like to get at things like how particle production relates to flux atte
 I could imagine calculating C_r everywhere and then just running a purely prism model propigating downward with that Cr. Seeing what flux is at some key threshold, and then comparing that to actual flux. I'd expect that essentially all of the attenuation woudl be through the production and removal of small particles.
 
 In the back of my mind though, my assumptions about small particles are bugging me. What if they are more recalcitrant than big particles. Then all of the models sort of don't work, right?
+
+# 20 April 2020
+Some unnesting
+```{r}
+synthetic_remineralized_concise <- synthetic_remineralized %>%
+  mutate(spec2 = map2(spec, prev_spec, ~tibble(.x, prev_np = .y))) %>%
+  mutate(spec2 = map2(spec2, pred_spec, ~tibble(.x, pred_np = .y))) %>%
+  select(-c(spec, prev_spec, pred_spec))
+
+synthetic_remineralized_unnested <- synthetic_remineralized_concise %>% unnest(spec2)
+```
+I wonder what is up with these name reassignments?
+
+
+Goal: Estimate attenuation of large and small particles. Compare that to total attenuation.
+(Hopefully they sum to the same thing). 
+Do this for both the model, and for the observed data.
+
+Calculate flux transfer to small particles from disaggregation which should be 
+
+ObservedSmallFlux - PredictedSmallFlux
+Which should equal: PredictedBigFlux - ObservedSmallFlux
 
 
