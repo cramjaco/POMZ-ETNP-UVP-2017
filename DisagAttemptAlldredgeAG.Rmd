@@ -526,7 +526,8 @@ Some unnesting
 synthetic_remineralized_concise <- synthetic_remineralized %>%
   mutate(spec2 = map2(spec, prev_spec, ~tibble(.x, prev_np = .y))) %>%
   mutate(spec2 = map2(spec2, pred_spec, ~tibble(.x, pred_np = .y))) %>%
-  select(-c(spec, prev_spec, pred_spec))
+  mutate(spec2 = map(spec2, mutate(prev_flux = )))
+  select(-c(spec, prev_spec, pred_spec, spec_only))
 
 synthetic_remineralized_unnested <- synthetic_remineralized_concise %>% unnest(spec2)
 ```
@@ -540,6 +541,50 @@ Do this for both the model, and for the observed data.
 Calculate flux transfer to small particles from disaggregation which should be 
 
 ObservedSmallFlux - PredictedSmallFlux
-Which should equal: PredictedBigFlux - ObservedSmallFlux
+Which should equal: PredictedBigFlux - ObservedFlux
+```{r}
+sr02 <- synthetic_remineralized_unnested %>%
+  mutate(prev_flux = C_f * prev_np ^ ag,
+         pred_flux = C_f * pred_np ^ ag)
 
+sr02Tot <- sr02 %>%
+  group_by(depth) %>%
+  summarize(DF = first(DF), DFP = first(DFP),
+            Flux = sum(flux), Prev_Flux = sum(prev_flux), Pred_Flux = sum(pred_flux))
+
+sr02Small <- sr02 %>% 
+  filter(lb <= 0.53) %>%
+  group_by(depth) %>%
+  summarize(Flux = sum(flux), Prev_Flux = sum(prev_flux), Pred_Flux = sum(pred_flux))
+
+sr02Big <- sr02 %>% 
+  filter(lb > 0.53) %>%
+  group_by(depth) %>%
+  summarize(Flux = sum(flux), Prev_Flux = sum(prev_flux), Pred_Flux = sum(pred_flux))
+
+sr02All <- sr02Tot %>%
+  left_join(sr02Small, by = "depth", suffix = c("", "_Small")) %>%
+  left_join(sr02Big, by = "depth", suffix = c("", "_Big")) %>%
+  mutate(osps = Flux_Small - Pred_Flux_Small, obpb = Pred_Flux_Big - Flux_Big) # And of course they are not equal
+head(sr02All)
+```
+  
+Ok. The issue here is that we aren't conserving flux. Are we actually even attenuatin the right amount of flux?
+Obviously no, because Pred_Flux < Flux.
+So what the heck am I doing?
+
+```{r}
+sr02All %>%
+  mutate(DF2 = Prev_Flux - Flux) %>% 
+  select(depth, DF, DFP, Flux, Prev_Flux, DF2)
+
+sr02All %>%
+  mutate(DF2 = )
+```
+
+  
+```{r}
+test <- synthetic_remineralized_concise[["spec2"]][[4]]
+test 
+```
 
