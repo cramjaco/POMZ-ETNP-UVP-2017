@@ -307,12 +307,14 @@ remin_shuffle <- function(abun_in, DFpct, DeltaZ = 10, size = lb_vec, Cm = m1mm,
  sran = sum(ran)
  
  omega = lb_vec[1] ^ (2 * alpha)  * abun_in[1]/(lb_vec[1] ^ alpha - llb ^ alpha)
+ #omega = lb_vec[1] ^ (2 * alpha)  * abun_in[1]/(llb ^ alpha - lb_vec[1] ^ alpha) # possible correction
  
  nmw = abun_in * mv * wv
  F1 = sum(nmw)
  DeltaF = (F1 * DFpct) - F1 # should be negative
  
- Cr = DeltaF/ (Cm*(1+gamma/alpha) * DeltaZ * (sran + omega));
+ #Cr = DeltaF/ (Cm*(1+gamma/alpha) * DeltaZ * (sran + omega));
+ Cr = DeltaF/ (Cm*  DeltaZ * ((1+gamma/alpha) * sran + omega)); # Possible correction
  #Cr = DeltaF/ (Cm*(1+gamma/alpha) * DeltaZ * (sran)); # Test
  CrCw = Cr/Cw
  
@@ -341,7 +343,7 @@ remin_shuffle_spec <- function(abun_in, ...){
 
 ```{r}
 dds_test <- 0.99
-trs_spec <- remin_shuffle_spec(test_abun_in, dds_test, 2, llb = .1019) # .076, .102, 0.08
+trs_spec <- remin_shuffle_spec(test_abun_in, dds_test, 2, llb = .08) # .076, .102, 0.08
 trs_spec
 
 (pre <- sum(C_f * test_abun_in ^ ag))
@@ -450,6 +452,49 @@ sum(C_f * trss ^ ag)
 tibble(test_abun_in, trss0, trss, lb_vec) %>% ggplot(aes(x = lb_vec)) + geom_point(aes(y = trss0)) + geom_point(aes(y = trss), shape = 2) + scale_y_log10() + scale_x_log10() + geom_point(aes(y = test_abun_in), shape = 1)
 ```
 
+
+
+## Leaks
+I'm having a leakage problem. I get nearly, but not quite the right amount of flux out.
+What if I address this by running remin smooth shuffle and then I optimize the DFPct that it gets so that it returns the right flux output.
+
+I ought to actually figure out what is wrong, but this should give a close answer for most analyses.
+
+```{r}
+# I want to minimize this function here
+shuffle_check <- function(abun_in, DFpct, C_f2 = C_f, ag2 = ag, ...){
+  abun_out <- remin_smooth_shuffle(abun_in, DFpct, ...)
+  flux_in <- sum(C_f2 * abun_in ^ ag2)
+  flux_out <- sum(C_f2 * abun_out ^ ag2)
+  DFPct_actual = flux_out/flux_in
+  rmse <- (DFpct - DFPct_actual)^2
+  rmse
+}
+
+find_DFP <- function(abun_in, ...){
+  abun_in_loc = abun_in
+  
+  sc_wrap <- function(x){
+    shuffle_check(abun_in = abun_in_loc, DFpct = x)
+  }
+  
+  adjDfp <- optimize(sc_wrap, c(0, 2))
+  adjDfp
+}
+
+
+# remin_smooth_shuffle_fix <- function(abun_in, DFpct, ...){
+#   
+# }
+```
+
+
+```{r}
+DFP = 0.8
+shuffle_check(DFpct = DFP , abun_in = test_abun_in)
+find_DFP(abun_in = test_abun_in)
+
+```
 
 
 ## Data
