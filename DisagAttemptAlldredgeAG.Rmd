@@ -300,7 +300,7 @@ little_lb <- lb_vec[1] - (lb_vec[2] - lb_vec[1])/2 # size of the particle that t
 
 ```{r}
 remin_shuffle <- function(abun_in, DFpct, DeltaZ = 10, size = lb_vec, Cm = m1mm, Cw = w1mm, lbv = lb_vec, mv = m_vec, wv = w_vec,
-                          alpha = 2.3, gamma = alpha - 1, llb = little_lb){
+                          alpha = 0.52, gamma = 0.26, llb = little_lb){
  rn = abun_in * lb_vec
  ran = abun_in * lb_vec ^ alpha
  srn = sum(rn)
@@ -313,6 +313,7 @@ remin_shuffle <- function(abun_in, DFpct, DeltaZ = 10, size = lb_vec, Cm = m1mm,
  DeltaF = (F1 * DFpct) - F1 # should be negative
  
  Cr = DeltaF/ (Cm*(1+gamma/alpha) * DeltaZ * (sran + omega));
+ #Cr = DeltaF/ (Cm*(1+gamma/alpha) * DeltaZ * (sran)); # Test
  CrCw = Cr/Cw
  
  phi = CrCw * (1+gamma/alpha) * ran * 
@@ -339,9 +340,53 @@ remin_shuffle_spec <- function(abun_in, ...){
 ```
 
 ```{r}
-trs_spec <- remin_shuffle_spec(test_abun_in, 0.99, 2, llb = .08) # .076, .102
+dds_test <- 0.99
+trs_spec <- remin_shuffle_spec(test_abun_in, dds_test, 2, llb = .1019) # .076, .102, 0.08
 trs_spec
+
+(pre <- sum(C_f * test_abun_in ^ ag))
+(expected <- sum(C_f * test_abun_in ^ ag) * dds_test)
+(modeled <- sum(C_f * trs_spec ^ ag))
+(expected - pre)/pre
+(modeled - pre)/pre
+(modeled - expected)/expected
 ```
+
+llb seems to be pretty relevant for getting flux right -- presumably I am not handling it correctly. I'd like things to adjust so that it is considered correctly
+
+```{r}
+test_abun_in * dds_test
+sum((C_f * test_abun_in ^ ag)) * dds_test
+explore_llb <- tibble(llb = c(0, 0.01, 0.07, 0.08, 0.09, .1, .101, .1019, .10199)) %>%
+  mutate(spec = map(llb, ~remin_shuffle_spec(test_abun_in, dds_test, 2, llb = .)))
+  
+explore_llb_unwrap <- explore_llb %>%
+  mutate(spec = map(spec, ~data_frame(lb_vec = lb_vec, spec = .))) %>%
+  unnest(spec) %>%
+  pivot_wider(names_from = lb_vec, values_from = spec)
+
+explore_llb_flux <- explore_llb %>%
+  mutate(flux = map_dbl(spec, ~sum(C_f * . ^ ag))) %>%
+  select(-spec)
+
+explore_llb_2 <- left_join(explore_llb_flux, explore_llb_unwrap)
+
+  #
+explore_llb_2
+```
+
+As we approach llb = lb_vec[1]
+
+```{r}
+dds_test <- 0.99
+trs_spec <- remin_shuffle_spec(test_abun_in, dds_test, 2, llb = .08) # .076, .102
+trs_spec
+
+sum(C_f * test_abun_in ^ ag)
+sum(C_f * trs_spec ^ ag)
+
+```
+
 
 
 
@@ -387,11 +432,18 @@ remin_smooth_shuffle <- function(abun_in, DFpct, Ipct = 0.9999, ...){
 ```
 
 ```{r}
-DFP = 0.8
+DFP = 0.9
 trss0 <- remin_shuffle_spec(DFpct = DFP , abun_in = test_abun_in) # .076, .102
 trss0
 trss <- remin_smooth_shuffle(DFpct =  DFP, abun_in = test_abun_in) # .076, .102
 trss
+
+# Confirm whether flux is treated appropriately
+sum(C_f * test_abun_in ^ ag) * DFP
+
+sum(C_f * trss0 ^ ag)
+
+sum(C_f * trss ^ ag)
 ```
 
 ```{r}
@@ -438,6 +490,8 @@ I guess because flux attenuates faster than it should.
 
 If I say that alpha + gamma = 0.63 as best fit flux, then I loose more big particles than small ones.
 More resetting instnaces and now things look really strange.
+
+As of april 21 2020, I'm using alldredge alpha and gamma
 
 But also my different flux profiles are no longer adding up.
 
@@ -526,7 +580,6 @@ Some unnesting
 synthetic_remineralized_concise <- synthetic_remineralized %>%
   mutate(spec2 = map2(spec, prev_spec, ~tibble(.x, prev_np = .y))) %>%
   mutate(spec2 = map2(spec2, pred_spec, ~tibble(.x, pred_np = .y))) %>%
-  mutate(spec2 = map(spec2, mutate(prev_flux = )))
   select(-c(spec, prev_spec, pred_spec, spec_only))
 
 synthetic_remineralized_unnested <- synthetic_remineralized_concise %>% unnest(spec2)
@@ -572,6 +625,9 @@ head(sr02All)
 Ok. The issue here is that we aren't conserving flux. Are we actually even attenuatin the right amount of flux?
 Obviously no, because Pred_Flux < Flux.
 So what the heck am I doing?
+
+Update. Alpha and gamma were a little off. I fixed them, but now predicted flux is low but a little high.
+Also osps is not equal to obpb
 
 ```{r}
 sr02All %>%
