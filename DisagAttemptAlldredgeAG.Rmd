@@ -737,63 +737,6 @@ sr02All <- sr02Tot %>%
 head(sr02All)
 ```
   
-Ok. The issue here is that we aren't conserving flux. Are we actually even attenuatin the right amount of flux?
-Obviously no, because Pred_Flux < Flux.
-So what the heck am I doing?
-
-Update. Alpha and gamma were a little off. I fixed them, but now predicted flux is low but a little high.
-Also osps is not equal to obpb
-
-```{r}
-optFun <- function(abun_in, DFpct){
-  opt <- optimize(shuffle_tune, c(0, 2), abun_in = abun_in, DFpct_target = DFpct)
-  opt$minimum
-}
-synthetic_data_fixDfp <- synthetic_data %>% filter(depth > 0) %>% mutate(use_this_DFpct = map2_dbl(prev_spec, DFP, optFun))
-```
-
-```{r}
-synthetic_data_fixDfp %>% ggplot(aes(x = DFP, y = use_this_DFpct)) + geom_point() + geom_abline(v = 1,h = 1)
-```
-
-```{r}
-synthetic_data_fixDfp %>% ggplot(aes(x = DFP, y = use_this_DFpct - DFP)) + geom_point() + geom_abline(v = 1,h = 1)
-```
-
-
-
-```{r}
-optFun <- function(abun_in, DFpct){
-  opt <- optimize(shuffle_tune, c(0, 2), abun_in = abun_in, DFpct_target = DFpct)
-  opt$minimum
-}
-synthetic_data_fixDfp <- synthetic_data %>% filter(depth > 0) %>% mutate(use_this_DFpct = map2_dbl(prev_spec, DFP, optFun))
-```
-
-```{r}
-synthetic_data_fixDfp %>% ggplot(aes(x = DFP, y = use_this_DFpct)) + geom_point() + geom_abline(v = 1,h = 1)
-```
-
-```{r}
-synthetic_data_fixDfp %>% ggplot(aes(x = DFP, y = use_this_DFpct - DFP)) + geom_point() + geom_abline(v = 1,h = 1)
-```
-  mutate(DF2 = Prev_Flux - Flux) %>% 
-  select(depth, DF, DFP, Flux, Prev_Flux, DF2)
-
-sr02All %>%
-  mutate(DF2 = )
-```
-
-  
-```{r}
-test <- synthetic_remineralized_concise[["spec2"]][[4]]
-test 
-```
-
-
-
-At least for a given spectrum. This relationship is linear. Might even have a slope of one. We can explore that maybe later.
-
 
 
 
