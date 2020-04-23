@@ -79,6 +79,11 @@ C_f = 10.51 # for now
 alpha = .52
 gamma = .26
 ag = alpha + gamma
+
+C_f_global <- C_f
+alpha_global <- alpha
+gamma_global <- gamma
+ag_global <- ag
 # mySpec
 # myDf <- tibble(lb_vec, mySpec, binsize_vec)
 ```
@@ -454,12 +459,11 @@ tibble(test_abun_in, trss0, trss, lb_vec) %>% ggplot(aes(x = lb_vec)) + geom_poi
 
 
 
-## Leaks
-I'm having a leakage problem. I get nearly, but not quite the right amount of flux out.
-What if I address this by running remin smooth shuffle and then I optimize the DFPct that it gets so that it returns the right flux output.
 
-I ought to actually figure out what is wrong, but this should give a close answer for most analyses.
 
+
+
+#### Graveyard for now
 ```{r}
 # I want to minimize this function here
 shuffle_check <- function(abun_in, DFpct, C_f2 = C_f, ag2 = ag, ...){
@@ -474,11 +478,11 @@ shuffle_check <- function(abun_in, DFpct, C_f2 = C_f, ag2 = ag, ...){
 find_DFP <- function(abun_in, ...){
   abun_in_loc = abun_in
   
-  sc_wrap <- function(x){
+  sc_wrap <- function(x, abun_in_loc){
     shuffle_check(abun_in = abun_in_loc, DFpct = x)
   }
   
-  adjDfp <- optimize(sc_wrap, c(0, 2))
+  adjDfp <- optimize(sc_wrap, c(0, 2), abun_in_loc = test_abun_in)
   adjDfp
 }
 
@@ -529,7 +533,7 @@ lb = lb_vec
 Frigging finally. Consistant everything I think.
 
 Looks promising! Lets be more systematic about this next!
-
+synthetic_remineralized_con
 Ok. If I calculate flux assuming alpha = 2.3 and gamma = 1.3, I get this stronger than traditional arch effect.
 I guess because flux attenuates faster than it should.
 
@@ -688,4 +692,60 @@ sr02All %>%
 test <- synthetic_remineralized_concise[["spec2"]][[4]]
 test 
 ```
+
+## Leaks
+I'm having a leakage problem. I get nearly, but not quite the right amount of flux out.
+What if I address this by running remin smooth shuffle and then I optimize the DFPct that it gets so that it returns the right flux output.
+
+I ought to actually figure out what is wrong, but this should give a close answer for most analyses.
+
+Optimization function:
+What I want it to do.
+Takes a structure and a DFP.
+Varies the DFP sent to remin smooth shuffle so the acutal DFP loss is what we want
+
+We need a function where we can pass the DFPct that we are using and the actual DFPct
+```{r}
+shuffle_tune <- function(DFpct_toRemin, abun_in,  DFpct_target,...){
+  abun_out <- remin_smooth_shuffle(abun_in, DFpct_toRemin, ...)
+  flux_in <- sum(C_f_global * abun_in ^ ag_global)
+  flux_out <- sum(C_f_global * abun_out ^ ag_global)
+  DFPct_actually_happened <- flux_out/flux_in
+  rmse <- (DFPct_actually_happened - DFpct_target)^2
+  rmse
+}
+
+stOpt <- optimize(shuffle_tune, c(0, 2), abun_in = test_abun_in, DFpct_target = 0.9)
+stOpt
+```
+
+So for a DFpct of 0.9, I should actually feed it 0.915
+
+```{r}
+plot(
+  seq(from = 0.5, to = 1, by = 0.05),
+  map_dbl(seq(from = 0.5, to = 1, by = 0.05), ~optFun(testSpectrum, .))
+  )
+```
+
+At least for a given spectrum. This relationship is linear. Might even have a slope of one. We can explore that maybe later.
+
+## Apply stopt over the data set.
+
+```{r}
+optFun <- function(abun_in, DFpct){
+  opt <- optimize(shuffle_tune, c(0, 2), abun_in = abun_in, DFpct_target = DFpct)
+  opt$minimum
+}
+synthetic_data_fixDfp <- synthetic_data %>% filter(depth > 0) %>% mutate(use_this_DFpct = map2_dbl(prev_spec, DFP, optFun))
+```
+
+```{r}
+synthetic_data_fixDfp %>% ggplot(aes(x = DFP, y = use_this_DFpct)) + geom_point() + geom_abline(v = 1,h = 1)
+```
+
+```{r}
+synthetic_data_fixDfp %>% ggplot(aes(x = DFP, y = use_this_DFpct - DFP)) + geom_point() + geom_abline(v = 1,h = 1)
+```
+
 
