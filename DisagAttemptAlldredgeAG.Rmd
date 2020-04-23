@@ -266,6 +266,7 @@ synthetic_data <- predDf2 %>%
          prev_Flux = lag(Flux),
          DF = prev_Flux - Flux,
          DFP = 1-DF/prev_Flux
+    # I could have calulated DFP = Flux / prev_Flux, which is equivalent to this way.
   )
 ```
 
@@ -544,6 +545,71 @@ As of april 21 2020, I'm using alldredge alpha and gamma
 
 But also my different flux profiles are no longer adding up.
 
+# As above, but this time, with adjusted DFP to account for "leakage"
+
+## Leaks
+I'm having a leakage problem. I get nearly, but not quite the right amount of flux out.
+What if I address this by running remin smooth shuffle and then I optimize the DFPct that it gets so that it returns the right flux output.
+
+I ought to actually figure out what is wrong, but this should give a close answer for most analyses.
+
+Optimization function:
+What I want it to do.
+Takes a structure and a DFP.
+Varies the DFP sent to remin smooth shuffle so the acutal DFP loss is what we want
+
+We need a function where we can pass the DFPct that we are using and the actual DFPct
+```{r}
+shuffle_tune <- function(DFpct_toRemin, abun_in,  DFpct_target,...){
+  abun_out <- remin_smooth_shuffle(abun_in, DFpct_toRemin, ...)
+  flux_in <- sum(C_f_global * abun_in ^ ag_global)
+  flux_out <- sum(C_f_global * abun_out ^ ag_global)
+  DFPct_actually_happened <- flux_out/flux_in
+  rmse <- (DFPct_actually_happened - DFpct_target)^2
+  rmse
+}
+
+stOpt <- optimize(shuffle_tune, c(0, 2), abun_in = test_abun_in, DFpct_target = 0.9)
+stOpt
+```
+
+So for a DFpct of 0.9, I should actually feed it 0.915
+
+```{r}
+plot(
+  seq(from = 0.5, to = 1, by = 0.05),
+  map_dbl(seq(from = 0.5, to = 1, by = 0.05), ~optFun(testSpectrum, .))
+  )
+```
+
+
+## Apply stopt over the data set.
+
+```{r}
+optFun <- function(abun_in, DFpct){
+  opt <- optimize(shuffle_tune, c(0, 2), abun_in = abun_in, DFpct_target = DFpct)
+  opt$minimum
+}
+synthetic_data_fixDfp <- synthetic_data %>% filter(depth > 0) %>% mutate(use_this_DFpct = map2_dbl(prev_spec, DFP, optFun))
+```
+
+```{r}
+synthetic_data_fixDfp %>% ggplot(aes(x = DFP, y = use_this_DFpct)) + geom_point() + geom_abline(v = 1,h = 1)
+```
+
+```{r}
+synthetic_data_fixDfp %>% ggplot(aes(x = DFP, y = use_this_DFpct - DFP)) + geom_point() + geom_abline(v = 1,h = 1)
+```
+
+# Redo remineralization
+
+```{r}
+synthetic_remineralized <- ssynthetic_data_fixDfp %>% .[-1,] %>% mutate(pred_spec = map2(prev_spec, use_this_DFpct, remin_smooth_shuffle))
+synthetic_remineralized
+```
+
+
+
 # Analyzing remineralized data
 Indicating which regions are actually loosing flux the whole time.
 Lets first look at particle numbers, observed minus expected
@@ -679,58 +745,22 @@ Update. Alpha and gamma were a little off. I fixed them, but now predicted flux 
 Also osps is not equal to obpb
 
 ```{r}
-sr02All %>%
-  mutate(DF2 = Prev_Flux - Flux) %>% 
-  select(depth, DF, DFP, Flux, Prev_Flux, DF2)
-
-sr02All %>%
-  mutate(DF2 = )
-```
-
-  
-```{r}
-test <- synthetic_remineralized_concise[["spec2"]][[4]]
-test 
-```
-
-## Leaks
-I'm having a leakage problem. I get nearly, but not quite the right amount of flux out.
-What if I address this by running remin smooth shuffle and then I optimize the DFPct that it gets so that it returns the right flux output.
-
-I ought to actually figure out what is wrong, but this should give a close answer for most analyses.
-
-Optimization function:
-What I want it to do.
-Takes a structure and a DFP.
-Varies the DFP sent to remin smooth shuffle so the acutal DFP loss is what we want
-
-We need a function where we can pass the DFPct that we are using and the actual DFPct
-```{r}
-shuffle_tune <- function(DFpct_toRemin, abun_in,  DFpct_target,...){
-  abun_out <- remin_smooth_shuffle(abun_in, DFpct_toRemin, ...)
-  flux_in <- sum(C_f_global * abun_in ^ ag_global)
-  flux_out <- sum(C_f_global * abun_out ^ ag_global)
-  DFPct_actually_happened <- flux_out/flux_in
-  rmse <- (DFPct_actually_happened - DFpct_target)^2
-  rmse
+optFun <- function(abun_in, DFpct){
+  opt <- optimize(shuffle_tune, c(0, 2), abun_in = abun_in, DFpct_target = DFpct)
+  opt$minimum
 }
-
-stOpt <- optimize(shuffle_tune, c(0, 2), abun_in = test_abun_in, DFpct_target = 0.9)
-stOpt
+synthetic_data_fixDfp <- synthetic_data %>% filter(depth > 0) %>% mutate(use_this_DFpct = map2_dbl(prev_spec, DFP, optFun))
 ```
-
-So for a DFpct of 0.9, I should actually feed it 0.915
 
 ```{r}
-plot(
-  seq(from = 0.5, to = 1, by = 0.05),
-  map_dbl(seq(from = 0.5, to = 1, by = 0.05), ~optFun(testSpectrum, .))
-  )
+synthetic_data_fixDfp %>% ggplot(aes(x = DFP, y = use_this_DFpct)) + geom_point() + geom_abline(v = 1,h = 1)
 ```
 
-At least for a given spectrum. This relationship is linear. Might even have a slope of one. We can explore that maybe later.
+```{r}
+synthetic_data_fixDfp %>% ggplot(aes(x = DFP, y = use_this_DFpct - DFP)) + geom_point() + geom_abline(v = 1,h = 1)
+```
 
-## Apply stopt over the data set.
+
 
 ```{r}
 optFun <- function(abun_in, DFpct){
@@ -747,5 +777,23 @@ synthetic_data_fixDfp %>% ggplot(aes(x = DFP, y = use_this_DFpct)) + geom_point(
 ```{r}
 synthetic_data_fixDfp %>% ggplot(aes(x = DFP, y = use_this_DFpct - DFP)) + geom_point() + geom_abline(v = 1,h = 1)
 ```
+  mutate(DF2 = Prev_Flux - Flux) %>% 
+  select(depth, DF, DFP, Flux, Prev_Flux, DF2)
+
+sr02All %>%
+  mutate(DF2 = )
+```
+
+  
+```{r}
+test <- synthetic_remineralized_concise[["spec2"]][[4]]
+test 
+```
+
+
+
+At least for a given spectrum. This relationship is linear. Might even have a slope of one. We can explore that maybe later.
+
+
 
 
