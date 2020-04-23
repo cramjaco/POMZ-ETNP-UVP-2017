@@ -575,12 +575,7 @@ stOpt
 
 So for a DFpct of 0.9, I should actually feed it 0.915
 
-```{r}
-plot(
-  seq(from = 0.5, to = 1, by = 0.05),
-  map_dbl(seq(from = 0.5, to = 1, by = 0.05), ~optFun(testSpectrum, .))
-  )
-```
+
 
 
 ## Apply stopt over the data set.
@@ -590,8 +585,24 @@ optFun <- function(abun_in, DFpct){
   opt <- optimize(shuffle_tune, c(0, 2), abun_in = abun_in, DFpct_target = DFpct)
   opt$minimum
 }
+```
+
+### Test optimization
+
+```{r}
+plot(
+  seq(from = 0.5, to = 1, by = 0.05),
+  map_dbl(seq(from = 0.5, to = 1, by = 0.05), ~optFun(testSpectrum, .))
+  )
+```
+
+### Apply optimization
+
+```{r}
 synthetic_data_fixDfp <- synthetic_data %>% filter(depth > 0) %>% mutate(use_this_DFpct = map2_dbl(prev_spec, DFP, optFun))
 ```
+
+
 
 ```{r}
 synthetic_data_fixDfp %>% ggplot(aes(x = DFP, y = use_this_DFpct)) + geom_point() + geom_abline(v = 1,h = 1)
@@ -604,7 +615,7 @@ synthetic_data_fixDfp %>% ggplot(aes(x = DFP, y = use_this_DFpct - DFP)) + geom_
 # Redo remineralization
 
 ```{r}
-synthetic_remineralized <- ssynthetic_data_fixDfp %>% .[-1,] %>% mutate(pred_spec = map2(prev_spec, use_this_DFpct, remin_smooth_shuffle))
+synthetic_remineralized <- synthetic_data_fixDfp %>% .[-1,] %>% mutate(pred_spec = map2(prev_spec, use_this_DFpct, remin_smooth_shuffle))
 synthetic_remineralized
 ```
 
@@ -733,10 +744,21 @@ sr02Big <- sr02 %>%
 sr02All <- sr02Tot %>%
   left_join(sr02Small, by = "depth", suffix = c("", "_Small")) %>%
   left_join(sr02Big, by = "depth", suffix = c("", "_Big")) %>%
-  mutate(osps = Flux_Small - Pred_Flux_Small, obpb = Pred_Flux_Big - Flux_Big) # And of course they are not equal
+  mutate(osps = Flux_Small - Pred_Flux_Small, obpb =  Pred_Flux_Big - Flux_Big) # And of course they are not equal
 head(sr02All)
 ```
   
+Ok. Osps ~= obpb, which means that big flux lost about equals small flux gained due to disaggregation 
+(or whatever proces makes things deviate from the model)
 
+```{r}
+sr02All %>% filter(DFP <= 1) %>% ggplot(aes(y = depth, x = osps, col = DFP)) + geom_point() + scale_y_reverse()
+```
 
+```{r}
+sr02All %>% filter(DFP <= 1) %>% ggplot(aes(y = DFP, x = osps)) + geom_point() + scale_y_reverse()
+```
 
+Ok. What do I actually want to know here. I think osps devided by the flux attenuation of the big particles (predicted or observed). I want to know what fraction of big particles become small particles vs just dissolve.
+
+Or maybe something else too?
