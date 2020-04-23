@@ -762,3 +762,19 @@ sr02All %>% filter(DFP <= 1) %>% ggplot(aes(y = DFP, x = osps)) + geom_point() +
 Ok. What do I actually want to know here. I think osps devided by the flux attenuation of the big particles (predicted or observed). I want to know what fraction of big particles become small particles vs just dissolve.
 
 Or maybe something else too?
+
+```{r}
+sr02All %>% filter(DFP <= 1) %>% ggplot(aes(y = DF, x = osps)) + geom_point() + scale_y_reverse()
+```
+
+```{r}
+sr02All %>% filter(DFP <= 1) %>% ggplot(aes(y = depth, x = osps/DF)) + geom_point() + scale_y_reverse()
+```
+
+```{r}
+sr02All %>% filter(DFP <= 1) %>% ggplot(aes(y = depth, x = osps/(Prev_Flux_Big- Flux_Big))) + geom_point() + scale_y_reverse() + scale_x_log10()
+```
+
+The above is the amount of flux of big particles that is disaggregated into small particles, devided by what is attenuated. Why is this ever less than one? Also this is the strangest shape.
+
+All this and more tomorrow.
