@@ -755,6 +755,8 @@ Ok. Osps ~= obpb, which means that big flux lost about equals small flux gained 
 sr02All %>% filter(DFP <= 1) %>% ggplot(aes(y = depth, x = osps, col = DFP)) + geom_point() + scale_y_reverse()
 ```
 
+Huh. Look at that. Sometimes osps goes negative, which is to say there is apparent aggregation there. I think.
+
 ```{r}
 sr02All %>% filter(DFP <= 1) %>% ggplot(aes(y = DFP, x = osps)) + geom_point() + scale_y_reverse()
 ```
@@ -770,11 +772,73 @@ sr02All %>% filter(DFP <= 1) %>% ggplot(aes(y = DF, x = osps)) + geom_point() + 
 ```{r}
 sr02All %>% filter(DFP <= 1) %>% ggplot(aes(y = depth, x = osps/DF)) + geom_point() + scale_y_reverse()
 ```
+Huh.Look at this. We have disaggregation happening in the surface, at ~500m (after an uptick in flux, which gets erased, so maybe a zooplankton thing) and again at the bottom of the OMZ. We have net aggregation in the OMZ core, for the most part.
+
+This is cool!
+
+I think the stuff below is misguided and the thing above, especially combined wiht illustrations of where flux increases, will be sufficiently informative.
 
 ```{r}
 sr02All %>% filter(DFP <= 1) %>% ggplot(aes(y = depth, x = osps/(Prev_Flux_Big- Flux_Big))) + geom_point() + scale_y_reverse() + scale_x_log10()
 ```
 
-The above is the amount of flux of big particles that is disaggregated into small particles, devided by what is attenuated. Why is this ever less than one? Also this is the strangest shape.
+Why is the above ever more than one? More stuff disaggregates than disapears? If it disapears, doesn't it disaggregate?
+
+```{r}
+plot_prev_big <- sr02All %>% filter(DFP <= 1) %>% ggplot(aes(y = depth, x = Prev_Flux_Big-Flux_Big)) + geom_point() + scale_y_reverse() 
+plot_big <- sr02All %>% filter(DFP <= 1) %>% ggplot(aes(y = depth, x = Prev_Flux_Big - Pred_Flux_Big)) + geom_point() + scale_y_reverse() 
+plot_pred_big <- sr02All %>% filter(DFP <= 1) %>% ggplot(aes(y = depth, x = Pred_Flux_Big)) + geom_point() + scale_y_reverse() + scale_x_log10()
+
+cowplot::plot_grid(plot_prev_big, plot_big, plot_pred_big)
+
+```
+
+Huh. Sometimes the big flux goes up, even when total flux goes down, both in observed and predicted space. I guess this makes sense if we have attenuation, but a flattening of the curve.
+
+```{r}
+sr02All %>% filter(DFP <= 1) %>% ggplot(aes(y = depth, x = osps/(Prev_Flux_Big- Pred_Flux_Big))) + geom_point() + scale_y_reverse() + scale_x_log10()
+```
 
 All this and more tomorrow.
+
+```{r}
+p <- sr02All %>% filter(DFP <= 1) %>% ggplot(aes(y = depth, x = osps/(Prev_Flux_Big - Flux_Big))) + geom_point() + scale_y_reverse()
+plotly::ggplotly(p)
+```
+
+875 m is the most clea example. Lets look at the profiles and see what is happening there.
+
+tibble(
+actual = synthetic_remineralized[["spec_only"]][[4]],
+predicted = synthetic_remineralized[["pred_spec"]][[4]],
+previous = synthetic_remineralized[["prev_spec"]][[4]],
+lb = lb_vec
+) %>% gather(key = "var", value = "np", actual, predicted, previous) %>%
+  ggplot(aes(x = lb, y = np, shape = var, col = var), ) + geom_point(size = 3, alpha = 0.75) + scale_x_log10() + scale_y_log10()
+
+
+```{r}
+synthetic_remineralized_unnested %>% filter(depth == 875, lb < 0.2) %>% select(lb, actual = np, previous = prev_np, predicted = pred_np) %>%
+gather(key = "var", value = "np", actual, previous, predicted) %>%
+   ggplot(aes(x = lb, y = np, shape = var, col = var), ) + geom_point(size = 3, alpha = 0.75) + scale_x_log10() + scale_y_log10()
+```
+
+```{r}
+synthetic_remineralized_unnested %>% filter(depth == 875, lb > 10) %>% select(lb, actual = np, previous = prev_np, predicted = pred_np) %>%
+gather(key = "var", value = "np", actual, previous, predicted) %>%
+   ggplot(aes(x = lb, y = np, shape = var, col = var), ) + geom_point(size = 3, alpha = 0.75) + scale_x_log10() + scale_y_log10()
+```
+
+```{r}
+synthetic_remineralized_unnested %>% filter(depth == 875) %>% mutate(previous = prev_np - np, predicted = pred_np - np) %>% select(lb, previous, predicted) %>%
+gather(key = "var", value = "np",previous, predicted) %>%
+   ggplot(aes(x = lb, y = 1/(np), shape = var, col = var), ) + geom_point(size = 3, alpha = 0.75) + scale_x_log10()
+```
+
+Huh. The curve appears to be flattening more than we would expect from random chance.
+But there are still more particles because of shenanigans in the smallist bin.
+
+So these positive numbers might in fact be places with negative osps (but also flattening and so an opposite of usual change in large particles)
+
+I wonder how even to address this.
+
