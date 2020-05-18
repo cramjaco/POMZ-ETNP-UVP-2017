@@ -1,0 +1,64 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+The goal here is instead of assuming everything is a power law, I'll use a gam to interpolate each size bin.
+Then we do the generally same analysis.
+
+```{r}
+library(tidyverse)
+pass <- function(x){x}
+```
+
+
+```{r, message= FALSE}
+options(readr.default_locale=readr::locale(tz="Mexico/General"))
+source("UVP_2017_library.R")
+
+ES01 <- read_csv("dataOut/binned_EachSize.csv") %>% filter(depth <= 1000)
+DS01 <- read_csv("dataOut/binned_DepthSummary.csv") %>% filter(depth <= 1000)
+twinS <- list(ES01, DS01)
+```
+
+```{r}
+SimpleBins <- seq(from = 0, to = 1100, by = 100)
+
+#debug(bin_depths)
+binnedS <- bin_depths(twinS, bins = SimpleBins) %>% calc_psd
+
+ESS <- binnedS[[1]]
+DSS <- binnedS[[2]]
+```
+
+Group by bin, and fit a gam to each bin.
+Then predict the particle numbers back out.
+We're going to work in `nparticle` space
+
+```{r}
+gaminate00 <- ESS %>% filter(profile == "stn_043") %>%
+  select(depth, nparticles, lb) %>%
+  group_by(lb) %>% 
+  nest(data = c(nparticles, depth)) %>%
+  pass
+
+# I think I want to family gamma this if it goes negative; or maybe bust poisson back out
+mygam <- function(df){gam(nparticles~depth, data = df, family = "Gamma")} 
+
+gaminate01 <- gaminate00 %>% 
+  mutate(bingam = map(data, mygam)) %>%
+  mutate(pred = map2(bingam, data, predict)) %>%
+  mutate(predDf = map2(data, pred, tibble)) %>%
+  mutate(predDf = map(predDf, ~rename(., pred = 3))) %>%
+  select(lb, predDf) %>%
+  unnest(cols = c(predDf)) %>%
+  pass
+  
+gaminate01 %>% head
+```
+
+```{r}
+gaminate01 %>% filter(lb == 0.102) %>% ggplot(aes(y = depth, x = nparticles)) + geom_point() + scale_y_reverse() +
+  geom_point(aes(x = pred), shape = 1)
+```
+
