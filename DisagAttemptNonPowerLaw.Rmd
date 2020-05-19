@@ -37,21 +37,21 @@ We're going to work in `nparticle` space
 
 ```{r}
 gaminate00 <- ESS %>% filter(profile == "stn_043") %>%
-  select(depth, nparticles, lb) %>%
+  select(depth, TotalParticles, vol, lb) %>%
   group_by(lb) %>% 
-  nest(data = c(nparticles, depth)) %>%
+  nest(data = c(TotalParticles, vol, depth)) %>%
   pass
 
 # I think I want to family gamma this if it goes negative; or maybe bust poisson back out
-mygam <- function(df){gam(nparticles~depth, data = df, family = "Gamma")} 
+mygam <- function(df){gam(TotalParticles~depth, offset = vol, data = df, family = "poisson")} 
 
 gaminate01 <- gaminate00 %>% 
   mutate(bingam = map(data, mygam)) %>%
-  mutate(pred = map2(bingam, data, predict)) %>%
-  mutate(predDf = map2(data, pred, tibble)) %>%
-  mutate(predDf = map(predDf, ~rename(., pred = 3))) %>%
-  select(lb, predDf) %>%
-  unnest(cols = c(predDf)) %>%
+  # mutate(pred = map2(bingam, data, predict)) %>%
+  # mutate(predDf = map2(data, pred, tibble)) %>%
+  # mutate(predDf = map(predDf, ~rename(., pred = 3))) %>%
+  # select(lb, predDf) %>%
+  # unnest(cols = c(predDf)) %>%
   pass
   
 gaminate01 %>% head
@@ -60,5 +60,104 @@ gaminate01 %>% head
 ```{r}
 gaminate01 %>% filter(lb == 0.102) %>% ggplot(aes(y = depth, x = nparticles)) + geom_point() + scale_y_reverse() +
   geom_point(aes(x = pred), shape = 1)
+```
+
+```{r}
+gaminate00[[2]][[1]] -> test
+#glm(TotalParticles~log(depth), offset = vol, data = test[,], family = "poisson")
+# below fails
+gam(TotalParticles~s(depth), offset = vol, data = test[-1,], family = poisson)
+```
+
+```{r}
+ESS %>% filter(profile == "stn_043") %>% group_by(lb) %>% ggplot(aes(x = TotalParticles, y = depth, col = log(lb), group = lb)) + scale_y_reverse() + geom_point() + scale_x_log10() + scale_color_viridis_c() + geom_path() + geom_vline(xintercept = 5)
+```
+
+What if any time we see < 5 Total particles, we fill in from the power law. Otherwise we use the observed number?
+
+Ok. Loess seems to work.
+
+Order of operations
+(1) if total particles < 5 (or similar), use psd_big and int_big to estimate nparticles in that bin
+(2) interpolate every size bin down to small sizes
+(3) recalculate things that need to be recalculated (like flux and what not)
+(4) calculate disaggregation
+
+```{r}
+particle_data <- ESS %>% select(-nparticles, -n_nparticles, -time, -binsize)
+```
+
+# Forget pre-binning, that was mostly for stack overflow I think
+
+Functionalize this
+Uses psd to guess the number of particles when we see fewer than five of them
+```{r}
+get_np = function(icp, psd, bin, binsize){
+  C_n = exp(icp)
+  np = (C_n * bin ^ psd) * binsize
+  np
+}
+
+ES02 <- ES01 %>%
+  left_join(DS01 %>% select(profile, time, depth, big_psd, big_icp), by = c("profile", "time", "depth")) %>%
+  mutate(nInterp = (exp(big_icp) * lb ^ big_psd) * binsize) %>%
+  mutate(nparticles2 = if_else(TotalParticles < 5, nInterp, nparticles)) %>% 
+  select(-big_icp, -big_psd)
+```
+
+Now, we want to make everything higher resolution.
+I do this by using loess to get nparticles for every depth
+
+```{r}
+
+C_f = 10.51
+ag = 0.78
+
+ready_tibble <- tibble(depth = seq(from = 25, to = 1000, by = 25))
+
+ES03 <- ES02 %>%
+  filter(profile == "stn_043") %>%
+  select(depth, lb, nparticles2) %>%
+  group_by(lb) %>%
+  #pull(depth) %>% unique %>%
+  nest(data = c(depth, nparticles2)) %>%
+  #mutate(loe = map(data, function(df) loess(nparticles2 ~ depth, data = df))) %>%
+  mutate(loe = map(data, function(df) gam(nparticles2 ~ depth, data = df, family = "Gamma"))) %>%
+  # the below column is awesome, but fails when set to map2_df, and is not actually the right solution
+  #mutate(data2 = map2(loe, data, ~mutate(.y, pred = predict(.x, .y)))) %>%
+  mutate(data2 = map(loe, ~mutate(ready_tibble, np = predict(., ready_tibble, type = "response")))) %>%
+  select(-data, -loe) %>% unnest(cols = data2) %>%
+  mutate(flux = np * C_f * lb ^ ag) %>%
+  ungroup() %>%
+  pass
+  
+ES03
+```
+
+Sanity check
+```{r}
+
+DS03 <- ES03 %>% group_by(depth) %>%
+  nest(spec = c(lb, np, flux)) %>%
+  ungroup() %>%
+  mutate(Flux = map_dbl(spec, ~sum(.$flux))) %>%
+  mutate(spec_only = map(spec, ~pull(., np)) )%>% 
+  mutate(prev_spec = lag(spec_only)) %>%
+  mutate(prev_Flux = lag(Flux)) %>%
+  mutate(DF = prev_Flux - Flux, 
+         DFP = Flux / prev_Flux) %>%
+  pass
+
+DS03
+```
+
+Degug
+```{r}
+DS03 %>% select(depth, Flux) %>% dput#%>% mutate(lFlux = lag(Flux))
+
+```
+
+```{r}
+DS03[["spec"]][[1]][["np"]]
 ```
 
