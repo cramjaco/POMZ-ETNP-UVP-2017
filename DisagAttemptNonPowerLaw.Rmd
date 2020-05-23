@@ -11,7 +11,7 @@ library(tidyverse)
 pass <- function(x){x}
 ```
 
-
+Data from elsewhere
 ```{r, message= FALSE}
 options(readr.default_locale=readr::locale(tz="Mexico/General"))
 source("UVP_2017_library.R")
@@ -45,28 +45,28 @@ gaminate00 <- ESS %>% filter(profile == "stn_043") %>%
 # I think I want to family gamma this if it goes negative; or maybe bust poisson back out
 mygam <- function(df){gam(TotalParticles~depth, offset = vol, data = df, family = "poisson")} 
 
-gaminate01 <- gaminate00 %>% 
-  mutate(bingam = map(data, mygam)) %>%
-  # mutate(pred = map2(bingam, data, predict)) %>%
-  # mutate(predDf = map2(data, pred, tibble)) %>%
-  # mutate(predDf = map(predDf, ~rename(., pred = 3))) %>%
-  # select(lb, predDf) %>%
-  # unnest(cols = c(predDf)) %>%
-  pass
+# gaminate01 <- gaminate00 %>% 
+#   mutate(bingam = map(data, mygam)) %>%
+#   mutate(pred = map2(bingam, data, predict)) %>%
+#   mutate(predDf = map2(data, pred, tibble)) %>%
+#   mutate(predDf = map(predDf, ~rename(., pred = 3))) %>%
+#   select(lb, predDf) %>%
+#   unnest(cols = c(predDf)) %>%
+#   pass
   
-gaminate01 %>% head
+# gaminate01 %>% head
 ```
 
 ```{r}
-gaminate01 %>% filter(lb == 0.102) %>% ggplot(aes(y = depth, x = nparticles)) + geom_point() + scale_y_reverse() +
-  geom_point(aes(x = pred), shape = 1)
+# gaminate01 %>% filter(lb == 0.102) %>% ggplot(aes(y = depth, x = nparticles)) + geom_point() + scale_y_reverse() +
+#   geom_point(aes(x = pred), shape = 1)
 ```
 
 ```{r}
 gaminate00[[2]][[1]] -> test
 #glm(TotalParticles~log(depth), offset = vol, data = test[,], family = "poisson")
 # below fails
-gam(TotalParticles~s(depth), offset = vol, data = test[-1,], family = poisson)
+# gam(TotalParticles~s(depth), offset = vol, data = test[-1,], family = poisson)
 ```
 
 ```{r}
@@ -87,7 +87,8 @@ Order of operations
 particle_data <- ESS %>% select(-nparticles, -n_nparticles, -time, -binsize)
 ```
 
-# Forget pre-binning, that was mostly for stack overflow I think
+# Without Pre-Binning
+Forget pre-binning, that was mostly for stack overflow I think
 
 Functionalize this
 Uses psd to guess the number of particles when we see fewer than five of them
@@ -151,6 +152,46 @@ DS03 <- ES03 %>% group_by(depth) %>%
 DS03
 ```
 
+Now I think I want to make pred_spec here from prev_spec
+I'll do this in three steps.
+
+1) Use remin shuffle to get a new spec.
+2) Now figure out what DFP needs to be to get the right flux
+3) Recalculate spec with the corrected DFP
+
+First a few tests
+```{r}
+test_abun_in <- DS03 %>% filter(depth == 25) %>% pull(spec) %>%.[[1]] %>% pull(np)
+```
+
+```{r}
+test_abun_out <- remin_smooth_shuffle(test_abun_in, 0.9)
+```
+
+```{r}
+tibble(lb = lb_vec, tin = test_abun_in, tout = test_abun_out) %>%
+  pivot_longer(cols = c("tin", "tout")) %>%
+  ggplot(aes(x = lb, y = value, color = name)) + geom_point() + scale_x_log10() + scale_y_log10() + cowplot::theme_cowplot()
+```
+
+```{r}
+topt <- optFun(test_abun_in, 0.9)
+topt
+```
+
+# Apply topt over everything
+
+```{r}
+DSA <- DS03 %>% slice(-1) %>%
+  mutate(DFP_corrected = map2_dbl(prev_spec, DFP, optFun)) %>%
+  mutate(prev_spec = map2(prev_spec, DFP_corrected, remin_smooth_shuffle))
+DSA
+
+```
+
+I so don't remember what happens next.
+
+# Graveyard
 Degug
 ```{r}
 DS03 %>% select(depth, Flux) %>% dput#%>% mutate(lFlux = lag(Flux))
@@ -160,4 +201,5 @@ DS03 %>% select(depth, Flux) %>% dput#%>% mutate(lFlux = lag(Flux))
 ```{r}
 DS03[["spec"]][[1]][["np"]]
 ```
+
 
