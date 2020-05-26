@@ -24,10 +24,11 @@ twinS <- list(ES01, DS01)
 ```
 
 ```{r}
-SimpleBins <- seq(from = 0, to = 1100, by = 10) # Modified the By
+SimpleBins <- seq(from = 0, to = 1100, by = 50) # Modified the By
 
 #debug(bin_depths)
 binnedS <- bin_depths(twinS, bins = SimpleBins) %>% calc_psd
+#binnedS <- bin_depths(twinS, bins = BianchiBins) %>% calc_psd
 
 ESS <- binnedS[[1]]
 DSS <- binnedS[[2]]
@@ -90,6 +91,7 @@ particle_data <- ESS %>% select(-nparticles, -n_nparticles, -time, -binsize)
 ```
 
 # Without Pre-Binning
+# Back to pre binning
 Forget pre-binning, that was mostly for stack overflow I think
 
 Functionalize this
@@ -101,7 +103,8 @@ get_np = function(icp, psd, bin, binsize){
   np
 }
 
-ES02 <- ES01 %>%
+#ES02 <- ES01 %>% # Without prebinning
+ES02 <- ESS %>%   # With prebinning
   left_join(DS01 %>% select(profile, time, depth, big_psd, big_icp), by = c("profile", "time", "depth")) %>%
   mutate(nInterp = (exp(big_icp) * lb ^ big_psd) * binsize) %>%
   mutate(nparticles2 = if_else(TotalParticles < 5, nInterp, nparticles)) %>% 
@@ -140,15 +143,15 @@ ES03
 ```
 
 ```{r}
-testDf <- ES03[["data"]][[24]]
-testDf
-
-testMod <- gam(nparticles2 ~ s(depth), data = testDf, family = "Gamma")
-testMod
-testPred <- predict(testMod, data = testMod, type = "response")
-testPredDf <- bind_cols(testDf, pred = testPred)
-ggplot(aes(nparticles2, depth), data = testPredDf) + geom_point() + scale_y_reverse() + 
-  geom_path(aes(x = pred)) + scale_x_log10()
+# testDf <- ES03[["data"]][[24]]
+# testDf
+# 
+# testMod <- gam(nparticles2 ~ s(depth), data = testDf, family = "Gamma")
+# testMod
+# testPred <- predict(testMod, data = testMod, type = "response")
+# testPredDf <- bind_cols(testDf, pred = testPred)
+# ggplot(aes(nparticles2, depth), data = testPredDf) + geom_point() + scale_y_reverse() + 
+#   geom_path(aes(x = pred)) + scale_x_log10()
 ```
 
 
@@ -175,7 +178,8 @@ ggplot(data = test02Df, aes(x = pred, y = depth)) + geom_point() + scale_y_rever
 C_f = 10.51
 ag = 0.78
 
-ready_tibble <- tibble(depth = seq(from = 20, to = 1000, by = 5))
+ready_tibble <- tibble(depth = seq(from = 20, to = 1000, by = 10))
+#ready_tibble <- tibble(depth = BianchiBins)
 
 ES03 <- ES02 %>%
   filter(profile == "stn_043") %>%
@@ -230,7 +234,7 @@ I'll do this in three steps.
 
 First a few tests
 ```{r}
-test_abun_in <- DS03 %>% filter(depth == 25) %>% pull(spec) %>%.[[1]] %>% pull(np)
+test_abun_in <- DS03 %>% filter(depth == 50) %>% pull(spec) %>%.[[1]] %>% pull(np)
 ```
 
 ```{r}
@@ -316,7 +320,7 @@ DSA01 %>% ggplot(aes(y = depth, x = Here_All)) + geom_point() + scale_y_reverse(
 
 
 ```{r}
-DSA01 %>% filter(DFP > 1) %>% ggplot(aes(y = depth, x = Disag_Big)) + scale_y_reverse() + geom_point()
+DSA01 %>% filter(DFP < 1) %>% ggplot(aes(y = depth, x = Disag_Big)) + scale_y_reverse() + geom_point()
 ```
 
 Silly, but working.
