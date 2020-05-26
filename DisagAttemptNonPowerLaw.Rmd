@@ -8,7 +8,9 @@ Then we do the generally same analysis.
 
 ```{r}
 library(tidyverse)
+library(tidyselect)
 pass <- function(x){x}
+source("Remin_Library.R")
 ```
 
 Data from elsewhere
@@ -123,17 +125,20 @@ ES03 <- ES02 %>%
   #pull(depth) %>% unique %>%
   nest(data = c(depth, nparticles2)) %>%
   #mutate(loe = map(data, function(df) loess(nparticles2 ~ depth, data = df))) %>%
-  mutate(loe = map(data, function(df) gam(nparticles2 ~ depth, data = df, family = "Gamma"))) %>%
+  # mutate(loe = map(data, function(df) gam(nparticles2 ~ s(depth), data = df, family = "Gamma"))) %>%
   # the below column is awesome, but fails when set to map2_df, and is not actually the right solution
   #mutate(data2 = map2(loe, data, ~mutate(.y, pred = predict(.x, .y)))) %>%
-  mutate(data2 = map(loe, ~mutate(ready_tibble, np = predict(., ready_tibble, type = "response")))) %>%
-  select(-data, -loe) %>% unnest(cols = data2) %>%
-  mutate(flux = np * C_f * lb ^ ag) %>%
-  ungroup() %>%
+  #mutate(data2 = map(loe, ~mutate(ready_tibble, np = predict(., ready_tibble, type = "response")))) %>%
+  # select(-data, -loe) %>%
+  # unnest(cols = data2) %>%
+  # mutate(flux = np * C_f * lb ^ ag) %>%
+  # ungroup() %>%
   pass
   
 ES03
 ```
+
+
 
 Sanity check
 ```{r}
@@ -184,22 +189,59 @@ topt
 ```{r}
 DSA <- DS03 %>% slice(-1) %>%
   mutate(DFP_corrected = map2_dbl(prev_spec, DFP, optFun)) %>%
-  mutate(prev_spec = map2(prev_spec, DFP_corrected, remin_smooth_shuffle))
+  mutate(pred_spec = map2(prev_spec, DFP_corrected, remin_smooth_shuffle))
 DSA
 
 ```
 
 I so don't remember what happens next.
+I think that now, I calculate big flux, small flux, big predicted flux, small predicted flux
+And then I calculate how much extra small predicted flux there is than you would expect from the remin model.
+That devided by, something is the number I care about.
+osps/(Prev_Flux_Big- Flux_Big)
+osps =  Flux_Small - Pred_Flux_Small
 
-# Graveyard
-Degug
+But this should be equivalent to something more basic, right?
+Flux_Small - Pred_Flux_Small = Pred_Flux_Big - Flux_Big = osps
+
+so
+(Pred_Flux_Big - Flux_Big)/ (Prev_Flux_Big - Flux_Big)
+
+Calculate Flux, prev_Flux, and pred_Flux, big and small
+
 ```{r}
-DS03 %>% select(depth, Flux) %>% dput#%>% mutate(lFlux = lag(Flux))
+DSA01 <- DSA %>%
+  select(depth, spec_only = spec_only, prev_spec, pred_spec) %>%
+  pivot_longer(cols = c("spec_only", "prev_spec", "pred_spec"), values_to = "spec", names_to = "type") %>%
+  mutate(fSpec = map(spec, function(spc){C_f_global * spc ^ ag_global})) %>%
+  mutate(fSpec_Big = map(fSpec, ~.[lb_vec > 0.53]),
+         fSpec_Small = map(fSpec, ~.[lb_vec <= 0.53])) %>%
+  select(-spec) %>%
+  pivot_longer(cols = contains("fSpec"), names_to = "SizeCat", values_to = "fSpec") %>%
+  mutate(Flux = map_dbl(fSpec, sum)) %>%
+  
+  # mutate(Flux = map_dbl(fSpec, sum),
+  #        Flux_Big = map_dbl(fSpec_Big, sum),
+  #        Flux_Small = map_dbl(fSpec_Small, sum)) %>%
+  # select(depth, type, contains("Flux")) %>%
+  # pivot_longer(cols = contains("Flux"), names_to = "category") %>%
+  mutate(type = recode(type, spec_only = "Here", prev_spec = "Prev",pred_spec = "Pred"),
+         SizeCat = recode(SizeCat, fSpec = "All", fSpec_Big = "Big", fSpec_Small = "Small")) %>%
+  select(-fSpec) %>%
+  pivot_wider(names_from = c("type", "SizeCat"), values_from = "Flux") %>%
+  # (Pred_Flux_Big - Flux_Big)/ (Prev_Flux_Big - Flux_Big)
+  mutate(Disag_Big = (Pred_Big - Here_Big) / (Prev_Big - Here_Big)) %>%
+  pass
+  
 
+
+DSA01
+
+         #Flux_Check = Flux_Big + Flux_Small) # confirmed and removed
 ```
 
 ```{r}
-DS03[["spec"]][[1]][["np"]]
+DSA01 %>% ggplot(aes(y = depth, x = Disag_Big)) + scale_y_reverse() + geom_point()
 ```
 
-
+What just happened here?
