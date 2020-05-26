@@ -24,7 +24,7 @@ twinS <- list(ES01, DS01)
 ```
 
 ```{r}
-SimpleBins <- seq(from = 0, to = 1100, by = 100)
+SimpleBins <- seq(from = 0, to = 1100, by = 10) # Modified the By
 
 #debug(bin_depths)
 binnedS <- bin_depths(twinS, bins = SimpleBins) %>% calc_psd
@@ -116,7 +116,7 @@ I do this by using loess to get nparticles for every depth
 C_f = 10.51
 ag = 0.78
 
-ready_tibble <- tibble(depth = seq(from = 25, to = 1000, by = 25))
+ready_tibble <- tibble(depth = seq(from = 20, to = 1000, by = 5))
 
 ES03 <- ES02 %>%
   filter(profile == "stn_043") %>%
@@ -125,9 +125,10 @@ ES03 <- ES02 %>%
   #pull(depth) %>% unique %>%
   nest(data = c(depth, nparticles2)) %>%
   #mutate(loe = map(data, function(df) loess(nparticles2 ~ depth, data = df))) %>%
-  # mutate(loe = map(data, function(df) gam(nparticles2 ~ s(depth), data = df, family = "Gamma"))) %>%
+  #BOOKMARK
+   # mutate(loe = map(data, function(df) gam(nparticles2 ~ s(depth), data = df, family = "Gamma"))) %>%
   # the below column is awesome, but fails when set to map2_df, and is not actually the right solution
-  #mutate(data2 = map2(loe, data, ~mutate(.y, pred = predict(.x, .y)))) %>%
+  # # mutate(data2 = map2(loe, data, ~mutate(.y, pred = predict(.x, .y)))) %>%
   #mutate(data2 = map(loe, ~mutate(ready_tibble, np = predict(., ready_tibble, type = "response")))) %>%
   # select(-data, -loe) %>%
   # unnest(cols = data2) %>%
@@ -138,6 +139,69 @@ ES03 <- ES02 %>%
 ES03
 ```
 
+```{r}
+testDf <- ES03[["data"]][[24]]
+testDf
+
+testMod <- gam(nparticles2 ~ s(depth), data = testDf, family = "Gamma")
+testMod
+testPred <- predict(testMod, data = testMod, type = "response")
+testPredDf <- bind_cols(testDf, pred = testPred)
+ggplot(aes(nparticles2, depth), data = testPredDf) + geom_point() + scale_y_reverse() + 
+  geom_path(aes(x = pred)) + scale_x_log10()
+```
+
+
+Ok, this isn't working with the close to zero values. Lets try this as a poisson GLM
+
+Lets do one example first
+
+```{r}
+test02 <- ES02 %>% filter(profile == "stn_043", lb == 2.050)
+
+test02
+
+mod02 <- gam(TotalParticles ~ s(depth), offset = log(vol), family = poisson, data = test02)
+
+predTest02 <- predict(mod02, data = test02, type = "response")
+test02Df <- bind_cols(test02, pred = predTest02)
+ggplot(data = test02Df, aes(x = pred, y = depth)) + geom_point() + scale_y_reverse() + scale_x_log10() + geom_point(aes(x = nparticles), shape = 1, size = 3)
+```
+
+# Re-attempt gam
+
+```{r}
+
+C_f = 10.51
+ag = 0.78
+
+ready_tibble <- tibble(depth = seq(from = 20, to = 1000, by = 5))
+
+ES03 <- ES02 %>%
+  filter(profile == "stn_043") %>%
+  select(depth, lb, TotalParticles, vol) %>%
+  group_by(lb) %>%
+  #pull(depth) %>% unique %>%
+  nest(data = c(depth, TotalParticles, vol)) %>%
+  mutate(loe = map(data, function(df){gam(TotalParticles ~ s(depth, k = -1), offset = log(vol), family = "poisson", data = df)})) %>%
+  # # mutate(data2 = map2(loe, data, ~mutate(.y, pred = predict(.x, .y)))) %>%
+  mutate(data2 = map(loe, ~mutate(ready_tibble, np = predict(., ready_tibble, type = "response")))) %>%
+  select(-data, -loe) %>%
+  unnest(cols = data2) %>%
+  mutate(flux = np * C_f * lb ^ ag) %>%
+  ungroup() %>%
+  pass
+  
+ES03
+```
+
+```{r}
+ES03 %>% ggplot(aes(y = depth, x = np, col = lb, group = factor(lb))) + geom_path() + scale_y_reverse() + scale_color_viridis_c()
+```
+
+```{r}
+ES03 %>% ggplot(aes(y = depth, x = flux, col = lb, group = factor(lb))) + geom_path() + scale_y_reverse() + scale_color_viridis_c()
+```
 
 
 Sanity check
@@ -183,6 +247,7 @@ tibble(lb = lb_vec, tin = test_abun_in, tout = test_abun_out) %>%
 topt <- optFun(test_abun_in, 0.9)
 topt
 ```
+Misterious warning message. Don't see a clear answer online.
 
 # Apply topt over everything
 
@@ -231,6 +296,7 @@ DSA01 <- DSA %>%
   pivot_wider(names_from = c("type", "SizeCat"), values_from = "Flux") %>%
   # (Pred_Flux_Big - Flux_Big)/ (Prev_Flux_Big - Flux_Big)
   mutate(Disag_Big = (Pred_Big - Here_Big) / (Prev_Big - Here_Big)) %>%
+  mutate(DFP = Here_All/Prev_All) %>%
   pass
   
 
@@ -241,7 +307,17 @@ DSA01
 ```
 
 ```{r}
-DSA01 %>% ggplot(aes(y = depth, x = Disag_Big)) + scale_y_reverse() + geom_point()
+DSA01 %>% ggplot(aes(y = depth, x = DFP)) + geom_point() + scale_y_reverse()
 ```
 
-What just happened here?
+```{r}
+DSA01 %>% ggplot(aes(y = depth, x = Here_All)) + geom_point() + scale_y_reverse()
+```
+
+
+```{r}
+DSA01 %>% filter(DFP > 1) %>% ggplot(aes(y = depth, x = Disag_Big)) + scale_y_reverse() + geom_point()
+```
+
+Silly, but working.
+Might explore pre binning again, to smooth things back out. Also not over chopping things up.
