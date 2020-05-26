@@ -529,7 +529,7 @@ predicted = synthetic_remineralized[["pred_spec"]][[4]],
 previous = synthetic_remineralized[["prev_spec"]][[4]],
 lb = lb_vec
 ) %>% gather(key = "var", value = "np", actual, predicted, previous) %>%
-  ggplot(aes(x = lb, y = np, shape = var, col = var), ) + geom_point(size = 3, alpha = 0.75) + scale_x_log10() + scale_y_log10()
+  ggplot(aes(x = lb, y = np, shape = var, col = var), ) + geom_point(size = 3, alpha = 0.75) + scale_x_log10() + scale_y_log10() + labs(x = "# Particles", y = "Size (mm)", col = "Model", shape = "Model")
 ```
 Frigging finally. Consistant everything I think.
 
@@ -626,8 +626,9 @@ Indicating which regions are actually loosing flux the whole time.
 Lets first look at particle numbers, observed minus expected
 
 ```{r}
-synthetic_remineralized %>% ggplot(aes(y = depth, x = DFP, col = DFP < 1)) + geom_point() + scale_y_reverse()
-synthetic_remineralized %>% ggplot(aes(y = depth, x = Flux, col = DFP < 1)) + geom_point() + scale_y_reverse()
+dfpPlt <- synthetic_remineralized %>% ggplot(aes(y = depth, x = DFP, col = DFP < 1)) + geom_point() + scale_y_reverse() 
+fluxPlt <- synthetic_remineralized %>% ggplot(aes(y = depth, x = Flux, col = DFP < 1)) + geom_point() + scale_y_reverse()
+plot_grid(dfpPlt, fluxPlt)
 ```
 
 ```{r}
@@ -770,13 +771,22 @@ sr02All %>% filter(DFP <= 1) %>% ggplot(aes(y = DF, x = osps)) + geom_point() + 
 ```
 
 ```{r}
-sr02All %>% filter(DFP <= 1) %>% ggplot(aes(y = depth, x = osps/DF)) + geom_point() + scale_y_reverse()
+ospsPlt <- sr02All %>% filter(DFP <= 1) %>% ggplot(aes(y = depth, x = osps/DF)) + geom_point() + scale_y_reverse() + labs(x = "Disaggregation") + theme_cowplot() + geom_vline(xintercept = 0, col = "gray50")
+ospsPlt
 ```
 Huh.Look at this. We have disaggregation happening in the surface, at ~500m (after an uptick in flux, which gets erased, so maybe a zooplankton thing) and again at the bottom of the OMZ. We have net aggregation in the OMZ core, for the most part.
 
 This is cool!
 
+```{r}
+plot_grid(fluxPlt + labs(col = "IsFluxDecreasing?") + theme_cowplot() + theme(legend.position = "none"),
+          ospsPlt + theme_cowplot())
+```
+
+
 I think the stuff below is misguided and the thing above, especially combined wiht illustrations of where flux increases, will be sufficiently informative.
+
+Disaggregation are positive values here, btw. Aggregation are negative values.
 
 ```{r}
 sr02All %>% filter(DFP <= 1) %>% ggplot(aes(y = depth, x = osps/(Prev_Flux_Big- Flux_Big))) + geom_point() + scale_y_reverse() + scale_x_log10()
@@ -800,6 +810,11 @@ sr02All %>% filter(DFP <= 1) %>% ggplot(aes(y = depth, x = osps/(Prev_Flux_Big- 
 ```
 
 All this and more tomorrow.
+
+```{r}
+plot_grid(dfpPlt, fluxPlt)
+```
+
 
 ```{r}
 p <- sr02All %>% filter(DFP <= 1) %>% ggplot(aes(y = depth, x = osps/(Prev_Flux_Big - Flux_Big))) + geom_point() + scale_y_reverse()
