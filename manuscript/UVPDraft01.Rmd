@@ -7,7 +7,45 @@ bibliography: ["../references.bib"]
 
 # Abstract
 
+Models and observations suggest that that particle flux attenuation is lower across the mesopelagic zone of anoxic environments compared to oxic ones. This attenuation is likely a function of microbial metabolism, as well as agregation and disaggregation by zooplankton. Analysis of particle size spectra provide insight into the relative roles of aggregation, disaggregation and remineralization.
 
+We measured particle size profiles at a station in the core of the Eastern Tropical North Pacific Oxygen Minimum Zone (ETNP OMZ) using an underwater vision profiler (UVP) multiple times of day, at different times of day, over the course of a week. We normalized our UVP measurements by comparing them to particle flux measurements measured by sediment traps, and we compared our observations to UVP measurements from similar latitudes but with higher oxygen concentrations.
+
+Particle flux attenuated more slowly in the ETNP OMZ than in a similar latitude oxic environment transect. Indeed, flux appeared to increase not only in the photic zone, but at several depth intervals within the anoxic zone, as well as at the base of the OMZ. 
+
+By comparing observed particle size distributions to those predicted by models in which particles remineralized, but did not aggregate or disaggreagate, we were able to quantify net rates of disaggreagation and how they varied throughout the water column. We found that particles appeared to disaggregate above and below the oxygen minimum zone, but not in the core of the OMZ.
+
+These patterns suggest that the oxygen minimum zone affects, but does not eliminate the role of zooplankton in transporting organic carbon to depth, and breaking large particles into smaller particles due to sloppy feeding.
+
+# Introduction
+
+* Some steinberg model of the role of zooplankton in flux.
+* Likely different in OMZ
+
+* Flux attenuates less in oxygen minum zones (Cram) and models have suggested a role of suppressed remineralization
+In the ETNP OMZ decreased flux attenuation has been observed near the coast, but not in the open ocean.
+
+Stuff that is known about zooplankton particle interactions.
+
+Stuff that is known about particle size distributions (esp, Guidi and Kiko)
+
+What we are trying to do.
+
+# Methods
+
+## Particle size measurments
+
+## Flux measurments
+
+## Analysis
+
+## Model Formuation
+
+# Results
+
+## Chemical Data
+
+## Particle abundance measurments 
 
 
 # Figures
@@ -24,11 +62,11 @@ Figure 5. Particle flux, measured from sinking traps large symbols. Data from th
 
 Figure 6. Binned particle number, slope, and flux for large ($>= 0.53\, \mu m$) and small ($< 0.53 \, \mu m$) particles.
 
-Figure 7. **A** Flux profile from smoothed particle size distributions. Regions where flux is *increasing* are coded as {color}. **B** Particle disaggregation, measured as the descrepancy between the observed and model predicted flux of small particles, devided by the attenuation of large particles. 
-Or
-The fraction of the decrease in large particle flux that appears as small particle flux.
+Figure 7. **A** Flux profile from smoothed particle size distributions. Regions where flux is *increasing* are coded as {color}. **B** Particle disaggregation, measured by comparing the expectation of a model in which there is no disaggregation to one in which there is disaggregation. It is the descrepancy between the observed and model predicted flux of small particles, devided by the attenuation of large particles. In other words it is the fraction of the decrease in large particle flux that appears as small particle flux.
 
 Figure S1. Observed particle size distribution superimposed and the gam fitted particle mean and bootstrapped 95% prediction intervals of those size distributions. That statisticaclly siginificantly more points fall outside of the prediction intervals than by chance alone suggests that there is more variability between points than predicted by random sampling effects alone.
+
+Figure S2. Particle flux at P16 station 100 (Lat XXX, Lon XXX)
 
 # References
 
