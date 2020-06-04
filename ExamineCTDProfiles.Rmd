@@ -1,0 +1,52 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+# CTD Data for comparason
+
+```{r}
+source("bring_in_ctd.R")
+```
+
+```{r}
+library(tidyverse)
+library(plotly)
+```
+
+
+```{r}
+ctdP2 <- ctd.m %>% left_join(cast2 %>% select(pstation, cast), by = 'cast') %>% filter(pstation == 'P2')
+# bin by 10 m
+depthBins <- seq(from = 0, to = max(ctdP2$depth), by = 10)
+depthMids <- seq(from = 5, to = max(ctdP2$depth), by = 10)
+ctdP2$depthBin <- cut(ctdP2$depth, breaks = depthBins, labels = depthMids) %>% as.character %>% as.numeric
+ctdP2Binned <- ctdP2 %>% filter(is.finite(depthBin)) %>% group_by(cast, variable, depthBin) %>% summarise(value = mean(value)) #%>% group_by(variable, depthBin) %>% summarize(value = mean(value))
+```
+
+```{r}
+ctdP2Binned %>% filter(variable == "fluorescence") %>%
+  ggplot(aes(y = depthBin, x = value, colour = as.ordered(cast))) +
+  geom_path() + scale_y_reverse(limits = c(400, 0))
+```
+
+```{r}
+fluprof <- ctdP2Binned %>% filter(variable == "fluorescence") %>%
+  group_by(depthBin) %>% summarize(value = mean(value)) %>%
+  ggplot(aes(y = depthBin, x = value)) +
+  geom_path() + scale_y_reverse()
+fluprof + scale_y_reverse(limits = c(400, 0))
+```
+
+```{r}
+ctdP2Binned %>% filter(variable == "oxygen") %>%
+  ggplot(aes(y = depthBin, x = value, colour = as.ordered(cast))) +
+  geom_path() + scale_y_reverse()
+```
+
+```{r}
+oxyprof <- ctdP2Binned %>% filter(variable == "oxygen") %>%
+  group_by(depthBin) %>% summarize(value = mean(value)) %>%
+  ggplot(aes(y = depthBin, x = value)) +
+  geom_path() + scale_y_reverse()
+oxyprof
+```

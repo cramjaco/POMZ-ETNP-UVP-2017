@@ -1,0 +1,173 @@
+---
+title: "StackOverflowQuestions"
+author: "Jacob Cram"
+date: "6/4/2020"
+output: html_document
+---
+Calls for help to stack overflow
+
+```{r}
+dput(binned_DepthSummary_ald_toPlot)
+```
+
+```{r}
+dput(fluxMS_distilled)
+```
+
+I have a chart that I am making from two data sets. The large points reflect some data from one kind of device, the small circles represent data from another device.
+I'd really like the small circles to show up in the legend.
+
+I recognize that I could rearrange this so that all of the points are in one row, and then I define size and shape carefully and get the small points in the legend that way. Somewhat like in this solution, but more complicated https://community.rstudio.com/t/adding-manual-legend-to-ggplot2/41651
+I'd rather just add a small circle to the legend and call it something like "sensor 2" Is there a way to do this?
+
+Code to generate the plot below:
+
+```{r}
+data1 <- structure(list(depth = c(10, 30, 50, 70, 90, 112.5, 137.5, 162.5, 
+187.5, 225, 275, 325, 375, 425, 475, 525, 575, 625, 675, 725, 
+775, 825, 875, 925, 975, 1050, 1150, 1250, 1350, 1450, 1550, 
+1650, 1750, 1850, 1950, 2100, 2300, 2500), tot_flux2 = c(493.391307122024, 
+88.4282572468022, 119.17354992495, 88.3420136880856, 55.6404426882139, 
+23.1812327572326, 25.1107180682511, 27.4461496846079, 27.3648719079245, 
+27.6454688644806, 29.8468118472875, 29.5852880741345, 26.9364421983894, 
+29.599067987919, 28.0689550543691, 26.9607925818058, 22.6299786403629, 
+21.8274647606067, 21.0185519382918, 18.2901098011584, 18.7644342604331, 
+13.302886924911, 12.4073411713533, 10.70527639076, 10.3989475670089, 
+11.1680615919731, 12.2697553616111, 14.9529491605114, 16.4925253769608, 
+16.8444291402253, 14.6677394251565, 13.5512808553714, 14.6541054086481, 
+15.2447655630027, 14.9427390135369, 12.2641023852846, 11.0432543841414, 
+10.4113941660271)), row.names = c(NA, -38L), class = c("tbl_df", 
+"tbl", "data.frame"))
+
+data2 <- structure(list(Class = c("Organic", "Organic", "Organic", "Organic", 
+"Organic", "Organic", "Organic", "Organic", "Organic", "Organic", 
+"Organic", "Organic", "Organic"), Depth = c(69, 73, 148, 365, 
+452, 965, 100, 100, 120, 120, 150, 159, 180), TrapID = c("4-22", 
+"1-12", "1-12", "3-21", "3-21", "4-13", "2-14", "2-17", "3-15", 
+"3-18", "2-17", "1-19", "3-18"), TrapType = c("cone", "cone", 
+"cone", "net", "net", "net", "cone", "cone", "cone", "cone", 
+"net", "cone", "net"), SampleType = c("plus.p", "plus.p", "plus.p", 
+"plus.p", "plus.p", "plus.p", "top", "top", "top", "top", "top", 
+"top", "top"), C_flux = c(1.86346195335968, 0.33708698993135, 
+0.287766715331808, 0.342070253658537, 0.53058016195122, 0.162216257196462, 
+0.237619178449906, 1.16823528498024, 0.82924427637051, 1.18838025889328, 
+0.316782054545455, 0.420967185507246, 0.448680747228381), C_flux_umol = c(155.288496113307, 
+28.0905824942792, 23.980559610984, 28.5058544715447, 44.215013495935, 
+13.5180214330385, 19.8015982041588, 97.3529404150198, 69.1036896975425, 
+99.0316882411067, 26.3985045454545, 35.0805987922705, 37.3900622690318
+)), class = c("spec_tbl_df", "tbl_df", "tbl", "data.frame"), row.names = c(NA, 
+-13L), spec = structure(list(cols = list(Class = structure(list(), class = c("collector_character", 
+"collector")), Depth = structure(list(), class = c("collector_double", 
+"collector")), TrapID = structure(list(), class = c("collector_character", 
+"collector")), TrapType = structure(list(), class = c("collector_character", 
+"collector")), SampleType = structure(list(), class = c("collector_character", 
+"collector")), C_flux = structure(list(), class = c("collector_double", 
+"collector")), C_flux_umol = structure(list(), class = c("collector_double", 
+"collector"))), default = structure(list(), class = c("collector_guess", 
+"collector")), skip = 1), class = "col_spec"))
+```
+
+
+
+```{r}
+data1 %>%
+  ggplot(aes(y = depth))  + scale_y_reverse(limits = c(1000, 0)) +
+  scale_x_continuous(limits = c(0, 200)) +
+  geom_point(aes(y = Depth, x = C_flux_umol, fill = SampleType, shape = TrapType),
+             colour = "black", stroke = 1, size = 5, data = data2) +
+  geom_point(aes(x = tot_flux2)) +
+scale_shape_manual(values = c(25, 22))+
+  scale_size_manual(values = c(3, 4)) +
+  ylab("Depth (m)") + xlab("Flux micro-mol/m^2/day") +
+    guides(fill = guide_legend(override.aes = list(shape = 25), order = 1),
+           shape = guide_legend(order = 1)) +
+  scale_color_identity(name = '', guide = 'legend',labels = c('UVP')) +
+  theme_cowplot()+
+  theme(legend.position = c(0.5, 0.4),
+        legend.box.background = element_rect(color = "black", size = .5))
+```
+
+# Solution 2
+
+```{r}
+library(tidyverse)
+data1 %>%
+  ggplot(aes(y = depth))  + scale_y_reverse(limits = c(1000, 0)) +
+  scale_x_continuous(limits = c(0, 200)) +
+  geom_point(aes(y = Depth, x = C_flux_umol, fill = SampleType, shape = TrapType),
+             colour = "black", stroke = 1, size = 5, data = data2) +
+  geom_point(aes(x = tot_flux2, color="black")) +
+  scale_shape_manual(values = c(25, 22))+
+  scale_size_manual(values = c(3, 4)) +
+  ylab("Depth (m)") + xlab("Flux micro-mol/m^2/day")  +
+  scale_color_identity(name = '', guide = 'legend',labels = c('UVP')) +
+  guides(fill = guide_legend(override.aes = list(shape = 25), order=1),
+         shape = guide_legend(order=1))
+```
+
+```{r}
+ggplot(data = data2)  + scale_y_reverse(limits = c(1000, 0)) +
+  scale_x_continuous(limits = c(0, 200)) +
+  geom_point(aes(y = Depth, x = C_flux_umol, fill = SampleType, shape = TrapType),
+             colour = "black", stroke = 1, size = 5) +
+  #geom_point(aes(x = tot_flux2)) +
+scale_shape_manual(values = c(25, 22))+
+  scale_size_manual(values = c(3, 4)) +
+  ylab("Depth (m)") + xlab("Flux micro-mol/m^2/day") +
+  guides(fill = guide_legend(override.aes = list(shape = 25))) +
+  theme_cowplot() +
+  theme(legend.position = c(0.5, 0.4),
+        legend.box.background = element_rect(color = "black", size = .5),
+        legend.margin = margin(5,5,5,5))
+```
+
+```{r}
+library(ggplot2)
+library(tidyverse)
+library(cowplot)
+
+data1 %>%
+  ggplot(aes(y = depth))  + scale_y_reverse(limits = c(1000, 0)) +
+  scale_x_continuous(limits = c(0, 200)) +
+  geom_point(aes(y = Depth, x = C_flux_umol, fill = SampleType, shape = TrapType),
+             colour = "black", stroke = 1, size = 5, data = data2) +
+  geom_point(aes(x = tot_flux2, color = "UVP")) +
+scale_shape_manual(values = c(25, 22))+
+  scale_color_manual(values = 1, name = "") +
+  ylab("Depth (m)") + xlab("Flux micro-mol/m^2/day") +
+    guides(fill = guide_legend(override.aes = list(shape = 25))) +
+  theme_cowplot()
+```
+
+```{r}
+data1 %>%
+  ggplot(aes(y = depth))  + 
+  scale_y_reverse(limits = c(1000, 0)) +
+  scale_x_continuous(limits = c(0, 200)) +
+  geom_point(aes(y = Depth, x = C_flux_umol, fill = SampleType, 
+                 shape = TrapType),
+             colour = "black", stroke = 1, size = 4, data = data2) +
+  geom_point(aes(x = tot_flux2, size = "UVP")) +
+  scale_shape_manual(values = c(25, 22))+
+  scale_size_manual(values = 1) +
+  ylab("Depth (m)") + xlab("Flux micro-mol/m^2/day") +
+  guides(fill = guide_legend(override.aes = list(shape = 25))) +
+  theme_cowplot()
+```
+
+```{r}
+ggplot(data = data2)  + scale_y_reverse(limits = c(1000, 0)) +
+  scale_x_continuous(limits = c(0, 200)) +
+  geom_point(aes(y = Depth, x = C_flux_umol, fill = SampleType, shape = TrapType),
+             colour = "black", stroke = 1, size = 5) +
+  #geom_point(aes(x = tot_flux2)) +
+scale_shape_manual(values = c(25, 22))+
+  scale_size_manual(values = c(3, 4)) +
+  ylab("Depth (m)") + xlab("Flux micro-mol/m^2/day") +
+  guides(fill = guide_legend(override.aes = list(shape = 25))) +
+  theme_cowplot() +
+  theme(legend.position = c(.95, .95),
+        legend.justification = c("right", "top"),
+        legend.box.just = "right",
+        legend.margin = margin(6, 6, 6, 6)) 
+```

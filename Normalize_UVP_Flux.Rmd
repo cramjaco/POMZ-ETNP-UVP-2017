@@ -419,13 +419,29 @@ binned_DepthSummary_ald <- OptFlux_ald$DS
 ```
 
 ```{r}
-binned_DepthSummary_ald %>% group_by(depth) %>% summarize(tot_flux2 = mean(tot_flux2)) %>% ggplot(aes(y = depth))  + scale_y_reverse(limits = c(1000, 0)) + scale_x_continuous(limits = c(0, 200)) +
-  geom_point(aes(y = Depth, x = C_flux_umol, fill = SampleType, shape = TrapType), colour = "black", stroke = 1, size = 5, data = fluxMS_distilled) +
-  geom_point(aes(x = tot_flux2)) +
+binned_DepthSummary_ald_toPlot <- binned_DepthSummary_ald %>% group_by(depth) %>% summarize(tot_flux2 = mean(tot_flux2))
+
+fluxMS_distilled_toPlot <- fluxMS_distilled %>%
+  mutate(SampleType = recode(SampleType, `plus.p` = "plus-particles", top = "top-collector"))
+
+binned_DepthSummary_ald_toPlot %>%
+  ggplot(aes(y = depth))  + scale_y_reverse(limits = c(1000, 0)) +
+  scale_x_continuous(limits = c(0, 200)) +
+  geom_point(aes(y = Depth, x = C_flux_umol, fill = SampleType, shape = TrapType),
+             colour = "black", stroke = 1, size = 5, data = fluxMS_distilled_toPlot) +
+  geom_point(aes(x = tot_flux2, size = "UVP")) +
 scale_shape_manual(values = c(25, 22))+
-  scale_size_manual(values = c(3, 4)) +
-  ylab("Depth (m)") + xlab("Flux micro-mol/m^2/day")
+  scale_size_manual(values = 1, name = "") +
+  ylab("Depth (m)") + xlab("Flux micro-mol/m^2/day") +
+  guides(fill = guide_legend(override.aes = list(shape = 21))) +
+  theme_cowplot() + 
+  theme(
+        legend.position = c(0.5, 0.4),
+        legend.box.background = element_rect(color = "black", size = 0.5),
+        legend.margin = margin(-10, 5, 10, 5)
+  )
   
+#ggsave("figures/Cf_fitted_flux_wTraps.svg")
 ```
 
 I'm feeling ok with this. Lets feed the aldredge optimized data into the remin model with aldredge params.
