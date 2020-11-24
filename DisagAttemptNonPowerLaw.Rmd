@@ -27,8 +27,8 @@ twinS <- list(ES01, DS01)
 SimpleBins <- seq(from = 0, to = 1100, by = 50) # Modified the By
 
 #debug(bin_depths)
-#binnedS <- bin_depths(twinS, bins = SimpleBins) %>% calc_psd
-binnedS <- bin_depths(twinS, bins = BianchiBins) %>% calc_psd
+binnedS <- bin_depths(twinS, bins = SimpleBins) %>% calc_psd
+#binnedS <- bin_depths(twinS, bins = BianchiBins) %>% calc_psd
 
 ESS <- binnedS[[1]]
 DSS <- binnedS[[2]]
@@ -200,13 +200,16 @@ ES03
 ```
 
 ```{r}
-ES03 %>% ggplot(aes(y = depth, x = np, col = lb, group = factor(lb))) + geom_path() + scale_y_reverse() + scale_color_viridis_c()
+ES03 %>% ggplot(aes(y = depth, x = np, col = lb, group = factor(lb))) + geom_path() + scale_y_reverse() + scale_color_viridis_c(trans = "log") + scale_x_log10()
 ```
+WTF? Is this because I'm extrapolating in some cases but not others?
+Also why is everything so wavy?
+
 
 ```{r}
-ES03 %>% ggplot(aes(y = depth, x = flux, col = lb, group = factor(lb))) + geom_path() + scale_y_reverse() + scale_color_viridis_c()
+ES03 %>% ggplot(aes(y = depth, x = flux, col = lb, group = factor(lb))) + geom_path() + scale_y_reverse() + scale_color_viridis_c() 
 ```
-
+As above, but for flux.
 
 Sanity check
 ```{r}
@@ -329,4 +332,3 @@ Might explore pre binning again, to smooth things back out. Also not over choppi
 ```{r}
 sessionInfo()
 ```
-

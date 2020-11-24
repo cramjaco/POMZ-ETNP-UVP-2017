@@ -1,0 +1,386 @@
+---
+title: "Smoothing of particle size data"
+output: html_notebook
+author: "Jacob Cram"
+date: "23 November 2020"
+---
+
+Simple Binned ESS
+ESS %>% filter(depth <= 500, profile == "stn_043") %>% select(depth, lb, ub, vol, TotalParticles) %>% dput
+
+I have a data-set where particles of different sizes, at different depths in the ocean.
+
+They are measured by an underwater vision profiler. This is a camera, that counts and sizes particles in a given volume of water.
+
+There are frequently zero particles sampled and I'd like to use what I do know about relationships between particles across size and depth to estemate the abundances of particles of different sizes at different depth.
+
+Here are a few things that I think are *mostly* true. 
+1) Particles follow power law size distribution spectrum. That is, when you normalize particle numbers to the width of the particle size bin (see below). They have a more or less linear relatinship such that log(number) ~ log(size).
+
+2) Particles of any given size follow a power law size distribution with respect to depth, such that log(number) ~ log(depth).
+
+I don't expect these relationships to be perfect, so I've been using gams to allow for some deviation from these patterns.
+
+Since my particles are of known number, I'm assuming that they are sampled from a binomial distribution. I also tried a poisson distribution but got some strange results.
+
+I'd like to try using baysean approaches to see if I get similar results to these frequentist approaches.
+
+```{r}
+#data <- ESS %>% filter(depth <= 500, profile == "stn_043") %>% select(depth, lb, ub, vol, TotalParticles)
+```
+
+I am using tidyverse for data handling and mgcv for gams
+```{r}
+library(tidyverse)
+library(mgcv)
+```
+
+```{r}
+theme_set(theme_bw())
+```
+
+
+Here's some data. This is one profile, truncated to the top 500m. 
+```{r}
+data <- structure(list(depth = c(25, 25, 25, 25, 25, 25, 25, 25, 25, 
+25, 25, 25, 25, 25, 25, 25, 25, 25, 25, 25, 25, 25, 25, 25, 25, 
+75, 75, 75, 75, 75, 75, 75, 75, 75, 75, 75, 75, 75, 75, 75, 75, 
+75, 75, 75, 75, 75, 75, 75, 75, 75, 125, 125, 125, 125, 125, 
+125, 125, 125, 125, 125, 125, 125, 125, 125, 125, 125, 125, 125, 
+125, 125, 125, 125, 125, 125, 125, 175, 175, 175, 175, 175, 175, 
+175, 175, 175, 175, 175, 175, 175, 175, 175, 175, 175, 175, 175, 
+175, 175, 175, 175, 175, 175, 225, 225, 225, 225, 225, 225, 225, 
+225, 225, 225, 225, 225, 225, 225, 225, 225, 225, 225, 225, 225, 
+225, 225, 225, 225, 225, 275, 275, 275, 275, 275, 275, 275, 275, 
+275, 275, 275, 275, 275, 275, 275, 275, 275, 275, 275, 275, 275, 
+275, 275, 275, 275, 325, 325, 325, 325, 325, 325, 325, 325, 325, 
+325, 325, 325, 325, 325, 325, 325, 325, 325, 325, 325, 325, 325, 
+325, 325, 325, 375, 375, 375, 375, 375, 375, 375, 375, 375, 375, 
+375, 375, 375, 375, 375, 375, 375, 375, 375, 375, 375, 375, 375, 
+375, 375, 425, 425, 425, 425, 425, 425, 425, 425, 425, 425, 425, 
+425, 425, 425, 425, 425, 425, 425, 425, 425, 425, 425, 425, 425, 
+425, 475, 475, 475, 475, 475, 475, 475, 475, 475, 475, 475, 475, 
+475, 475, 475, 475, 475, 475, 475, 475, 475, 475, 475, 475, 475
+), lb = c(0.102, 0.128, 0.161, 0.203, 0.256, 0.323, 0.406, 0.512, 
+0.645, 0.813, 1.02, 1.29, 1.63, 2.05, 2.58, 3.25, 4.1, 5.16, 
+6.5, 8.19, 10.3, 13, 16.4, 20.6, 26, 0.102, 0.128, 0.161, 0.203, 
+0.256, 0.323, 0.406, 0.512, 0.645, 0.813, 1.02, 1.29, 1.63, 2.05, 
+2.58, 3.25, 4.1, 5.16, 6.5, 8.19, 10.3, 13, 16.4, 20.6, 26, 0.102, 
+0.128, 0.161, 0.203, 0.256, 0.323, 0.406, 0.512, 0.645, 0.813, 
+1.02, 1.29, 1.63, 2.05, 2.58, 3.25, 4.1, 5.16, 6.5, 8.19, 10.3, 
+13, 16.4, 20.6, 26, 0.102, 0.128, 0.161, 0.203, 0.256, 0.323, 
+0.406, 0.512, 0.645, 0.813, 1.02, 1.29, 1.63, 2.05, 2.58, 3.25, 
+4.1, 5.16, 6.5, 8.19, 10.3, 13, 16.4, 20.6, 26, 0.102, 0.128, 
+0.161, 0.203, 0.256, 0.323, 0.406, 0.512, 0.645, 0.813, 1.02, 
+1.29, 1.63, 2.05, 2.58, 3.25, 4.1, 5.16, 6.5, 8.19, 10.3, 13, 
+16.4, 20.6, 26, 0.102, 0.128, 0.161, 0.203, 0.256, 0.323, 0.406, 
+0.512, 0.645, 0.813, 1.02, 1.29, 1.63, 2.05, 2.58, 3.25, 4.1, 
+5.16, 6.5, 8.19, 10.3, 13, 16.4, 20.6, 26, 0.102, 0.128, 0.161, 
+0.203, 0.256, 0.323, 0.406, 0.512, 0.645, 0.813, 1.02, 1.29, 
+1.63, 2.05, 2.58, 3.25, 4.1, 5.16, 6.5, 8.19, 10.3, 13, 16.4, 
+20.6, 26, 0.102, 0.128, 0.161, 0.203, 0.256, 0.323, 0.406, 0.512, 
+0.645, 0.813, 1.02, 1.29, 1.63, 2.05, 2.58, 3.25, 4.1, 5.16, 
+6.5, 8.19, 10.3, 13, 16.4, 20.6, 26, 0.102, 0.128, 0.161, 0.203, 
+0.256, 0.323, 0.406, 0.512, 0.645, 0.813, 1.02, 1.29, 1.63, 2.05, 
+2.58, 3.25, 4.1, 5.16, 6.5, 8.19, 10.3, 13, 16.4, 20.6, 26, 0.102, 
+0.128, 0.161, 0.203, 0.256, 0.323, 0.406, 0.512, 0.645, 0.813, 
+1.02, 1.29, 1.63, 2.05, 2.58, 3.25, 4.1, 5.16, 6.5, 8.19, 10.3, 
+13, 16.4, 20.6, 26), ub = c(0.128, 0.161, 0.203, 0.256, 0.323, 
+0.406, 0.512, 0.645, 0.813, 1.02, 1.29, 1.63, 2.05, 2.58, 3.25, 
+4.1, 5.16, 6.5, 8.19, 10.3, 13, 16.4, 20.6, 26, 32, 0.128, 0.161, 
+0.203, 0.256, 0.323, 0.406, 0.512, 0.645, 0.813, 1.02, 1.29, 
+1.63, 2.05, 2.58, 3.25, 4.1, 5.16, 6.5, 8.19, 10.3, 13, 16.4, 
+20.6, 26, 32, 0.128, 0.161, 0.203, 0.256, 0.323, 0.406, 0.512, 
+0.645, 0.813, 1.02, 1.29, 1.63, 2.05, 2.58, 3.25, 4.1, 5.16, 
+6.5, 8.19, 10.3, 13, 16.4, 20.6, 26, 32, 0.128, 0.161, 0.203, 
+0.256, 0.323, 0.406, 0.512, 0.645, 0.813, 1.02, 1.29, 1.63, 2.05, 
+2.58, 3.25, 4.1, 5.16, 6.5, 8.19, 10.3, 13, 16.4, 20.6, 26, 32, 
+0.128, 0.161, 0.203, 0.256, 0.323, 0.406, 0.512, 0.645, 0.813, 
+1.02, 1.29, 1.63, 2.05, 2.58, 3.25, 4.1, 5.16, 6.5, 8.19, 10.3, 
+13, 16.4, 20.6, 26, 32, 0.128, 0.161, 0.203, 0.256, 0.323, 0.406, 
+0.512, 0.645, 0.813, 1.02, 1.29, 1.63, 2.05, 2.58, 3.25, 4.1, 
+5.16, 6.5, 8.19, 10.3, 13, 16.4, 20.6, 26, 32, 0.128, 0.161, 
+0.203, 0.256, 0.323, 0.406, 0.512, 0.645, 0.813, 1.02, 1.29, 
+1.63, 2.05, 2.58, 3.25, 4.1, 5.16, 6.5, 8.19, 10.3, 13, 16.4, 
+20.6, 26, 32, 0.128, 0.161, 0.203, 0.256, 0.323, 0.406, 0.512, 
+0.645, 0.813, 1.02, 1.29, 1.63, 2.05, 2.58, 3.25, 4.1, 5.16, 
+6.5, 8.19, 10.3, 13, 16.4, 20.6, 26, 32, 0.128, 0.161, 0.203, 
+0.256, 0.323, 0.406, 0.512, 0.645, 0.813, 1.02, 1.29, 1.63, 2.05, 
+2.58, 3.25, 4.1, 5.16, 6.5, 8.19, 10.3, 13, 16.4, 20.6, 26, 32, 
+0.128, 0.161, 0.203, 0.256, 0.323, 0.406, 0.512, 0.645, 0.813, 
+1.02, 1.29, 1.63, 2.05, 2.58, 3.25, 4.1, 5.16, 6.5, 8.19, 10.3, 
+13, 16.4, 20.6, 26, 32), vol = c(1542.64, 1542.64, 1542.64, 1542.64, 
+1542.64, 1542.64, 1542.64, 1542.64, 1542.64, 1542.64, 1542.64, 
+1542.64, 1542.64, 1542.64, 1542.64, 1542.64, 1542.64, 1542.64, 
+1542.64, 1542.64, 1542.64, 1542.64, 1542.64, 1542.64, 1542.64, 
+563.2, 563.2, 563.2, 563.2, 563.2, 563.2, 563.2, 563.2, 563.2, 
+563.2, 563.2, 563.2, 563.2, 563.2, 563.2, 563.2, 563.2, 563.2, 
+563.2, 563.2, 563.2, 563.2, 563.2, 563.2, 563.2, 413.6, 413.6, 
+413.6, 413.6, 413.6, 413.6, 413.6, 413.6, 413.6, 413.6, 413.6, 
+413.6, 413.6, 413.6, 413.6, 413.6, 413.6, 413.6, 413.6, 413.6, 
+413.6, 413.6, 413.6, 413.6, 413.6, 402.16, 402.16, 402.16, 402.16, 
+402.16, 402.16, 402.16, 402.16, 402.16, 402.16, 402.16, 402.16, 
+402.16, 402.16, 402.16, 402.16, 402.16, 402.16, 402.16, 402.16, 
+402.16, 402.16, 402.16, 402.16, 402.16, 406.56, 406.56, 406.56, 
+406.56, 406.56, 406.56, 406.56, 406.56, 406.56, 406.56, 406.56, 
+406.56, 406.56, 406.56, 406.56, 406.56, 406.56, 406.56, 406.56, 
+406.56, 406.56, 406.56, 406.56, 406.56, 406.56, 397.76, 397.76, 
+397.76, 397.76, 397.76, 397.76, 397.76, 397.76, 397.76, 397.76, 
+397.76, 397.76, 397.76, 397.76, 397.76, 397.76, 397.76, 397.76, 
+397.76, 397.76, 397.76, 397.76, 397.76, 397.76, 397.76, 389.84, 
+389.84, 389.84, 389.84, 389.84, 389.84, 389.84, 389.84, 389.84, 
+389.84, 389.84, 389.84, 389.84, 389.84, 389.84, 389.84, 389.84, 
+389.84, 389.84, 389.84, 389.84, 389.84, 389.84, 389.84, 389.84, 
+410.96, 410.96, 410.96, 410.96, 410.96, 410.96, 410.96, 410.96, 
+410.96, 410.96, 410.96, 410.96, 410.96, 410.96, 410.96, 410.96, 
+410.96, 410.96, 410.96, 410.96, 410.96, 410.96, 410.96, 410.96, 
+410.96, 410.08, 410.08, 410.08, 410.08, 410.08, 410.08, 410.08, 
+410.08, 410.08, 410.08, 410.08, 410.08, 410.08, 410.08, 410.08, 
+410.08, 410.08, 410.08, 410.08, 410.08, 410.08, 410.08, 410.08, 
+410.08, 410.08, 410.08, 410.08, 410.08, 410.08, 410.08, 410.08, 
+410.08, 410.08, 410.08, 410.08, 410.08, 410.08, 410.08, 410.08, 
+410.08, 410.08, 410.08, 410.08, 410.08, 410.08, 410.08, 410.08, 
+410.08, 410.08, 410.08), TotalParticles = c(136084, 50891, 43620, 
+18820, 14902, 12063, 6635, 4518, 4229, 3081, 2606, 931, 222, 
+584, 782, 2, 0, 0, 624, 59, 633, 51, 0, 0, 0, 5204, 2056, 1971, 
+697, 557, 386, 229, 122, 63, 22, 12, 8, 3, 0, 1, 0, 0, 0, 0, 
+0, 0, 0, 0, 0, 0, 1596, 513, 571, 211, 131, 84, 36, 18, 12, 5, 
+3, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1950, 607, 594, 
+195, 120, 92, 32, 23, 10, 13, 1, 3, 1, 1, 0, 0, 0, 0, 0, 0, 0, 
+0, 0, 0, 0, 2083, 634, 642, 196, 116, 65, 21, 21, 8, 3, 0, 1, 
+0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2231, 792, 721, 225, 117, 
+68, 25, 9, 15, 6, 3, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
+1796, 590, 695, 235, 137, 86, 31, 16, 11, 7, 3, 4, 1, 0, 0, 0, 
+0, 0, 0, 0, 0, 0, 0, 0, 0, 1928, 650, 711, 214, 135, 66, 19, 
+17, 5, 6, 2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1901, 
+668, 712, 234, 150, 79, 20, 10, 4, 2, 2, 0, 0, 0, 0, 0, 0, 0, 
+0, 0, 0, 0, 0, 0, 0, 1808, 678, 785, 255, 157, 79, 31, 13, 2, 
+2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)), class = c("tbl_df", 
+"tbl", "data.frame"), row.names = c(NA, -250L))
+```
+
+Particles are binned by size. And the number of particles in each size bin, at each depth are recorded.
+
+Here depth is measured as meters depth in the water column. `lb` is the lower bound of the size bin `ub` is the upper bound of the size bin, measured in mm, `vol` is the volume sampled (L) and `TotalParticles` are the number of particles seen in that bin.
+```{r}
+head(data)
+```
+
+I make a few extra parameters. `binsize` is the difference between `lb` and `ub`. `nparticles` are the particles normalized to volume, measured in (Particles/L) and `n_nparticles` is the number of particles normalized both to volume and bin-size (Particles/L/mm)
+```{r}
+data01 <- data %>% mutate(binsize = ub-lb, nparticles = TotalParticles/vol, n_nparticles = nparticles/binsize)
+```
+
+
+```{r}
+data01 %>% head
+```
+
+First look at the data.
+```{r}
+data01Plot <- data01 %>% group_by(lb) %>% ggplot(aes(x = TotalParticles, y = depth, col = log(lb), group = lb)) + scale_y_reverse() + geom_point() + scale_x_log10() + scale_color_viridis_c() + geom_path() + geom_vline(xintercept = 1) + geom_vline(xintercept = 5)
+data01Plot
+```
+
+Here you can see generally how these profiles look. There are lots of small particles, and fewer large particles. The largist particles are not detected below the shallowist depth. The intermediatly large particles (lb ≈ 1 mm) are sometimes detected a few times, sometimes once, and sometimes not at all, below the surface.
+
+I can also show particle abundance, normalized to binsize and volume.
+
+```{r}
+nnPlot <- data01 %>% group_by(lb) %>% ggplot(aes(x = n_nparticles, y = depth, col = log(lb), group = lb)) + scale_y_reverse() + geom_point() + scale_x_log10() + scale_color_viridis_c() + geom_path() + geom_vline(xintercept = 1) + geom_vline(xintercept = 5) + labs(x = "Normalized Particles (#/L/mm)")
+nnPlot
+```
+You can see that this looks similar to the plot above.
+
+I would like to estemate the true abundance of all of these size fractions, but especially the particles of intermediate abundance, that show up sometimes once, sometimes a few times, and sometimes not at all. 
+
+I would like to estemate these from both the abundance of particles above and below that particle, but also from the abundance of smaller particles.
+
+The data at each depth, sort-of follow a power law, where the log of the size is more-or-less linearly related to the log of the volume and bin-width normalized abundance.
+
+```{r}
+data_125m <- data01 %>% filter(depth == 125)
+data_125m %>% ggplot(aes(x = lb, y = n_nparticles)) + scale_x_log10() + scale_y_log10() + geom_point()
+``` 
+
+Of course, the large particles are so rare that we don't detect them, so the line flattens off eventually.
+
+I can fit this with a glm with a negative binomial family, if I assume that the particles are distributed at random.
+
+```{r}
+myGlm <- function(df){
+  MASS::glm.nb(TotalParticles ~ log(lb) + offset(log(vol * binsize)), data = df)
+}
+
+mod_125m <- myGlm(data_125m)
+summary(mod_125m)
+```
+
+```{r}
+pred_glm_125m <- predict(mod_125m, type = "link", se.fit = TRUE) %>% as_tibble %>% mutate(lower = fit - 2 * se.fit, upper = fit + 2 * se.fit) %>%
+  mutate(glmFit = exp(fit), glmLower = exp(lower), glmUpper = exp(upper)) %>% select(-c(fit, lower, upper))
+```
+
+```{r}
+df_125m <- bind_cols(data_125m, pred_glm_125m) %>% mutate(glmFit = glmFit/vol/binsize, glmLower = glmLower/vol/binsize, glmUpper = glmUpper/vol/binsize) 
+
+ggplot(df_125m, aes(x = lb)) + geom_point(aes(y = glmFit), shape = 1) + geom_point(aes(y = n_nparticles)) +
+  geom_errorbar(aes(ymin = glmLower, ymax = glmUpper)) +
+  scale_x_log10() + scale_y_log10()
+```
+
+So here, the open circles are the predicted values. For my subsequent analyses, I could for instance use these to estemate the larger particles, when we don't see them, or all large particles.
+
+Another option, is to use a gam. In this case, everything is pretty linear, but gams allow for some deviation from the power law relationship.
+
+```{r}
+myGam <- function(df){
+  gam(TotalParticles ~ s(log(lb)), offset = log(vol * binsize), family = nb(), data = df)
+}
+
+mod1_125m <- myGam(data_125m)
+summary(mod1_125m)
+AIC(mod1_125m)
+```
+
+```{r}
+pred1_tp_125m <- predict(mod1_125m, type = "link", se.fit = TRUE) %>% as.data.frame %>% mutate(lower = fit - 2 * se.fit, upper = fit + 2 * se.fit) %>%
+  #translate back into response units
+  mutate(gamFit = exp(fit), gamLower = exp(lower), gamUpper = exp(upper)) #%>% select(-c(fit, lower, upper))
+
+
+df1_125m <- bind_cols(df_125m,  pred1_tp_125m)
+
+
+ggplot(df1_125m, aes(x = lb)) + geom_point(aes(y = gamFit), shape = 1) +
+  geom_errorbar(aes(ymin = gamLower, ymax = gamUpper)) + 
+  geom_point(aes(y = n_nparticles)) + scale_x_log10() + scale_y_log10()
+```
+
+This gets me a slightly bendier line, with wider (and I think more believable) confedence intervals. Every observed, non-zero, value is inside of the confedence intervals Also, for the points with no values, the confedence intervals get larger.
+
+Here are some bookkeeping functions, that allow us to redo the above calculations with one function.
+
+```{r}
+expand_with_gam <- function(df, mod){
+  loc_pred <- predict(mod, type = "link", se.fit = TRUE) %>% as.data.frame %>% mutate(lower = fit - 2 * se.fit, upper = fit + 2 * se.fit) %>% mutate(resp_fit = exp(fit), resp_lower = exp(lower), resp_upper = exp(upper))
+  loc_df <- bind_cols(df, loc_pred)
+  loc_df
+}
+
+gam_size_ggplot <- function(df){
+  ggplot(df, aes(x = lb)) + geom_point(aes(y = resp_fit), shape = 1) +
+  geom_errorbar(aes(ymin = resp_lower, ymax = resp_upper)) + 
+  geom_point(aes(y = n_nparticles)) + scale_x_log10() + scale_y_log10()
+}
+```
+
+Test
+```{r}
+expand_with_gam(df_125m, mod1_125m) %>% gam_size_ggplot
+```
+
+
+## Whole water column, by size only
+
+I can loop the above gam over each depth, to estemate the size distribution throughout the water column.
+
+```{r}
+dataGamHorizontal <- data01 %>% group_by(depth) %>% nest %>% mutate(mod = map(data, myGam)) %>%
+  mutate(data2 = map2(data, mod, expand_with_gam)) %>% select(-data, -mod)%>% unnest(data2)
+dataGamHorizontal %>% head
+```
+
+```{r fig.height = 6, fig.width=6}
+library(cowplot)
+
+horizontalGamPlot <- dataGamHorizontal %>% ggplot(aes(x = resp_fit, y = depth, col = log(lb), group = lb)) + scale_y_reverse() + geom_point() + scale_x_log10(limits = c(10^-8, NA)) + scale_color_viridis_c() + geom_path() + geom_vline(xintercept = 1) + geom_vline(xintercept = 5)  + geom_errorbar(aes(xmin = resp_lower, xmax = resp_upper), width = 10, alpha = 0.5)+ theme_bw()
+
+plot_grid(nnPlot, horizontalGamPlot, nrow = 2)
+```
+
+Above you see the observed, and predicted values. The predicted values seem ok. However there is some jumping around between depths that could be real or not.
+
+
+## Whole water column, by depth
+
+Another option is to do just about the same thing, but this time look at the relationship between depths.
+
+```{r}
+verticalGam <- function(df){
+  gam(TotalParticles ~ s(log(depth)), offset = log(vol * binsize), family = nb(), data = df)
+}
+
+dataGamVertical <- data01 %>% group_by(lb) %>% nest %>% mutate(mod = map(data, verticalGam)) %>%
+  mutate(data2 = map2(data, mod, expand_with_gam)) %>% select(-data, -mod)%>% unnest(data2)
+dataGamVertical %>% head
+```
+
+```{r}
+verticalGamPlot <- dataGamVertical %>% ggplot(aes(x = resp_fit, y = depth, col = log(lb), group = lb)) + scale_y_reverse() + geom_point() + scale_x_log10() + scale_color_viridis_c() + geom_path() + geom_vline(xintercept = 1) + geom_vline(xintercept = 5) + geom_errorbar(aes(xmin = resp_lower, xmax = resp_upper), width = 10, alpha = 0.5) + theme_bw()
+verticalGamPlot
+```
+
+Odd pattern, but huge confedence intervals for the small particles. I'm suspicious that they seem to overlap the observed particles.
+
+That said, for the smaller size particles, these seem reasonable.
+
+# Depth and Size Together
+I can also use a gam to try to use size and depth together:
+
+```{r}
+doubleSmooth <- gam(TotalParticles ~s(log(lb), log(depth)), offset = log(vol * binsize), family = nb(), data = data01)
+
+#doubleSmooth <- gam(TotalParticles ~ s(log(lb)) + log(depth), offset = log(vol * binsize), family = quasipoisson(), data = data01)
+```
+
+```{r}
+summary(doubleSmooth)
+AIC(doubleSmooth)
+```
+
+Just confirming that the smooth term with both components does a beter job than a linear relationship including both variables.
+```{r}
+linearSum <- gam(TotalParticles ~ log(lb) + log(depth), offset = log(vol * binsize), family = nb(), data = data01)
+summary(linearSum)
+multSum <- gam(TotalParticles ~ log(lb) * log(depth), offset = log(vol * binsize), family = nb(), data = data01)
+summary(multSum)
+AIC(linearSum,
+  multSum,
+  doubleSmooth
+)
+```
+
+
+Here I predict the variables:
+
+```{r}
+predDS <- predict(doubleSmooth, type = "link", se.fit = TRUE)
+
+dataPredDS <- data01 %>% bind_cols(link_pred = predDS$fit, link_se = predDS$se) %>% 
+  mutate(link_lower = link_pred - 2 * link_se, link_upper = link_pred + 2 * link_se) %>%
+  mutate(resp_pred = exp(link_pred), resp_lower = exp(link_lower), resp_upper = exp(link_upper))
+```
+
+
+Original data, again, for reference.
+```{r}
+nnPlot
+```
+
+Gam data.
+
+```{r}
+predDSPlot <- dataPredDS %>% group_by(lb) %>% ggplot(aes(x = resp_pred, y = depth, col = log(lb), group = lb)) + scale_y_reverse() + geom_point() + geom_errorbar(aes(xmin = resp_lower, xmax = resp_upper), width = 10) +  scale_color_viridis_c() + geom_path() + geom_vline(xintercept = 1) + geom_vline(xintercept = 5)  + scale_x_log10()
+predDSPlot
+```
+
+As above, but focusing on the at least sort-of abundant particles.
+```{r}
+#predDSPlot + scale_x_log10(limits = c(1e-22, NA))
+predDSPlot + scale_x_log10(limits = c(1e-3, NA))
+```
+
+So in general, I like this two component gam model. That said, I'd be interested to see if we can pull additonal insight from higherarchical baysean approaches.
+
+-Jacob

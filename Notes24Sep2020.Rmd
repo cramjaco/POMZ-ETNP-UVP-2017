@@ -1,0 +1,13 @@
+---
+title: "GettingBackIntoIt_September2020"
+author: "Jacob Cram"
+date: "9/24/2020"
+output: html_document
+---
+
+I am looking over what I have done, with an eye towards writing a manuscript. Lots of files, lets figure out what each does, and which depend on which.
+
+Also, I'm over in the POMZ-EK60 file processing the ek60 data. I'd like to show where the plankton are for realsies.
+
+I appear to have left off the non-power law assumption disaggregation thing stuck.
+

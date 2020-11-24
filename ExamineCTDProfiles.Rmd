@@ -23,12 +23,14 @@ ctdP2$depthBin <- cut(ctdP2$depth, breaks = depthBins, labels = depthMids) %>% a
 ctdP2Binned <- ctdP2 %>% filter(is.finite(depthBin)) %>% group_by(cast, variable, depthBin) %>% summarise(value = mean(value)) #%>% group_by(variable, depthBin) %>% summarize(value = mean(value))
 ```
 
+Variability in fluorescence
 ```{r}
 ctdP2Binned %>% filter(variable == "fluorescence") %>%
   ggplot(aes(y = depthBin, x = value, colour = as.ordered(cast))) +
   geom_path() + scale_y_reverse(limits = c(400, 0))
 ```
 
+Mean Fluorescence
 ```{r}
 fluprof <- ctdP2Binned %>% filter(variable == "fluorescence") %>%
   group_by(depthBin) %>% summarize(value = mean(value)) %>%
@@ -37,11 +39,14 @@ fluprof <- ctdP2Binned %>% filter(variable == "fluorescence") %>%
 fluprof + scale_y_reverse(limits = c(400, 0))
 ```
 
+Variability in Oxygen
 ```{r}
 ctdP2Binned %>% filter(variable == "oxygen") %>%
   ggplot(aes(y = depthBin, x = value, colour = as.ordered(cast))) +
   geom_path() + scale_y_reverse()
 ```
+
+Oxygen
 
 ```{r}
 oxyprof <- ctdP2Binned %>% filter(variable == "oxygen") %>%
@@ -50,3 +55,29 @@ oxyprof <- ctdP2Binned %>% filter(variable == "oxygen") %>%
   geom_path() + scale_y_reverse()
 oxyprof
 ```
+
+# Combined profiles
+,
+             labeller = as_labeller(salinity = "temperature (C)")
+
+```{r}
+ctdP2Binned %>% rename(depth = depthBin) %>% filter(depth <= 1500, cast == 43) %>% ungroup() %>%
+  mutate(variable = fct_relevel(variable, levels = c("temperature", "salinity", "sigmaT", "fluorescence", "oxygen", "beamAttenuation"))) %>%
+  ggplot(aes(x = value, y = depth)) +
+  facet_wrap(~variable, scales = "free", strip.position = "bottom") +
+  scale_y_reverse() + geom_path()
+```
+
+```{r}
+ctdP2Binned %>% rename(depth = depthBin) %>% filter(depth <= 1500, cast == 43) %>% ungroup() %>%
+  mutate(variable = fct_relevel(variable, levels = c("temperature", "salinity", "sigmaT", "fluorescence", "oxygen", "beamAttenuation"))) %>%
+  ggplot(aes(x = value, y = depth)) +
+  facet_wrap(~variable, scales = "free", strip.position = "bottom",
+             labeller = as_labeller(c(temperature = "Temperature (\u00B0C)", salinity = "Salinity (ppt)", sigmaT = "Density (\u03C3\u03b8)", fluorescence = "Flurescence (rfu)",
+                                      oxygen = "oxygen (mg/L)", beamAttenuation = "Beam Attenuation \n (relative)"))) +
+  scale_y_reverse() + geom_path() + xlab(NULL) + theme_cowplot() + theme(strip.background = element_blank(), strip.placement = "outside")
+
+ggsave("figures/CTDSummary.svg")
+```
+
+Cryptic warning mesage that seems to come from the fct_relevel, but that doenst have an effect

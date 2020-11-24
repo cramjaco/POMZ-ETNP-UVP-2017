@@ -1,0 +1,177 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+```{r}
+library(mgcv)
+library(tidyverse)
+```
+
+
+data01 %>% filter(depth == 125) %>% select(lb, binsize, vol, TotalParticles)
+
+https://stats.stackexchange.com/questions/496900/why-are-the-upper-bounds-of-my-poisson-gam-so-high
+
+I am wondering why, when I run a gam with `family = poisson`. I get really large confedence intervals in some cases when I actually see zero particles.
+
+# Background
+Here is my situation:
+
+I measured the size and number of particles in a 414 L volume of the ocean.
+
+My data look like this
+
+```{r}
+particles0 <- structure(list(lb = c(0.102, 0.128, 0.161, 0.203, 0.256, 0.323, 
+0.406, 0.512, 0.645, 0.813, 1.02, 1.29, 1.63, 2.05, 2.58, 3.25, 
+4.1, 5.16, 6.5, 8.19, 10.3, 13, 16.4, 20.6, 26), binsize = c(0.026, 
+0.033, 0.042, 0.053, 0.067, 0.083, 0.106, 0.133, 0.168, 0.207, 
+0.27, 0.34, 0.42, 0.53, 0.67, 0.85, 1.06, 1.34, 1.69, 2.11, 2.7, 
+3.4, 4.2, 5.4, 6), vol = c(413.6, 413.6, 413.6, 413.6, 413.6, 
+413.6, 413.6, 413.6, 413.6, 413.6, 413.6, 413.6, 413.6, 413.6, 
+413.6, 413.6, 413.6, 413.6, 413.6, 413.6, 413.6, 413.6, 413.6, 
+413.6, 413.6), TotalParticles = c(1596, 513, 571, 211, 131, 84, 
+36, 18, 12, 5, 3, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)), class = c("tbl_df", 
+"tbl", "data.frame"), row.names = c(NA, -25L))
+```
+
+```{r}
+ggplot(particles0, aes(x = lb, y = TotalParticles)) + geom_point() + scale_y_log10() + scale_x_log10() + theme_bw()
+```
+
+You can see that there are lots of small particles and fewer big ones. 
+
+Also, we don't see any particles bigger than 1.29. For various reasons, I'd like to extrapolate the number of particles larger than 1.29 using a glm and gam model.
+
+If I normalize the number of particles to volume and size, I expect them to follow a more or less linear distribution.
+
+```{r}
+particles <- particles0 %>% mutate(nparticles = TotalParticles/vol, n_nparticles = nparticles/binsize)
+ggplot(particles, aes(x = lb, y = n_nparticles)) + geom_point() + scale_y_log10() + scale_x_log10() + theme_bw()
+```
+
+This figure looks similar to the one above, but these generally and actually tend to be more linear.
+
+# GLM
+
+The first model that I built was a poisson glm and I used it to extrapolate values with confedence intervals.
+
+```{r}
+# family was poisson
+my_glm <- function(df){
+  glm(TotalParticles ~ log(lb), offset = log(vol * binsize), family = quasipoisson, data = df)
+}
+
+modGlm <- my_glm(particles)
+predGlm <- predict(modGlm, type = "link", se.fit = TRUE) %>% as_tibble
+```
+
+```{r}
+## Bind the model estemates to the actual data and estemate confedence intervals
+particles_01 <- bind_cols(particles, predGlm) %>%
+  rename(glmFit = fit, glmSE = se.fit) %>%
+  ## estemate lower and upper confedence intervals, in link space
+  mutate(glmLower = glmFit - 2 * glmSE, glmUpper = glmFit + 2 * glmSE) %>% 
+  ## Translate into response space
+  mutate(glmTP = exp(glmFit), glmTPLower = exp(glmLower), glmTPUpper = exp(glmUpper))
+```
+
+I'm not sure why I don't have to address the offsets here to get back into total particle space, but emperically it doesn't seem to be necessary.
+
+Here I show total particles, against their fitted values
+```{r}
+particles_01 %>% ggplot(aes(x = lb)) +
+  ## Actual Data (Solid Circles)
+  geom_point(aes(y = TotalParticles)) +
+  ## Modelled Linear Fit
+  geom_point(aes(y = glmTP), shape = 1) +
+  geom_errorbar(aes(ymin = glmTPLower, ymax = glmTPUpper)) +
+  scale_x_log10() + scale_y_log10() + labs(title = "Total Particles + GLM Fit") +
+  geom_hline(yintercept = 1)
+```
+
+Here I show normalized values vs fitted predictions.
+
+```{r}
+particles_01 %>% ggplot(aes(x = lb)) +
+  ## Actual Data (Solid Circles)
+  geom_point(aes(y = n_nparticles)) +
+  ## Modelled Linear Fit
+  geom_point(aes(y = glmTP/vol/binsize), shape = 1) +
+  geom_errorbar(aes(ymin = glmTPLower/vol/binsize, ymax = glmTPUpper/vol/binsize)) +
+  scale_x_log10() + scale_y_log10() + labs(title = "Normalized Particles + GLM Fit")
+```
+This generally seems reaosonable to me. Its a line, in log-log space. When we see zeros, we have estemates of true values that are less than one. Thus these seem like ok predictions if I assume a power law relationship between particle size and normalized particle number.
+
+There are a few things I don't love.
+1 - Those confedence intervals are suspiciously small as we get into the larger particle sizes.
+2 - There's a little bendyness to the actual points that the data that I'd like to allow for. This is especially the problem in some other sets of these data.
+ 
+
+# GAM
+
+Klaus: what is quasipoisson
+Library gamlss (don't use the lss part)
+In gam universe. Is it converging on the same thing as poisson. How valid is poisson assumption.
+Look at help page on selecting gams
+Maybe compare summaries of nb, quasipoisson and linear and smooth
+I might be able to use a compound gam. 
+
+Smoothing method may depend on scale, find one that doesn't. The standard s doesn't but others might work.
+
+> gamBoth <- gam(TotalParticles ~ (log(lb)) + s(log(lb)), offset = log(vol * binsize), family = nb(), data = particles)
+> summary(gamBoth)
+
+Not enough to justify being a line.
+
+
+One thing I tried was doing a poisson gam instead. This allows for some bendyness which should allow the confedence intervals to be larger for the larger particles, and also fit the small particles a little better too.
+
+```{r}
+# was poisson
+my_gam <- function(df){
+  gam(TotalParticles ~ s(log(lb)), offset = log(vol * binsize), family = nb(), data = df)
+}
+
+modGam <- my_gam(particles)
+predGam <- predict(modGam, type = "link", se.fit = TRUE) %>% as_tibble
+```
+
+```{r}
+particles_02 <- bind_cols(particles, predGam) %>%
+  rename(gamFit = fit, gamSE = se.fit) %>%
+  ## estemate lower and upper confedence intervals, in link space
+  mutate(gamLower = gamFit - 2 * gamSE, gamUpper = gamFit + 2 * gamSE) %>% 
+  ## Translate into response space
+  mutate(gamTP = exp(gamFit), gamTPLower = exp(gamLower), gamTPUpper = exp(gamUpper))
+```
+Unlike the glm, these end up in units of n_nparticles. Again, I determined this emperically.
+
+I translate everything back into total particle space first in this case.
+
+```{r}
+particles_02 %>% ggplot(aes(x = lb)) +
+  ## Actual Data (Solid Circles)
+  geom_point(aes(y = TotalParticles)) +
+  ## Modelled Linear Fit
+  geom_point(aes(y = gamTP * vol * binsize), shape = 1) +
+  geom_errorbar(aes(ymin = gamTPLower * vol * binsize, ymax = gamTPUpper * vol * binsize)) +
+  scale_x_log10() + scale_y_log10() + labs(title = "Total Particles + Gam Fit") + 
+  geom_hline(yintercept = 1)
+```
+
+```{r}
+particles_02 %>% ggplot(aes(x = lb)) +
+  ## Actual Data (Solid Circles)
+  geom_point(aes(y = n_nparticles)) +
+  ## Modelled Linear Fit
+  geom_point(aes(y = gamTP), shape = 1) +
+  geom_errorbar(aes(ymin = gamTPLower, ymax = gamTPUpper)) +
+  scale_x_log10() + scale_y_log10() + labs(title = "Normalized Particles + Gam Fit") 
+```
+These extrapolations seem reasonable as mean estemates, but the standard errors look strange to me. At least their upper bounds do.
+
+Why do the confedence intervals of the gam range into the very large for the large particles? I would think that if one saw no particles one would at least know that the true concentration of the particles was not 10^14. So it makes sense to me that the lower bounds can be very small, but not that they are as large as they are for the large particles. Is the model ignoring the zeros and treeating them as missing values? Is there anything I can do to make it take the zeros into consideration?
+
+Thanks for any advice.

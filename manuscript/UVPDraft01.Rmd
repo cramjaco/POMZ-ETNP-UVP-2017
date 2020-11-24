@@ -32,23 +32,51 @@ Stuff that is known about particle size distributions (esp, Guidi and Kiko)
 What we are trying to do.
 
 # Methods
-All measurments were taken on board the R/V Sekuliaq from XX January 2017 thorugh XX January 2017 at XXX Lat XXX Long.  
+All measurments were taken on board the R/V Sekuliaq from XX January 2017 thorugh XX January 2017 at XXX Lat XXX Long.
+
+## Water property measurment
+We measured water properties of temperature, salinity, fluorescence, oxygen concentration and turbidity using a XXX CTD {get sensor information}. Data were processed using seabird software and analyzed and visualized in R.
 
 ## Particle size measurments
-Particle size data were collected by underwater vision profiler, processed using custom matlab scripts, and analyzed in R.
+Particle size data were collected by underwater vision profiler (UVP) that was mounted to the CTD and deployed for all CTD casts shallower than 2500m. A UVP is a combenation camera and light source that describes the abundance and size of particles from 100 microns to several centemeters in size (ref). Particles have been previously shown to be primarely "marine snow" but may also include a small number of zooplankton and visual artifacts. UVP data were processed using custom matlab scripts, and analyzed in R.
 
 ## Flux measurments
-Particles were collected in incubating particle traps (REF). Traps were primarely used for incubation studies which will be reported elsewhere, but did collect data about carbon flux, which is reportd here. Two types of traps were deployed.  included traps with a X m diameter cone opening, and a larger Xm diameter 200 micron nylon mesh. The particles were collected in two c, a "plus particles" trap, which collected particles and incubated them for a period, and a "top collectors"
+Particles were collected in incubating particle traps (REF). Traps were used to performincubation studies which will be reported elsewhere. As part of these studies, the traps also generated data about carbon flux, which is reportd here. Two types of traps were deployed.  The particles were collected in two kinds of traps. One set of traps, generally deployed in shallower water had a solid cone opening with a X m diameter cone opening. The second set had larger conical Xm diameter 200 micron nylon mesh net at the top. In all cases particles collected in the net or cone fell into one of two chambers. The "plus-particles" chamber collected particles from the net and incubated them for an amount of time that ranged from X days to X days. The top-collector trap collected particles, and then returned immediately to the surface. We prferentially used data from the "top-collector"; however in many cases, data was only available forom the "plus-particles" trap, in which case we used that data.
 
+{What if I move the analysis to the results section}
 ## Analysis
 
+The total number of particles in each size were visualized. We calcualted total particle number by multiplying over all size bins.
+
+### Particle size distribution
+
+ We determined the slope and intercept of the particle size distribution spectrum by fitting a power law of form $log(# Particles) = Int + PSD * log(Size)$. Because large particles were infrequently detected we used a poisson- general linear model that considered the volume of paricles sampled and that assumed that the residuals of the data followed a poisson (rather than normal) distribution.
+ 
+### Estimating particle flux
+
+We estemated particle flux by assuming that particle flux in each size bin followed the equation `flux = C_f * d ^ a` (guidi 2008 ref). We used Alledredge and XXX's estemate of `a` and then fit the observed flux measurments to particle measurments to estemate C_f. We then used this equation to estimate flux from the data collected by the UVP.
+
+### Size specific information
+
+We seperately analyzed total particle numbers, particle size distribution, and particle flux for particles larger than 53 microns, and those smaller than 53 microns to determine the relative contributions of these two particle classes to particle properties
+
+## Variability
+We quantified whether the sample to sample variability 
+
 ## Model Formuation
+
 
 # Results
 
 ## Chemical Data
+Temperature, salinity, density, fluorescence, oxygen and turbidity were examined (Figure 2). The oxygen minimum zone extends from the base of the primary chlorophyl maximum layer (XXXm) to 950m. This site, like many in the ETNP OMZ has two fluorescence maxima, one above, and one inside of the OMZ. Turbidity is highest above the omz, and decreases with depth, and then increases again at the base of the oxygen minimum zone.
+
+## Acoustic data
+EK60 data, not shown, show a peak of migratory plankton which travel from the surface at dawn to a maximum depth of XXXm and then return to the surface at dusk. 
 
 ## Particle abundance measurments 
+Particles at all depths are most abundant in the smallest size fraction and less abundant in larger size fractions. It was typical to observe no particles larger than Xmm.
+The total number of particles at each depth was _______. Most of these were small particles (Figure X). 
 
 
 # Figures
