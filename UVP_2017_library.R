@@ -399,3 +399,52 @@ bin_depths <- function(x, DepthSummary = NULL, bins = BianchiBins){
 }
 
 
+
+# combine_timesteps <- function(x, DepthSummary = NULL){
+#   # Load in data, flexably
+#   x2 <- parse_jac_input2(x, DepthSummary)
+#   EachSize = x2[[1]]
+#   DepthSummary = x2[[2]]
+#   
+#   # consistency with other expressions
+#   EachSize2 <- EachSize
+#   
+#   EachSize3 <- EachSize2 %>%
+#     select(-nparticles, -n_nparticles) %>%
+#     group_by(profile, time, DepthBin, lb, ub, binsize) %>%
+#     summarize(vol = sum(vol), TotalParticles = sum(TotalParticles)) %>%
+#     ungroup()
+#   
+# }
+
+## 24 November 2020
+
+my_double_gam <- function(df){
+  gam(TotalParticles ~s(log(lb), log(depth)), offset = log(vol * binsize), family = nb(), data = df)
+}
+
+expand_with_gam <- function(df, mod){
+  loc_pred <- predict(mod, type = "link", se.fit = TRUE) %>% as.data.frame %>% mutate(lower = fit - 2 * se.fit, upper = fit + 2 * se.fit) %>% mutate(resp_fit = exp(fit), resp_lower = exp(lower), resp_upper = exp(upper))
+  loc_df <- bind_cols(df, loc_pred)
+  loc_df
+}
+
+gam_size_ggplot <- function(df){
+  ggplot(df, aes(x = lb)) + geom_point(aes(y = resp_fit), shape = 1) +
+  geom_errorbar(aes(ymin = resp_lower, ymax = resp_upper)) + 
+  geom_point(aes(y = n_nparticles)) + scale_x_log10() + scale_y_log10()
+}
+
+gam_size_ggplot_2d <- function(df){
+  df %>% ggplot(aes(x = resp_fit, y = depth, col = log(lb), group = lb)) +
+    scale_y_reverse() + geom_point() + scale_x_log10(limits = c(10^-8, NA)) +
+    scale_color_viridis_c() + geom_path() + geom_vline(xintercept = 1) + geom_vline(xintercept = 5)  +
+    geom_errorbar(aes(xmin = resp_lower, xmax = resp_upper), width = 10, alpha = 0.5) + theme_bw()
+}
+
+nnp_size_ggplot_2d <- function(df){
+  df %>% ggplot(aes(x = n_nparticles, y = depth, col = log(lb), group = lb)) +
+    scale_y_reverse() + geom_point() + scale_x_log10(limits = c(10^-8, NA)) +
+    scale_color_viridis_c() + geom_path() + geom_vline(xintercept = 1) + geom_vline(xintercept = 5)  +
+     theme_bw()
+}

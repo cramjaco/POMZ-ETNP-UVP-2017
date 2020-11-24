@@ -1,0 +1,112 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+The goal here is instead of assuming everything is a power law, I'll use a gam to interpolate each size bin.
+Then we do the generally same analysis.
+
+```{r}
+library(tidyverse)
+library(tidyselect)
+pass <- function(x){x}
+source("Remin_Library.R")
+```
+
+Data from elsewhere
+```{r, message= FALSE}
+options(readr.default_locale=readr::locale(tz="Mexico/General"))
+source("UVP_2017_library.R")
+
+ES01 <- read_csv("dataOut/binned_EachSize.csv") %>% filter(depth <= 1000)
+DS01 <- read_csv("dataOut/binned_DepthSummary.csv") %>% filter(depth <= 1000)
+twinS <- list(ES01, DS01)
+```
+
+```{r}
+SimpleBins <- seq(from = 0, to = 1100, by = 50) # Modified the By
+
+#debug(bin_depths)
+binnedS <- bin_depths(twinS, bins = SimpleBins) %>% calc_psd
+#binnedS <- bin_depths(twinS, bins = BianchiBins) %>% calc_psd
+
+ESS <- binnedS[[1]]
+DSS <- binnedS[[2]]
+```
+
+24 November 2020
+
+
+
+```{r}
+# I think I want to family gamma this if it goes negative; or maybe bust poisson back out
+
+
+
+S43data <- ESS %>% filter(profile == "stn_043", depth <= 1000)
+
+S43GAM2X <- S43data %>% my_double_gam
+summary(S43GAM2X)
+```
+
+```{r}
+S43dataEx <- expand_with_gam(S43data, S43GAM2X)
+```
+
+```{r}
+nnp_size_ggplot_2d(S43dataEx)
+gam_size_ggplot_2d(S43dataEx)
+```
+
+
+
+
+Order of operations
+(1) recalculate things that need to be recalculated (like flux and what not)
+(2) calculate disaggregation
+
+# Recalculating
+
+I should make the following code blocks into one function...
+```{r}
+S43Smooth <- S43dataEx %>%
+  select(profile:vol, depth, n_nparticles = resp_fit) %>%
+  mutate(nparticles = n_nparticles * binsize, TotalParticles = nparticles * vol)
+
+S43Twin <- S43Smooth %>% make_twin_df_list() %>%
+  calc_particle_parameters()
+
+Esmooth42 <- S43Twin[[1]]
+Dsmooth42 <- S43Twin[[2]]
+```
+
+```{r}
+specData42 <- Esmooth42 %>% select(profile, depth, lb, nnp = n_nparticles) %>%
+  mutate(sizeFlux = C_f_global * nnp * ag_global) %>%
+  nest(spec_meta = c(lb, nnp, sizeFlux))
+```
+
+```{r}
+Dsmooth42_prepaired <- Dsmooth42 %>% left_join(specData42, by = c("profile", "depth")) %>%
+  mutate(spec_only = map(spec_meta, ~pull(., nnp))) %>% 
+  mutate(spec_prev = lag(spec_only),
+         flux_prev = lag(tot_flux),
+         DF = flux_prev - tot_flux,
+         DFP = 1 - DF/flux_prev
+         )
+```
+
+```{r}
+Dsmooth42_fixDFP <- Dsmooth42_prepaired %>%
+  mutate(use_this_DFP = map2_dbl(spec_prev, DFP, optFun))
+```
+
+```{r}
+Dsmooth42_remineralized <- Dsmooth42_fixDFP %>% .[-1,] %>%
+  mutate(spec_pred = map2(spec_prev, use_this_DFP, remin_smooth_shuffle))
+```
+
+
+```{r}
+sessionInfo()
+```
