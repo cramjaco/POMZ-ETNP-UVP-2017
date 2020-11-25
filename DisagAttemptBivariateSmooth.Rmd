@@ -106,6 +106,56 @@ Dsmooth42_remineralized <- Dsmooth42_fixDFP %>% .[-1,] %>%
   mutate(spec_pred = map2(spec_prev, use_this_DFP, remin_smooth_shuffle))
 ```
 
+Runs as written. Lets do calcs later.
+
+```{r}
+Dsmooth42_concise <- Dsmooth42_remineralized %>% 
+  mutate(spec_meta = map2(spec_meta, spec_prev, ~tibble(.x, nnp_prev = .y))) %>%
+  mutate(spec_meta = map2(spec_meta, spec_pred, ~tibble(.x, nnp_pred = .y))) %>%
+  select(profile, time, depth, DF, DFP, spec_meta)
+
+Dsmooth42_unnest <- Dsmooth42_concise %>% unnest(spec_meta)
+```
+
+```{r}
+Dsmooth42_sr02 <- Dsmooth42_unnest %>% 
+  mutate(sizeFlux_prev = C_f * nnp_prev ^ ag,
+         sizeFlux_pred = C_f * nnp_pred ^ ag)
+Dsmooth42_sr02_Tot <- Dsmooth42_sr02 %>% group_by(depth) %>%
+  summarize(DF = first(DF), DFP = first(DFP),
+            Flux = sum(sizeFlux), Flux_Prev = sum(sizeFlux_prev), Flux_Pred = sum(sizeFlux_pred))
+Dsmooth42_sr02_Small <- Dsmooth42_sr02 %>%
+  filter(lb <= 0.53) %>%
+  group_by(depth) %>%
+  summarize(Flux = sum(sizeFlux), Flux_Prev = sum(sizeFlux_prev), Flux_Pred = sum(sizeFlux_pred))
+
+Dsmooth42_sr02_Big <- Dsmooth42_sr02 %>%
+  filter(lb > 0.53) %>%
+  group_by(depth) %>%
+  summarize(Flux = sum(sizeFlux), Flux_Prev = sum(sizeFlux_prev), Flux_Pred = sum(sizeFlux_pred))
+
+Dsmooth42_sr02_All <- Dsmooth42_sr02_Tot %>%
+  left_join(Dsmooth42_sr02_Small, by = "depth", suffix = c("", "_Small")) %>%
+  left_join(Dsmooth42_sr02_Big, by = "depth", suffix = c("", "_Big"))  %>%
+  mutate(osps = Flux_Small - Flux_Pred_Small, Disag = osps/DF)
+```
+
+```{r}
+Dsmooth42_sr02_All
+```
+
+```{r}
+Dsmooth42_sr02_All %>% ggplot(aes(x = DFP, y = depth)) + scale_y_reverse() + geom_point()
+```
+
+
+```{r}
+Dsmooth42_sr02_All %>% filter(DFP <= 1) %>%
+  ggplot(aes(y = depth, x = osps)) + geom_point() +
+  scale_y_reverse()
+```
+
+Welp. These are suspiciously large.
 
 ```{r}
 sessionInfo()
