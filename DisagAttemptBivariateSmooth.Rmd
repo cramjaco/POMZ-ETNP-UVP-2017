@@ -10,7 +10,8 @@ Then we do the generally same analysis.
 library(tidyverse)
 library(tidyselect)
 pass <- function(x){x}
-source("Remin_Library.R")
+#source("Remin_Library.R")
+source("ModelStuff.R")
 ```
 
 Data from elsewhere
@@ -81,14 +82,15 @@ Dsmooth42 <- S43Twin[[2]]
 ```
 
 ```{r}
-specData42 <- Esmooth42 %>% select(profile, depth, lb, nnp = n_nparticles) %>%
-  mutate(sizeFlux = C_f_global * nnp * ag_global) %>%
-  nest(spec_meta = c(lb, nnp, sizeFlux))
+specData42 <- Esmooth42 %>% select(profile, depth, lb, nparticles, n_nparticles, flux_fit) %>%
+  #mutate(sizeFlux = nnp * C_f_global * lb_vec * ag_global) %>%
+  nest(spec_meta = c(lb, nparticles, n_nparticles, flux_fit))
 ```
 
 ```{r}
 Dsmooth42_prepaired <- Dsmooth42 %>% left_join(specData42, by = c("profile", "depth")) %>%
-  mutate(spec_only = map(spec_meta, ~pull(., nnp))) %>% 
+   mutate(spec_only = map(spec_meta, ~pull(., nparticles))) %>% 
+  # mutate(flux2 = map(spec_meta, ~summarize(., flux3 = sum(sizeFlux)))) %>%
   mutate(spec_prev = lag(spec_only),
          flux_prev = lag(tot_flux),
          DF = flux_prev - tot_flux,
@@ -97,9 +99,55 @@ Dsmooth42_prepaired <- Dsmooth42 %>% left_join(specData42, by = c("profile", "de
 ```
 
 ```{r}
+shuffle_tune(Dsmooth42_prepaired$DFP[[5]], Dsmooth42_prepaired$spec_only[[5]], Dsmooth42_prepaired$DFP[[5]])
+
+```
+
+```{r}
+# debugging
+Dsmooth42_prepaired$DFP[[5]]
+optFun(Dsmooth42_prepaired$spec_only[[5]], Dsmooth42_prepaired$DFP[[5]])
+```
+
+```{r}
+# debugging
+shuffle_tune(optFun(Dsmooth42_prepaired$spec_only[[5]], Dsmooth42_prepaired$DFP[[5]]), Dsmooth42_prepaired$spec_only[[5]], Dsmooth42_prepaired$DFP[[5]])
+
+remin_smooth_shuffle(Dsmooth42_prepaired$spec_only[[5]], optFun(Dsmooth42_prepaired$spec_only[[5]], Dsmooth42_prepaired$DFP[[5]]))
+remin_smooth_shuffle(Dsmooth42_prepaired$spec_only[[5]], Dsmooth42_prepaired$DFP[[5]])
+```
+
+```{r}
 Dsmooth42_fixDFP <- Dsmooth42_prepaired %>%
   mutate(use_this_DFP = map2_dbl(spec_prev, DFP, optFun))
 ```
+
+Testing what is going on with these spectra
+
+```{r}
+test_prev <- Dsmooth42_fixDFP %>% filter(depth == 125) %>% pull(spec_prev) %>% .[[1]]
+test_spec <- Dsmooth42_fixDFP %>% filter(depth == 125) %>% pull(spec_only) %>% .[[1]]
+test_DFP <- Dsmooth42_fixDFP %>% filter(depth == 125) %>% pull(DFP)
+test_use_DFP <- Dsmooth42_fixDFP %>% filter(depth == 125) %>% pull(use_this_DFP)
+test_spec
+test_DFP
+test_use_DFP
+
+test_shuf <- remin_smooth_shuffle(test_prev, test_use_DFP)
+test_shuf
+
+optFun(test_prev, test_DFP)
+
+shuffle_tune(test_use_DFP, test_prev, test_DFP)
+```
+
+```{r}
+sum(test_prev * C_f_global * lb_vec ^ ag_global)
+sum(test_spec * C_f_global * lb_vec ^ ag_global)
+sum(test_shuf * C_f_global * lb_vec ^ ag_global)
+```
+
+test shuf's flux should equal test_spec's flux...
 
 ```{r}
 Dsmooth42_remineralized <- Dsmooth42_fixDFP %>% .[-1,] %>%
@@ -110,41 +158,58 @@ Runs as written. Lets do calcs later.
 
 ```{r}
 Dsmooth42_concise <- Dsmooth42_remineralized %>% 
-  mutate(spec_meta = map2(spec_meta, spec_prev, ~tibble(.x, nnp_prev = .y))) %>%
-  mutate(spec_meta = map2(spec_meta, spec_pred, ~tibble(.x, nnp_pred = .y))) %>%
+  mutate(spec_meta = map2(spec_meta, spec_prev, ~tibble(.x, np_prev = .y))) %>%
+  mutate(spec_meta = map2(spec_meta, spec_pred, ~tibble(.x, np_pred = .y))) %>%
   select(profile, time, depth, DF, DFP, spec_meta)
 
 Dsmooth42_unnest <- Dsmooth42_concise %>% unnest(spec_meta)
+Dsmooth42_unnest
 ```
 
 Examine change
 ```{r}
-Dsmooth42_unnest %>% filter(depth == 125) %>% ungroup() %>% select(lb, nnp, nnp_prev, nnp_pred) %>% pivot_longer(cols = c(nnp, nnp_prev, nnp_pred)) %>% 
+
+Dsmooth42_unnest %>% filter(depth == 125) %>% ungroup() %>% select(lb, nparticles, np_prev, np_pred) %>% pivot_longer(cols = c(nparticles, np_prev, np_pred)) %>% 
   ggplot(aes(x = lb, y = value, col = name)) + geom_point() + scale_x_log10() + scale_y_log10() + scale_color_manual(values = c("red", "blue", "gray20"))
+
+Dsmooth42_unnest %>% filter(depth == 625) %>% ungroup() %>% select(lb, nparticles, np_prev, np_pred) %>% pivot_longer(cols = c(nparticles, np_prev, np_pred)) %>% 
+  ggplot(aes(x = lb, y = value, col = name)) + geom_point(alpha = 0.75, size = 1) + scale_x_log10() + scale_y_log10() + scale_color_manual(values = c("red", "blue", "gray20"))
+
 ```
 This doesn't look right.
 
 ```{r}
+f_vec = C_f_global * lb_vec ^ ag_global
+
+Dsmooth42_unnest %>% filter(depth == 125) %>% ungroup() %>% select(lb, nparticles, np_prev, np_pred) %>% pivot_longer(cols = c(nparticles, np_prev, np_pred)) %>% 
+  ggplot(aes(x = lb, y = value * C_f_global * lb  ^ ag_global, col = name)) + geom_point() + scale_x_log10() + scale_y_log10() + scale_color_manual(values = c("red", "blue", "gray20"))
+```
+
+
+```{r}
+# what is going on with my keyboard
 Dsmooth42_sr02 <- Dsmooth42_unnest %>% 
-  mutate(sizeFlux_prev = C_f * nnp_prev ^ ag,
-         sizeFlux_pred = C_f * nnp_pred ^ ag)
+  mutate(flux_prev = np_prev * f_vec,
+         flux_pred = np_pred * f_vec,
+         flux2 = nparticles * f_vec)
 Dsmooth42_sr02_Tot <- Dsmooth42_sr02 %>% group_by(depth) %>%
   summarize(DF = first(DF), DFP = first(DFP),
-            Flux = sum(sizeFlux), Flux_Prev = sum(sizeFlux_prev), Flux_Pred = sum(sizeFlux_pred))
+            Flux = sum(flux2), Flux_Prev = sum(flux_prev), Flux_Pred = sum(flux_pred))
 Dsmooth42_sr02_Small <- Dsmooth42_sr02 %>%
   filter(lb <= 0.53) %>%
   group_by(depth) %>%
-  summarize(Flux = sum(sizeFlux), Flux_Prev = sum(sizeFlux_prev), Flux_Pred = sum(sizeFlux_pred))
+  summarize(Flux = sum(flux2), Flux_Prev = sum(flux_prev), Flux_Pred = sum(flux_pred))
 
 Dsmooth42_sr02_Big <- Dsmooth42_sr02 %>%
   filter(lb > 0.53) %>%
   group_by(depth) %>%
-  summarize(Flux = sum(sizeFlux), Flux_Prev = sum(sizeFlux_prev), Flux_Pred = sum(sizeFlux_pred))
+  summarize(Flux = sum(flux2), Flux_Prev = sum(flux_prev), Flux_Pred = sum(flux_pred))
 
 Dsmooth42_sr02_All <- Dsmooth42_sr02_Tot %>%
   left_join(Dsmooth42_sr02_Small, by = "depth", suffix = c("", "_Small")) %>%
   left_join(Dsmooth42_sr02_Big, by = "depth", suffix = c("", "_Big"))  %>%
-  mutate(osps = Flux_Small - Flux_Pred_Small, Disag = osps/DF)
+  mutate(osps = Flux_Small - Flux_Pred_Small, Disag = osps/DF) %>%
+  mutate(obpb = Flux_Pred_Big - Flux_Big) # should equal osps, but doesn't
 ```
 
 ```{r}
@@ -160,9 +225,13 @@ Dsmooth42_sr02_All %>% ggplot(aes(x = DFP, y = depth)) + scale_y_reverse() + geo
 Dsmooth42_sr02_All %>% filter(DFP <= 1) %>%
   ggplot(aes(y = depth, x = osps)) + geom_point() +
   scale_y_reverse()
+
+Dsmooth42_sr02_All %>% filter(DFP <= 1) %>%
+  ggplot(aes(y = depth, x = Disag)) + geom_point() +
+  scale_y_reverse()
 ```
 
-Welp. These are suspiciously large.
+Still bizzare. Was running wrong code file. Works now.
 
 ```{r}
 sessionInfo()

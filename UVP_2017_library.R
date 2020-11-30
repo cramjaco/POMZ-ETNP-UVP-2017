@@ -111,7 +111,7 @@ calc_particle_parameters <- function(x, DepthSummary = NULL){
   
   alpha = 0.52 # Alldredge
   gamma = 0.26 # Alldredge & Gotschalk
-  C_f_fit = 10.5 # Normalize_UVP_Flux.Rmd, nonlinear for now
+  C_f_fit = 10.51 # Normalize_UVP_Flux.Rmd, nonlinear for now
   ag_fit = alpha + gamma # Zerod out for now; I'd like to clean this all up soon.
   
   EachSize2 <- EachSize %>% 
