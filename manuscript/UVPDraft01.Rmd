@@ -18,7 +18,7 @@ By comparing observed particle size distributions to those predicted by models i
 These patterns suggest that the oxygen minimum zone affects, but does not eliminate the role of zooplankton in transporting organic carbon to depth, and breaking large particles into smaller particles due to sloppy feeding.
 
 # Introduction
-
+## And:
 * Some steinberg model of the role of zooplankton in flux.
 * Likely different in OMZ
 
@@ -29,7 +29,13 @@ Stuff that is known about zooplankton particle interactions.
 
 Stuff that is known about particle size distributions (esp, Guidi and Kiko)
 
-What we are trying to do.
+## But
+It is not known how migratory zooplankton affect particle size distributions, and if they lead to diel variability in particle flux that might affect overall transport into the deep ocean.
+It is not fully known how oxygen limitation affects particle size dynamics and flux.
+
+## Therefore
+
+We conducted the first ever time-series analysis of particles, in an oxygne minimum zone. With the goal of normalizing to observed flux, and comparing particle size data to acoustic data about the distributions of zooplankton and larger orgasnisms. 
 
 # Methods
 All measurments were taken on board the R/V Sekuliaq from XX January 2017 thorugh XX January 2017 at XXX Lat XXX Long.
@@ -38,7 +44,7 @@ All measurments were taken on board the R/V Sekuliaq from XX January 2017 thorug
 We measured water properties of temperature, salinity, fluorescence, oxygen concentration and turbidity using a XXX CTD {get sensor information}. Data were processed using seabird software and analyzed and visualized in R.
 
 ## Particle size measurments
-Particle size data were collected by underwater vision profiler (UVP) that was mounted to the CTD and deployed for all CTD casts shallower than 2500m. A UVP is a combenation camera and light source that describes the abundance and size of particles from 100 microns to several centemeters in size (ref). Particles have been previously shown to be primarely "marine snow" but may also include a small number of zooplankton and visual artifacts. UVP data were processed using custom matlab scripts, and analyzed in R.
+Particle size data were collected by underwater vision profiler (UVP) that was mounted to the CTD and deployed for all CTD casts shallower than 2500m. A UVP is a combenation camera and light source that describes the abundance and size of particles from 100 microns to several centemeters in size (ref). Particles have been previously shown to be primarely "marine snow" but may also include a small number of zooplankton and visual artifacts. UVP data were processed using custom matlab scripts, uploaded to XXX, and analyzed in R.
 
 ## Flux measurments
 Particles were collected in incubating particle traps (REF). Traps were used to performincubation studies which will be reported elsewhere. As part of these studies, the traps also generated data about carbon flux, which is reportd here. Two types of traps were deployed.  The particles were collected in two kinds of traps. One set of traps, generally deployed in shallower water had a solid cone opening with a X m diameter cone opening. The second set had larger conical Xm diameter 200 micron nylon mesh net at the top. In all cases particles collected in the net or cone fell into one of two chambers. The "plus-particles" chamber collected particles from the net and incubated them for an amount of time that ranged from X days to X days. The top-collector trap collected particles, and then returned immediately to the surface. We prferentially used data from the "top-collector"; however in many cases, data was only available forom the "plus-particles" trap, in which case we used that data.
@@ -72,7 +78,9 @@ We quantified whether the sample to sample variability
 Temperature, salinity, density, fluorescence, oxygen and turbidity were examined (Figure 2). The oxygen minimum zone extends from the base of the primary chlorophyl maximum layer (XXXm) to 950m. This site, like many in the ETNP OMZ has two fluorescence maxima, one above, and one inside of the OMZ. Turbidity is highest above the omz, and decreases with depth, and then increases again at the base of the oxygen minimum zone.
 
 ## Acoustic data
-EK60 data, not shown, show a peak of migratory plankton which travel from the surface at dawn to a maximum depth of XXXm and then return to the surface at dusk. 
+EK60 data, figure 8. show a peak of migratory plankton which travel from the surface at dawn to a maximum depth of XXXm and then return to the surface at dusk. 
+
+* Similar patterns between different freuencies, with better resoultion by the lower bandwidth. While we expect that small organisms likely have the greatist impact on particles, 
 
 ## Particle abundance measurments 
 Particles at all depths are most abundant in the smallest size fraction and less abundant in larger size fractions. It was typical to observe no particles larger than Xmm.
@@ -103,9 +111,13 @@ Figure 6. Binned particle number, slope, and flux for large ($>= 0.53\, \mu m$) 
 
 Figure 7. **A** Flux profile from smoothed particle size distributions. Regions where flux is *increasing* are coded as {color}. **B** Particle disaggregation, measured by comparing the expectation of a model in which there is no disaggregation to one in which there is disaggregation. It is the descrepancy between the observed and model predicted flux of small particles, devided by the attenuation of large particles. In other words it is the fraction of the decrease in large particle flux that appears as small particle flux.
 
+Figure 8. Acoustic data, measured by EK60, measured over the course of the experiment. Particle flux increases, and particle disaggregation both appear to associate with the top 500 m where organisms of all sizes are sometimes present.
+
 Figure S1. Observed particle size distribution superimposed and the gam fitted particle mean and bootstrapped 95% prediction intervals of those size distributions. That statisticaclly siginificantly more points fall outside of the prediction intervals than by chance alone suggests that there is more variability between points than predicted by random sampling effects alone.
 
-Figure S2. Particle flux at P16 station 100 (Lat XXX, Lon XXX)
+Figure S2. Particle numbers and flux at P16 station 100 (Lat XXX, Lon XXX)
+
+Figure S2. Smoothed particle size distribution data used to inform the disaggregaton model.
 
 # References
 

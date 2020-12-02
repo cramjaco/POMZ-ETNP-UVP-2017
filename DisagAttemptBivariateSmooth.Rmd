@@ -28,8 +28,8 @@ twinS <- list(ES01, DS01)
 SimpleBins <- seq(from = 0, to = 1100, by = 50) # Modified the By
 
 #debug(bin_depths)
-binnedS <- bin_depths(twinS, bins = SimpleBins) %>% calc_psd
-#binnedS <- bin_depths(twinS, bins = BianchiBins) %>% calc_psd
+#binnedS <- bin_depths(twinS, bins = SimpleBins) %>% calc_psd
+binnedS <- bin_depths(twinS, bins = BianchiBins) %>% calc_psd
 
 ESS <- binnedS[[1]]
 DSS <- binnedS[[2]]
@@ -125,10 +125,11 @@ Dsmooth42_fixDFP <- Dsmooth42_prepaired %>%
 Testing what is going on with these spectra
 
 ```{r}
-test_prev <- Dsmooth42_fixDFP %>% filter(depth == 125) %>% pull(spec_prev) %>% .[[1]]
-test_spec <- Dsmooth42_fixDFP %>% filter(depth == 125) %>% pull(spec_only) %>% .[[1]]
-test_DFP <- Dsmooth42_fixDFP %>% filter(depth == 125) %>% pull(DFP)
-test_use_DFP <- Dsmooth42_fixDFP %>% filter(depth == 125) %>% pull(use_this_DFP)
+testDepth = 137.5
+test_prev <- Dsmooth42_fixDFP %>% filter(depth == testDepth) %>% pull(spec_prev) %>% .[[1]]
+test_spec <- Dsmooth42_fixDFP %>% filter(depth == testDepth) %>% pull(spec_only) %>% .[[1]]
+test_DFP <- Dsmooth42_fixDFP %>% filter(depth == testDepth) %>% pull(DFP)
+test_use_DFP <- Dsmooth42_fixDFP %>% filter(depth == testDepth) %>% pull(use_this_DFP)
 test_spec
 test_DFP
 test_use_DFP
@@ -169,11 +170,11 @@ Dsmooth42_unnest
 Examine change
 ```{r}
 
-Dsmooth42_unnest %>% filter(depth == 125) %>% ungroup() %>% select(lb, nparticles, np_prev, np_pred) %>% pivot_longer(cols = c(nparticles, np_prev, np_pred)) %>% 
+Dsmooth42_unnest %>% filter(depth == testDepth) %>% ungroup() %>% select(lb, nparticles, np_prev, np_pred) %>% pivot_longer(cols = c(nparticles, np_prev, np_pred)) %>% 
   ggplot(aes(x = lb, y = value, col = name)) + geom_point() + scale_x_log10() + scale_y_log10() + scale_color_manual(values = c("red", "blue", "gray20"))
 
-Dsmooth42_unnest %>% filter(depth == 625) %>% ungroup() %>% select(lb, nparticles, np_prev, np_pred) %>% pivot_longer(cols = c(nparticles, np_prev, np_pred)) %>% 
-  ggplot(aes(x = lb, y = value, col = name)) + geom_point(alpha = 0.75, size = 1) + scale_x_log10() + scale_y_log10() + scale_color_manual(values = c("red", "blue", "gray20"))
+# Dsmooth42_unnest %>% filter(depth == 625) %>% ungroup() %>% select(lb, nparticles, np_prev, np_pred) %>% pivot_longer(cols = c(nparticles, np_prev, np_pred)) %>% 
+#   ggplot(aes(x = lb, y = value, col = name)) + geom_point(alpha = 0.75, size = 1) + scale_x_log10() + scale_y_log10() + scale_color_manual(values = c("red", "blue", "gray20"))
 
 ```
 This doesn't look right.
@@ -181,7 +182,7 @@ This doesn't look right.
 ```{r}
 f_vec = C_f_global * lb_vec ^ ag_global
 
-Dsmooth42_unnest %>% filter(depth == 125) %>% ungroup() %>% select(lb, nparticles, np_prev, np_pred) %>% pivot_longer(cols = c(nparticles, np_prev, np_pred)) %>% 
+Dsmooth42_unnest %>% filter(depth == testDepth) %>% ungroup() %>% select(lb, nparticles, np_prev, np_pred) %>% pivot_longer(cols = c(nparticles, np_prev, np_pred)) %>% 
   ggplot(aes(x = lb, y = value * C_f_global * lb  ^ ag_global, col = name)) + geom_point() + scale_x_log10() + scale_y_log10() + scale_color_manual(values = c("red", "blue", "gray20"))
 ```
 
@@ -220,18 +221,38 @@ Dsmooth42_sr02_All
 Dsmooth42_sr02_All %>% ggplot(aes(x = DFP, y = depth)) + scale_y_reverse() + geom_point()
 ```
 
+```{r}
+Dsmooth42_sr02_All %>% #filter(DFP <= 1) %>%
+  ggplot(aes(y = depth, x = pracma::nthroot(DF, 3))) + geom_point() +
+  scale_y_reverse()
+
+Dsmooth42_sr02_All %>% #filter(DFP <= 1) %>%
+  ggplot(aes(y = depth, x = pracma::nthroot(DFP, 1))) + geom_point() +
+  scale_y_reverse()
+
+Dsmooth42_sr02_All %>% #filter(DFP <= 1) %>%
+  ggplot(aes(x = depth, y = Flux, 1)) + geom_point() +
+  scale_x_log10() + scale_y_log10()
+```
 
 ```{r}
 Dsmooth42_sr02_All %>% filter(DFP <= 1) %>%
-  ggplot(aes(y = depth, x = osps)) + geom_point() +
+  ggplot(aes(y = depth, x = pracma::nthroot(osps, 3))) + geom_point() +
   scale_y_reverse()
 
 Dsmooth42_sr02_All %>% filter(DFP <= 1) %>%
-  ggplot(aes(y = depth, x = Disag)) + geom_point() +
+  ggplot(aes(y = depth, x = pracma::nthroot(Disag, 3))) + geom_point() +
   scale_y_reverse()
 ```
 
 Still bizzare. Was running wrong code file. Works now.
+Ok. And the disaggregation happens where the zoops go at night.
+
+To do. 
+* Finer bins. 
+* Whole pipeline with different alpha and gamma params. Is this sensitive to those?
+* Dry and reproducable code
+* What is the particle size distribution of the new particles that is appearing in the mid water column and how do they compare to the particles that are appearing at the surface?
 
 ```{r}
 sessionInfo()
