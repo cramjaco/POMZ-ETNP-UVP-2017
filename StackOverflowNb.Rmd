@@ -1,0 +1,77 @@
+---
+title: "DebugGlmBinomial"
+author: "Jacob Cram"
+date: "12/3/2020"
+output: html_document
+---
+
+Dear Internet,
+    I am trying to fit a particular binomial glm to the following data.
+
+```{r}
+testData <- structure(list(lb = c(0.102, 0.128, 0.161, 0.203, 0.256, 0.323, 
+0.406, 0.512, 0.645, 0.813, 1.02, 1.29, 1.63, 2.05, 2.58, 3.25, 
+4.1, 5.16, 6.5, 8.19, 10.3, 13, 16.4, 20.6, 26), TotalParticles = c(50612, 
+20541, 18851, 8058, 5606, 4123, 1995, 1234, 677, 381, 202, 111, 
+75, 42, 64, 118, 127, 83, 9, 2, 4, 7, 67, 8, 143), binsize = c(0.026, 
+0.033, 0.042, 0.053, 0.067, 0.083, 0.106, 0.133, 0.168, 0.207, 
+0.27, 0.34, 0.42, 0.53, 0.67, 0.85, 1.06, 1.34, 1.69, 2.11, 2.7, 
+3.4, 4.2, 5.4, 6), vol = c(309.76, 309.76, 309.76, 309.76, 309.76, 
+309.76, 309.76, 309.76, 309.76, 309.76, 309.76, 309.76, 309.76, 
+309.76, 309.76, 309.76, 309.76, 309.76, 309.76, 309.76, 309.76, 
+309.76, 309.76, 309.76, 309.76)), class = c("tbl_df", "tbl", 
+"data.frame"), row.names = c(NA, -25L))
+```
+
+```{r}
+testData %>% ggplot(aes(x = lb, y = TotalParticles)) + geom_point() + scale_x_log10() + scale_y_log10()
+```
+
+
+I have no trouble fitting a poisson glm to the data.
+
+```{r}
+fit_model <- function(df) glm(TotalParticles ~ log(lb), offset = log(binsize * vol), data = df, family = "poisson")
+summary(fit_model(testData))
+```
+
+I can also fit a quasipoisson model. Which gives me exactly the same coefficients, and all other parameters, as far as I can tell.
+```{r}
+fit_quasi <- function(df) glm(TotalParticles ~ log(lb), offset = log(binsize * vol), data = df, family = "quasipoisson")
+summary(fit_quasi(testData))
+```
+
+However, when I try to fit a negative binomial model, I get this cryptic error message
+
+```{r}
+fit_nb = function(df) MASS::glm.nb(TotalParticles ~ log(lb) + offset(log(vol * binsize)), data = df)
+fit_nb = function(df) MASS::glm.nb(TotalParticles ~ log(lb) , data = df)
+fit_nb(testData)
+```
+
+```{r}
+traceback()
+```
+
+The problem seems related to the non-linear nature of the data. For instance, if I zero out the last five values, I can do the binomial regression.
+
+```{r}
+testDataWorks <- testData
+testDataWorks[(nrow(testDataWorks)-3):nrow(testDataWorks),"TotalParticles"] <- 0
+```
+
+
+
+```{r}
+fit_nb(testDataWorks)
+```
+
+Why exactly is my binomial regression failing? Is there a work-around that I can do to get it to run anyway? I get that these data aren't really particularly linear, but I would like to be able to run the model anyway for reasons (I have a bunch of similar data andthis mostly works for them).
+
+I see that my problem is similar to this one https://stackoverflow.com/questions/20814590/r-na-nan-inf-in-x-error however, the consensus seemed to be that that user's model had way too many parameters, while in my case I have many fewer paramters to predict total particles.
+
+This post https://stats.stackexchange.com/questions/52527/unable-to-fit-negative-binomial-regression-in-r-attempting-to-replicate-publish may also be relevant, though I'm not exactly sure how I would apply it in practice.
+
+Thanks for any advice.
+
+

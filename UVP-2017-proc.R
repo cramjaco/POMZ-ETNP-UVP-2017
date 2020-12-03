@@ -3,10 +3,13 @@
 options(readr.default_locale=readr::locale(tz="Mexico/General"))
 source("UVP_2017_library.R")
 dataP2 <- bring_in_p2()
+dataP16S100 <- bring_in_p16_s100()
 
-## We will always have a data with information about each size, and a summary of each depth
+dataBoth <- combine_projects(dataP2, dataP16S100)
 
-twin01 <- make_twin_df_list(dataP2)
+  ## We will always have a data with information about each size, and a summary of each depth
+
+twin01 <- make_twin_df_list(dataBoth)
 ES01 <- twin01[[1]]
 DS01 <- twin01[[2]]
 

@@ -50,11 +50,70 @@ bring_in_p2 <- function(){
   particleNumbers001
 }
 
+### Import P16 station 100
+
+bring_in_p16_s100 <- function(){
+  require(tidyverse)
+  
+  ## initial read in
+  s100data00 <- read_tsv("data/p16uvp/export_detailed_20190908_00_44_PAR_p16n_100.tsv", locale = locale(encoding = "latin1"))
+  
+  ## just the data we need
+  s100data01 <- s100data00 %>%
+    select(profile = Profile, time = `yyyy-mm-dd hh:mm`, depth = `Depth [m]`, vol = `Sampled volume [L]`, `LPM (102-128 µm) [# l-1]`:`LPM (>26 mm) [# l-1]`) %>%
+    gather(key = "sizeclass", value = "nparticles", `LPM (102-128 µm) [# l-1]`:`LPM (>26 mm) [# l-1]`)
+  
+  ## Convert bin names to values in microns
+  renDf00 <- s100data01 %>% select(sizeclass) %>% unique()
+  
+  renDf01 <- renDf00 %>%
+    mutate(
+      ##bounds, ignoring microns or mm designation
+      lb0 = str_extract(sizeclass, "(?<=\\().*(?=-)") %>% str_extract( ".*(?=-)") %>% as.numeric(),
+      ub0 = str_extract(sizeclass, "(?<=-).*(?=\\s)") %>% str_extract(".*(?=\\s)") %>% str_extract(".*(?=\\s)") %>% as.numeric(),
+      ## test for mm
+      ismm = str_detect(sizeclass, "mm"),
+      ## set everthing in microns
+      lb1 = if_else(ismm, lb0, lb0 / 1000),
+      ub1 = if_else(ismm, ub0, ub0 / 1000),
+      ## deal with  biggist size bin
+      
+      lb2 = if_else(str_detect(sizeclass, "\\>26"),26, lb1),
+      ub2 = if_else(str_detect(sizeclass, "\\>26"),32, ub1) # arbitrary
+    ) %>%
+    select(sizeclass, lb = lb2, ub = ub2)
+  
+  ## join the names
+  s100data02 <- s100data01 %>% left_join(renDf01, by = "sizeclass")
+  
+  ## merge small bin with no particles wiht the bin one smaller
+  s100data03 <- s100data02 %>%
+    filter(lb != 0.128) %>% # removing small bin with no particles
+    mutate(ub = if_else(ub == 0.128, 0.161, ub))
+  
+  ## Preliminary math
+  s100data04 <- s100data03 %>%
+    mutate(
+      TotalParticles = nparticles * vol,
+      binsize = ub - lb,
+      n_nparticles = nparticles/binsize
+    )
+  
+  s100data04
+}
+
+combine_projects <- function(proj1, proj2, name1 = "ETNP", name2 = "P16"){
+  proj1 <- proj1 %>% mutate(project = name1)
+  proj2 <- proj2 %>% mutate(project = name2)
+  bothProj = bind_rows(proj1, proj2)
+  bothProj
+}
+
 ### 
 
 make_twin_df_list <- function(EachSize){
   
-  DepthSummary <- EachSize %>% group_by(profile, time, depth) %>%
+  DepthSummary <- EachSize %>% group_by(project, profile, time, depth) %>%
     summarize()
   list(EachSize, DepthSummary)
 }
@@ -122,7 +181,7 @@ calc_particle_parameters <- function(x, DepthSummary = NULL){
       flux_fit = nparticles * C_f_fit * lb ^ ag_fit
     )
   DepthSummary2 <- EachSize2 %>%
-    group_by(profile, time, depth) %>%
+    group_by(project, profile, time, depth) %>%
     summarize(
       vol = first(vol),
       tot_TotParticles = sum(TotalParticles),
@@ -151,7 +210,7 @@ calc_small_and_big <- function(x, DepthSummary = NULL){
     filter(lb >= 0.53)
   
   small2 <- small %>%
-    group_by(profile, time, depth) %>%
+    group_by(project, profile, time, depth) %>%
     summarise(
       small_TotParticles = sum(TotalParticles),
       small_nparticles = sum(nparticles),
@@ -163,7 +222,7 @@ calc_small_and_big <- function(x, DepthSummary = NULL){
     )
   
   big2 <- big %>%
-    group_by(profile, time, depth) %>%
+    group_by(project, profile, time, depth) %>%
     summarise(
       big_TotParticles = sum(TotalParticles),
       big_nparticles = sum(nparticles),
@@ -174,8 +233,8 @@ calc_small_and_big <- function(x, DepthSummary = NULL){
       big_speed = big_flux/big_biovolume
     )
   
-  DepthSummary2 <- left_join(DepthSummary, small2, by = c("profile", "time", "depth")) %>%
-    left_join(big2, by = c("profile", "time", "depth"))
+  DepthSummary2 <- left_join(DepthSummary, small2, by = c("project","profile", "time", "depth")) %>%
+    left_join(big2, by = c("project","profile", "time", "depth"))
   
   list(ES = EachSize, DS = DepthSummary2)
   
@@ -187,7 +246,8 @@ calc_small_and_big <- function(x, DepthSummary = NULL){
 ## Poisson
 fit_model = function(df) glm(TotalParticles ~ log(lb), offset = log(binsize * vol), data = df, family = "poisson")
 ## Neg Bin, doesn't work
-#fit_model = function(df) MASS::glm.nb(TotalParticles ~ log(lb) + offset(log(vol * binsize)), data = df)
+fit_nb = function(df) MASS::glm.nb(TotalParticles ~ log(lb) + offset(log(vol * binsize)), data = df)
+safe_fit_nb <- safely(fit_nb)
 
 ### Calculate particle size distribution, intercept and slope
 ## Takes EachSize, a data frame of particle size specific stuff, and Depth Summary, which is depth specific stuff
@@ -201,17 +261,17 @@ calc_psd <- function(x, DepthSummary = NULL){
   
   
   psdCalc01 <- EachSize %>% 
-    group_by(profile, time, depth) %>%
+    group_by(project, profile, time, depth) %>%
     nest() %>%
     mutate(model = map(data, fit_model)) %>%
     mutate(tidied = map(model, tidy)) %>%
     select(-data, -model) %>%
     unnest(tidied) %>%
-    select(profile:estimate) %>%
+    select(project, profile:estimate) %>%
     spread(key = "term", value = "estimate") %>%
     rename(icp = `(Intercept)`, psd = `log(lb)`)
   
-  DepthSummary2 <- left_join(DepthSummary, psdCalc01, by = c("profile", "time", "depth"))
+  DepthSummary2 <- left_join(DepthSummary, psdCalc01, by = c("project","profile", "time", "depth"))
   
   list(ES = EachSize, DS = DepthSummary2)
   
@@ -227,17 +287,17 @@ calc_small_psd <- function(x, DepthSummary = NULL){
   
   psdCalc01 <- EachSize %>% 
     filter(lb < 0.53) %>%
-    group_by(profile, time, depth) %>%
+    group_by(project, profile, time, depth) %>%
     nest() %>%
     mutate(model = map(data, fit_model)) %>%
     mutate(tidied = map(model, tidy)) %>%
     select(-data, -model) %>%
     unnest(tidied) %>%
-    select(profile:estimate) %>%
+    select(project, profile:estimate) %>%
     spread(key = "term", value = "estimate") %>%
     rename(small_icp = `(Intercept)`, small_psd = `log(lb)`)
   
-  DepthSummary2 <- left_join(DepthSummary, psdCalc01, by = c("profile", "time", "depth"))
+  DepthSummary2 <- left_join(DepthSummary, psdCalc01, by = c("project","profile", "time", "depth"))
   
   list(ES = EachSize, DS = DepthSummary2)
 }
@@ -252,17 +312,17 @@ calc_big_psd <- function(x, DepthSummary = NULL){
   
   psdCalc01 <- EachSize %>% 
     filter(lb >= 0.53) %>%
-    group_by(profile, time, depth) %>%
+    group_by(project, profile, time, depth) %>%
     nest() %>%
     mutate(model = map(data, fit_model)) %>%
     mutate(tidied = map(model, tidy)) %>%
     select(-data, -model) %>%
     unnest(tidied) %>%
-    select(profile:estimate) %>%
+    select(project, profile:estimate) %>%
     spread(key = "term", value = "estimate") %>%
     rename(big_icp = `(Intercept)`, big_psd = `log(lb)`)
   
-  DepthSummary2 <- left_join(DepthSummary, psdCalc01, by = c("profile", "time", "depth"))
+  DepthSummary2 <- left_join(DepthSummary, psdCalc01, by = c("project","profile", "time", "depth"))
   
   list(ES = EachSize, DS = DepthSummary2)
 }
@@ -294,8 +354,8 @@ pred_tp_gam <- function(x, DepthSummary = NULL){
   EachSize = x2[[1]]
   DepthSummary = x2[[2]]
   
-  EachSize2 <- DepthSummary %>% select(profile, time, depth, icp_gam, psd_gam) %>%
-    right_join(EachSize, by = c("profile", "time", "depth")) %>%
+  EachSize2 <- DepthSummary %>% select(project, profile, time, depth, icp_gam, psd_gam) %>%
+    right_join(EachSize, by = c("project","profile", "time", "depth")) %>%
     mutate(GamPredictTP = vol * lb * (exp(icp_gam + log(lb) * psd_gam))) %>% 
     select(-icp_gam, psd_gam)
   
@@ -331,9 +391,9 @@ tp_quantiles <-  function(x, DepthSummary = NULL,  niter = 10){
   DepthSummary = x2[[2]]
   
   
-  t2Calc01 <- EachSize %>% select(profile, time, depth, binsize, lb, vol, GamPredictTP) %>%
+  t2Calc01 <- EachSize %>% select(project, profile, time, depth, binsize, lb, vol, GamPredictTP) %>%
     mutate(vol2 = vol) %>%
-    group_by(profile, time, depth) %>%
+    group_by(project, profile, time, depth) %>%
     nest(data = c(binsize, lb, vol, GamPredictTP))
   
   #t2Calc02 <- t2Calc01 %>% mutate(quantiles = future_map(data, quantilater, niter = niter))
@@ -344,7 +404,7 @@ tp_quantiles <-  function(x, DepthSummary = NULL,  niter = 10){
   
   t2Calc03 <- t2Calc02 %>% select(-data) %>% unnest(quantiles)
   
-  DepthSummary2 <- DepthSummary %>% left_join(t2Calc03, by = c("profile", "time", "depth"))
+  DepthSummary2 <- DepthSummary %>% left_join(t2Calc03, by = c("project","profile", "time", "depth"))
   
   return(list(ES = EachSize, DS = DepthSummary2))
   
@@ -379,7 +439,7 @@ bin_depths <- function(x, DepthSummary = NULL, bins = BianchiBins){
   
   EachSize3 <- EachSize2 %>%
     select(-nparticles, -n_nparticles, -depth) %>%
-    group_by(profile, time, DepthBin, lb, ub, binsize) %>%
+    group_by(project, profile, time, DepthBin, lb, ub, binsize) %>%
     summarize(vol = sum(vol), TotalParticles = sum(TotalParticles)) %>%
     ungroup()
   
@@ -395,7 +455,7 @@ bin_depths <- function(x, DepthSummary = NULL, bins = BianchiBins){
   
   DepthSummary2 <- DepthSummary %>%
     mutate(DepthBin = cut(depth, bins, labels = mids)) %>%
-    group_by(profile, time, DepthBin) %>%
+    group_by(project, profile, time, DepthBin) %>%
     summarize() %>%
     ungroup() %>%
     mutate(depth = as.numeric(as.character(DepthBin))) %>%
@@ -418,7 +478,7 @@ bin_depths <- function(x, DepthSummary = NULL, bins = BianchiBins){
 #   
 #   EachSize3 <- EachSize2 %>%
 #     select(-nparticles, -n_nparticles) %>%
-#     group_by(profile, time, DepthBin, lb, ub, binsize) %>%
+#     group_by(project, profile, time, DepthBin, lb, ub, binsize) %>%
 #     summarize(vol = sum(vol), TotalParticles = sum(TotalParticles)) %>%
 #     ungroup()
 #   
