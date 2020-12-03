@@ -182,6 +182,13 @@ calc_small_and_big <- function(x, DepthSummary = NULL){
 }
 
 
+## Used in a few functions
+
+## Poisson
+fit_model = function(df) glm(TotalParticles ~ log(lb), offset = log(binsize * vol), data = df, family = "poisson")
+## Neg Bin, doesn't work
+#fit_model = function(df) MASS::glm.nb(TotalParticles ~ log(lb) + offset(log(vol * binsize)), data = df)
+
 ### Calculate particle size distribution, intercept and slope
 ## Takes EachSize, a data frame of particle size specific stuff, and Depth Summary, which is depth specific stuff
 ## Returns a list with the above.
@@ -191,7 +198,7 @@ calc_psd <- function(x, DepthSummary = NULL){
   EachSize = x2[[1]]
   DepthSummary = x2[[2]]
   
-  fit_model = function(df) glm(TotalParticles ~ log(lb), offset = log(binsize * vol), data = df, family = "poisson")
+  
   
   psdCalc01 <- EachSize %>% 
     group_by(profile, time, depth) %>%
@@ -216,7 +223,7 @@ calc_small_psd <- function(x, DepthSummary = NULL){
   EachSize = x2[[1]]
   DepthSummary = x2[[2]]
   
-  fit_model = function(df) glm(TotalParticles ~ log(lb), offset = log(binsize * vol), data = df, family = "poisson")
+  #fit_model = function(df) glm(TotalParticles ~ log(lb), offset = log(binsize * vol), data = df, family = "poisson")
   
   psdCalc01 <- EachSize %>% 
     filter(lb < 0.53) %>%
@@ -241,7 +248,7 @@ calc_big_psd <- function(x, DepthSummary = NULL){
   EachSize = x2[[1]]
   DepthSummary = x2[[2]]
   
-  fit_model = function(df) glm(TotalParticles ~ log(lb), offset = log(binsize * vol), data = df, family = "poisson")
+  #fit_model = function(df) glm(TotalParticles ~ log(lb), offset = log(binsize * vol), data = df, family = "poisson")
   
   psdCalc01 <- EachSize %>% 
     filter(lb >= 0.53) %>%

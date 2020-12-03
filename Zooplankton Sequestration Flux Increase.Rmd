@@ -1,0 +1,35 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+Question: How does the transport by zooplankton effect transfer efficiency.
+For instance, what if we identified the slope of a martin curve, from below 500m (where the flux attenuation follows a nice power law), took the flux at 175m (base of photic) and estemated the flux at 1000m.
+Then get the actual flux at 1000m.
+
+Flux_1000m - Flux_1000m Estimated / Flux 1000m Estimated = % change in flux due to zooplankton transport
+
+```{r}
+disphotic <- DS01  %>% filter(profile %in% c("stn_032", "stn_043"), depth >= 175)
+fplt <- disphotic %>%
+  ggplot(aes(x = depth, y = tot_flux_fit, col = profile)) + geom_point() + scale_x_log10(limits = c(175, NA)) + scale_y_log10()
+plotly::ggplotly(fplt)
+```
+
+```{r}
+fplt <- disphotic %>%
+  ggplot(aes(x = log(depth), y = log(tot_flux_fit), col = profile)) + geom_point() 
+plotly::ggplotly(fplt)
+```
+
+plot a line on the points deeper than 500m
+```{r}
+diszoonotic <- disphotic %>% filter(depth > 500)
+deepLm <- lm(log(tot_flux_fit) ~ log(depth), data = diszoonotic)
+summary(deepLm)
+```
+
+```{r}
+disphotic %>% filter(depth %in% c(min(depth), max(depth))) %>% group_by(depth) %>% summarize( tot_flux_fit = mean(tot_flux_fit)) %>% mutate(ln_tot_flux = log(tot_flux_fit), ln_depth = log(depth))
+```
+
+Its like 1/3 using point slope.

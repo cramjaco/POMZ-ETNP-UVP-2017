@@ -44,7 +44,7 @@ DSS <- binnedS[[2]]
 
 
 
-S43data <- ESS %>% filter(profile == "stn_043", depth <= 1000)
+S43data <- ESS %>% filter(profile == "stn_043")
 
 S43GAM2X <- S43data %>% my_double_gam
 summary(S43GAM2X)
@@ -170,7 +170,12 @@ Dsmooth42_unnest
 Examine change
 ```{r}
 
-Dsmooth42_unnest %>% filter(depth == testDepth) %>% ungroup() %>% select(lb, nparticles, np_prev, np_pred) %>% pivot_longer(cols = c(nparticles, np_prev, np_pred)) %>% 
+DSUPlot <- Dsmooth42_unnest %>% filter(depth == testDepth) %>% ungroup() %>% select(lb, nparticles, np_prev, np_pred) %>% pivot_longer(cols = c(nparticles, np_prev, np_pred)) %>% 
+  ggplot(aes(x = lb, y = value, col = name)) + geom_point() + scale_x_log10() + scale_y_log10() + scale_color_manual(values = c("red", "blue", "gray20"))
+
+DSUPlot
+
+Dsmooth42_unnest %>% filter(depth == testDepth, lb < 0.2) %>% ungroup() %>% select(lb, nparticles, np_prev, np_pred) %>% pivot_longer(cols = c(nparticles, np_prev, np_pred)) %>% 
   ggplot(aes(x = lb, y = value, col = name)) + geom_point() + scale_x_log10() + scale_y_log10() + scale_color_manual(values = c("red", "blue", "gray20"))
 
 # Dsmooth42_unnest %>% filter(depth == 625) %>% ungroup() %>% select(lb, nparticles, np_prev, np_pred) %>% pivot_longer(cols = c(nparticles, np_prev, np_pred)) %>% 
@@ -241,7 +246,7 @@ Dsmooth42_sr02_All %>% filter(DFP <= 1) %>%
   scale_y_reverse()
 
 Dsmooth42_sr02_All %>% filter(DFP <= 1) %>%
-  ggplot(aes(y = depth, x = pracma::nthroot(Disag, 3))) + geom_point() +
+  ggplot(aes(y = depth, x = pracma::nthroot(Disag, 3))) + geom_point() + geom_hline(yintercept = 175, color = "darkgreen") +
   scale_y_reverse()
 ```
 
@@ -253,6 +258,67 @@ To do.
 * Whole pipeline with different alpha and gamma params. Is this sensitive to those?
 * Dry and reproducable code
 * What is the particle size distribution of the new particles that is appearing in the mid water column and how do they compare to the particles that are appearing at the surface?
+
+# Test time gam
+
+```{r}
+doubleGamAll <- ESS %>% my_double_gam()
+summary(doubleGamAll)
+AIC(doubleGamAll)
+```
+
+```{r}
+my_tripple_gam <- function(df){gam(TotalParticles ~s(log(lb), log(depth), as.numeric(time)), offset = log(vol * binsize), family = nb(), data = df)}
+trippleGamAll <- ESS %>% my_tripple_gam()
+summary(trippleGamAll)
+AIC(trippleGamAll)
+```
+
+```{r}
+my_tripple_gam_2 <- function(df){gam(TotalParticles ~s(log(lb), log(depth)) + as.numeric(time), offset = log(vol * binsize), family = nb(), data = df)}
+trippleGamAll2 <- ESS %>% my_tripple_gam_2()
+summary(trippleGamAll2)
+AIC(trippleGamAll2)
+```
+
+```{r}
+my_tripple_gam_2 <- function(df){gam(TotalParticles ~s(log(lb), log(depth)) + s(as.numeric(time)), offset = log(vol * binsize), family = nb(), data = df)}
+trippleGamAll2 <- ESS %>% my_tripple_gam_2()
+summary(trippleGamAll2)
+AIC(trippleGamAll2)
+plot(trippleGamAll2)
+```
+
+```{r}
+my_tripple_gam_2 <- function(df){gam(TotalParticles ~s(log(lb), log(depth)) + as.factor(time), offset = log(vol * binsize), family = nb(), data = df)}
+trippleGamAll2 <- ESS %>% my_tripple_gam_2()
+summary(trippleGamAll2)
+AIC(trippleGamAll2)
+plot(trippleGamAll2)
+```
+
+```{r}
+time_to_hour <- function(tim){
+  as.numeric(tim) %% 86400/3600
+}
+
+my_tripple_gam_cy <- function(df){gam(TotalParticles ~s(log(lb), log(depth)) + s(as.numeric(time)) + s(hour, bs = "cc"), offset = log(vol * binsize), knots = list(hour = c(0, 24)), family = nb(), data = df)}
+trippleGamAllCy <- ESS %>% mutate(hour = time_to_hour(time)) %>% my_tripple_gam_cy()
+summary(trippleGamAllCy)
+AIC(trippleGamAllCy)
+plot(trippleGamAllCy)
+```
+
+```{r}
+time_to_hour <- function(tim){
+  as.numeric(tim) %% 86400/3600
+}
+
+my_tripple_gam_cy <- function(df){gam(TotalParticles ~s(log(lb), log(depth))  + s(hour, bs = "cc"), offset = log(vol * binsize), knots = list(hour = c(0, 24)), family = nb(), data = df)}
+trippleGamAllCy <- ESS %>% mutate(hour = time_to_hour(time)) %>% my_tripple_gam_cy()
+summary(trippleGamAllCy)
+AIC(trippleGamAllCy)
+```
 
 ```{r}
 sessionInfo()
