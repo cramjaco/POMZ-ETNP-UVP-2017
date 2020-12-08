@@ -29,6 +29,7 @@ unbinned <- twin01 %>%
   pred_tp_gam %>%
   calc_small_psd() %>%
   calc_big_psd() %>%
+  #double_gam_smooth() %>%
   #tp_quantiles(niter = 1000) %>%
   pass
 pt1 = proc.time()
@@ -54,6 +55,7 @@ binned02 <- binned01 %>%
   pred_tp_gam %>%
   calc_small_psd() %>%
   calc_big_psd() %>%
+  double_gam_smooth() %>%
   #tp_quantiles(niter = 1000) %>%
   pass
 pt1 = proc.time()

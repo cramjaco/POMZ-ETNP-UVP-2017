@@ -44,6 +44,11 @@ summary(fit_quasi(testData))
 However, when I try to fit a negative binomial model, I get this cryptic error message
 
 ```{r}
+fit_nb2 <- function(df) gam(TotalParticles ~ log(lb), offset = log(binsize * vol), data = df, family = "nb")
+summary(fit_nb2(testData))
+```
+
+```{r}
 fit_nb = function(df) MASS::glm.nb(TotalParticles ~ log(lb) + offset(log(vol * binsize)), data = df)
 fit_nb = function(df) MASS::glm.nb(TotalParticles ~ log(lb) , data = df)
 fit_nb(testData)

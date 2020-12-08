@@ -19,7 +19,7 @@ bring_in_p2 <- function(){
   # bring in particle data
   uvp_data_path <- "data/uvpdata"
   particleData <- uvpMetaP2 %>% pull(`Particle filename`) %>%
-    map(~ read_tsv(file.path(uvp_data_path, .), locale = locale(encoding = "latin1"))) %>%
+    map(~read_tsv(file.path(uvp_data_path, .), locale = locale(encoding = "latin1"))) %>%
     reduce(rbind)
   
   # some initial processing
@@ -153,6 +153,14 @@ parse_jac_input2 <- function(x, DepthSummary){
   }
 }
   
+
+function_template <- function(x, DepthSummary = NULL){
+  x2 <- parse_jac_input2(x, DepthSummary)
+  EachSize = x2[[1]]
+  DepthSummary = x2[[2]]
+  # Code does stuff here
+  return(list(ES = EachSize, DS = DepthSummary))
+}
 
 ###  Calculate biovolume, flux, speed, both for size classes and in aggregate
 calc_particle_parameters <- function(x, DepthSummary = NULL){
@@ -490,6 +498,8 @@ my_double_gam <- function(df){
   gam(TotalParticles ~s(log(lb), log(depth)), offset = log(vol * binsize), family = nb(), data = df)
 }
 
+safe_double_gam <- safely(my_double_gam)
+
 expand_with_gam <- function(df, mod){
   loc_pred <- predict(mod, type = "link", se.fit = TRUE) %>% as.data.frame %>% mutate(lower = fit - 2 * se.fit, upper = fit + 2 * se.fit) %>% mutate(resp_fit = exp(fit), resp_lower = exp(lower), resp_upper = exp(upper))
   loc_df <- bind_cols(df, loc_pred)
@@ -515,3 +525,72 @@ nnp_size_ggplot_2d <- function(df){
     scale_color_viridis_c() + geom_path() + geom_vline(xintercept = 1) + geom_vline(xintercept = 5)  +
      theme_bw()
 }
+
+double_gam_smooth <- function(x, DepthSummary = NULL){
+  # Input from twin please.
+  #Allow passing in either a two elemet list of Eachsize and DepthSummary, or passing in as two variables.
+
+  x2 <- parse_jac_input2(x, DepthSummary)
+  EachSize = x2[[1]]
+  DepthSummary = x2[[2]]
+  
+  withGamFit <- EachSize %>% group_by(profile) %>% nest() %>%
+    mutate(mod = map(data, safe_double_gam),
+           modOnly = map(mod, ~.[[1]]),
+           pred = map2(modOnly, data, safely(predict), se.fit = TRUE),
+           predOnly = map(pred, .[[1]]),
+           data01 = map2(data, pred,
+                         ~bind_cols(.x, link = .y$result$fit, lse = .y$result$se.fit))) %>%
+    select(profile, data01) %>%
+    unnest(data01) %>%
+    mutate(link_lower = link - lse,
+           link_upper = link + lse,
+           nnp_smooth = exp(link),
+           nnp_lower = exp(link_lower),
+           nnp_upper = exp(link_upper),
+           np_smooth = nnp_smooth * binsize,
+           tp_smooth = np_smooth * vol,
+           flux_smooth = np_smooth * (C_f_global * lb ^ alpha_global)
+    )
+  
+  TotalStuff <- withGamFit %>% group_by(project, profile, time, depth) %>%
+    summarize(smooth_TotParticles = sum(tp_smooth),
+           smooth_nparticles = sum(np_smooth),
+           smooth_nnparticles = sum(nnp_smooth),
+           smooth_flux_fit = sum(flux_smooth)
+           )
+  
+  DepthSummary_B <- left_join(DepthSummary, TotalStuff, by = c("project", "profile", "time", "depth"))
+  
+  return(list(ES = withGamFit, DS = DepthSummary_B))
+  
+  # BOOKMARK
+}
+
+filter_profile <- function(x, DepthSummary = NULL, profile = "stn_043"){
+  prof2 <- profile
+  x2 <- parse_jac_input2(x, DepthSummary)
+  EachSize = x2[[1]]
+  DepthSummary = x2[[2]]
+  
+  EachSize <- EachSize %>% filter(profile = prof2)
+  DepthSummary <- DepthSummary %>% filter(profile = prof2)
+  
+  return(list(ES = EachSize, DS = DepthSummary))
+}
+
+# diagnose_disaggregation_one_project <- function()
+# 
+# diagnose_disaggregation<- function(x, DepthSummary = NULL){
+#   ## Preamble
+#   x2 <- parse_jac_input2(x, DepthSummary)
+#   EachSize = x2[[1]]
+#   DepthSummary = x2[[2]]
+#   
+#   # 
+#   
+#   
+#   # Code does stuff here
+#   return(list(ES = EachSize, DS = DepthSummary))
+# }
+

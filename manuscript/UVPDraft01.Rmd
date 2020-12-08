@@ -82,9 +82,38 @@ EK60 data, figure 8. show a peak of migratory plankton which travel from the sur
 
 * Similar patterns between different freuencies, with better resoultion by the lower bandwidth. While we expect that small organisms likely have the greatist impact on particles, 
 
+## Flux data
+Flux measurmenets at station P2 were consistant between the different particle trap types and chambers measured, and showed a profile that broadly represented a power law with respect to depth, with the exception that flux appeared to increase around 500m.
+
 ## Particle abundance measurments 
-Particles at all depths are most abundant in the smallest size fraction and less abundant in larger size fractions. It was typical to observe no particles larger than Xmm.
-The total number of particles at each depth was _______. Most of these were small particles (Figure X). 
+Particles at all depths are most abundant in the smallest size fraction and less abundant in larger size fractions. At every depth, partiles roughly followed a power law with respect to size. Thus, a particle size distribution slope could be calculated at each depth and compared. {This is what the PSD slope does}. 
+
+These patterns differed from those seen at the P16 transect, station 100 where XXXXX. 
+
+## Estemated particle flux
+When fit to the flux profile data (per Guidi et al.) we predicted that the particle flux to size ratio was best goverend by the relationship flux = cXX * size ^ aXX. As the exponent parameter in this best fit was much smaller than predicted values, we also performed a fit where that value was taken from the literature and set to aXX1. In this case the relationship was governed by the equation flux = 10.51 * size ^ axx1. This resulted in a flux profile that broadly fit the results seen by the traps (figure XX).  
+
+### Large vs small particles
+
+Generally the profiles are related. Most flux appears to be from smaller particles.
+
+## Possible particle transport by zooplankton
+There was an apparent increase in particle flux between XXX and XXX m (Figure X), which corresponded to the region where migratory organsisms spent most of the day (Figure X). 
+To estemate how this flux increased transfer efficiency, we compared the sequestration flux (flux through the depth bin centered at 975m) to an estemated sequestration flux if a power law, typical of the flux attenuation below 500m, was applied to the flux out of the photic zone (185.5m bin). 
+
+
+Extrapolating the power law relationship seen below 500m to the flux at the base of the photic zone suggests that if it was not for zooplnkton transport the transfer efficiency would be 1/3 of what it is observed to be.
+
+{Compare to P2.}
+
+## Variations from remineralization and sinking dynamics
+
+By comparing the particle size distributions at each depth to the particle size distribution that woudl be predicted from the particle size distribution one depth bin shallower in the water column, and the observed flux attenuation, we were able to examine how particle number attenuation differed from what would be expected if particles sank and remineralized following PRiSM model like dynamics. We observed that there were more small particles than would be predicted from remineralization dynamics only. By comparing the observed flux of particles < 53 microns to the reminineralization-predicted flux of small particles, we observed that above 500m, there was excess observed small particle flux above 500m (Figure X). 
+
+{Discussion: This suggested that one of two things could be happening. The first is that particle disaggregation, possibly caused by sloppy feeding by zooplankton, could be breaking large particles into smaller particles. The other possibility is that zooplankton could be preferentially removing larger particles via grazing, leaving smaller particles behind}. 
+
+
+##
 
 
 # Figures
