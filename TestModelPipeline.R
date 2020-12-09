@@ -3,6 +3,11 @@ source("ModelStuff.R")
 
 test_go <- function(){
 testModPipe <<- binned02 %>% 
+  diagnose_disaggregation()
+}
+
+test_go_in <- function(){
+testModPipe_in <<- binned02 %>%
   filter_profile(profile = "stn_043") %>%
   diagnose_disaggregation_one_profile()
 }
