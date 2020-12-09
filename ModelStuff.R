@@ -29,6 +29,7 @@ Cm = m1mm
 Cw = w1mm
 m_vec =  Cm * lb_vec ^ alpha;
 w_vec = Cw * lb_vec ^ gamma;
+f_vec = C_f_global * lb_vec ^ alpha;
 
 
 ## Disagg functions

@@ -573,13 +573,87 @@ filter_profile <- function(x, DepthSummary = NULL, profile = "stn_043"){
   EachSize = x2[[1]]
   DepthSummary = x2[[2]]
   
-  EachSize <- EachSize %>% filter(profile = prof2)
-  DepthSummary <- DepthSummary %>% filter(profile = prof2)
+  EachSize <- EachSize %>% filter(profile == prof2)
+  DepthSummary <- DepthSummary %>% filter(profile == prof2)
   
   return(list(ES = EachSize, DS = DepthSummary))
 }
 
-# diagnose_disaggregation_one_project <- function()
+diagnose_disaggregation_one_profile <- function(x, DepthSummary = NULL){
+  ## Preamble
+  x2 <- parse_jac_input2(x, DepthSummary)
+  EachSize = x2[[1]]
+  DepthSummary = x2[[2]]
+  
+  specData <- EachSize %>% select(profile, depth, lb, np_smooth, nnp_smooth, flux_smooth) %>%
+    nest(spec_meta = c(lb, np_smooth, nnp_smooth, flux_smooth))
+  
+  preparedData <- DepthSummary %>% left_join(specData, by = c("profile","depth")) %>%
+    arrange(depth) %>%
+    mutate(spec_only = map(spec_meta, ~pull(., np_smooth)),
+           spec_prev = lag(spec_only),
+           flux_prev = lag(smooth_flux_fit),
+           DF = flux_prev - smooth_flux_fit,
+           DFP = 1 - DF/flux_prev
+    )
+  
+  modelRun <- preparedData %>%
+    .[-1,] %>%
+    # fix flux leak here
+    mutate(use_this_DFP = map2_dbl(spec_prev, DFP, optFun)) %>%
+    mutate(spec_pred = map2(spec_prev, use_this_DFP, remin_smooth_shuffle))
+  
+  modelConcise <- modelRun %>%
+    mutate(spec_meta = map2(spec_meta, spec_prev, ~tibble(.x, np_prev = .y))) %>%
+    mutate(spec_meta = map2(spec_meta, spec_pred, ~tibble(.x, np_pred = .y))) %>%
+    select(project, profile, time, depth, DF, DFP, spec_meta)
+  
+  modelUnnest <- modelConcise %>%
+    unnest(spec_meta) %>%
+    ungroup()
+  
+  modelPostCalc <- modelUnnest %>%
+    mutate(
+      flux_prev = np_prev * C_f_global * lb ^ ag_global,
+      flux_pred = np_pred * C_f_global * lb ^ ag_global,
+      flux2 = np_smooth * C_f_global * lb ^ ag_global
+    )
+  
+  Tot <- modelPostCalc %>% 
+    group_by(depth) %>%
+    summarize(DF = first(DF), DFP = first(DFP), 
+              Flux = sum(flux2), 
+              Flux_Prev = sum(flux_prev),
+              Flux_Pred = sum(flux_pred))
+  
+  Small <- modelPostCalc %>% 
+    filter(lb <= 0.53) %>%
+    group_by(depth) %>%
+    summarize(DF = first(DF), DFP = first(DFP), 
+              Flux = sum(flux2), 
+              Flux_Prev = sum(flux_prev),
+              Flux_Pred = sum(flux_pred))
+  Big <- modelPostCalc %>% 
+    filter(lb > 0.53) %>%
+    group_by(depth) %>%
+    summarize(DF = first(DF), DFP = first(DFP), 
+              Flux = sum(flux2), 
+              Flux_Prev = sum(flux_prev),
+              Flux_Pred = sum(flux_pred))
+  
+  All <- Tot %>%
+    left_join(Small, by = "depth", suffix = c("", "_Small")) %>%
+    left_join(Big, by = "depth", suffix = c("", "_Big")) %>%
+    mutate(osps = Flux_Small - Flux_Pred_Small,
+           obpb = Flux_Pred_Big - Flux_Big, # INEQUAL AGAIN ## BOOKMARK
+           )
+  
+    
+
+
+  # Code does stuff here
+  #return(list(ES = EachSize, DS = DepthSummary))
+}
 # 
 # diagnose_disaggregation<- function(x, DepthSummary = NULL){
 #   ## Preamble
