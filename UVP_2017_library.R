@@ -550,7 +550,7 @@ double_gam_smooth <- function(x, DepthSummary = NULL){
            nnp_upper = exp(link_upper),
            np_smooth = nnp_smooth * binsize,
            tp_smooth = np_smooth * vol,
-           flux_smooth = np_smooth * (C_f_global * lb ^ alpha_global)
+           flux_smooth = np_smooth * (C_f_global * lb ^ ag_global)
     )
   
   TotalStuff <- withGamFit %>% group_by(project, profile, time, depth) %>%
@@ -614,9 +614,9 @@ diagnose_disaggregation_one_profile <- function(x, DepthSummary = NULL){
   
   modelPostCalc <- modelUnnest %>%
     mutate(
-      flux_prev = np_prev * C_f_global * lb ^ ag_global,
-      flux_pred = np_pred * C_f_global * lb ^ ag_global,
-      flux2 = np_smooth * C_f_global * lb ^ ag_global
+      flux_prev = np_prev * (C_f_global * lb ^ ag_global),
+      flux_pred = np_pred * (C_f_global * lb ^ ag_global),
+      flux2 = np_smooth * (C_f_global * lb ^ ag_global)
     )
   
   Tot <- modelPostCalc %>% 
