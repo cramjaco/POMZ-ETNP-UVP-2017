@@ -2,6 +2,7 @@
 
 options(readr.default_locale=readr::locale(tz="Mexico/General"))
 source("UVP_2017_library.R")
+source("ModelStuff.R")
 dataP2 <- bring_in_p2()
 dataP16S100 <- bring_in_p16_s100()
 

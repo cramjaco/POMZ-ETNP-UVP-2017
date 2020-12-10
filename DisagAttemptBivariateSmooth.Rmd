@@ -323,3 +323,4 @@ AIC(trippleGamAllCy)
 ```{r}
 sessionInfo()
 ```
+2005 Pierson Model about zoop.

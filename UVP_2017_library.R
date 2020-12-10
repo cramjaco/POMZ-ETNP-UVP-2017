@@ -256,6 +256,7 @@ fit_model = function(df) glm(TotalParticles ~ log(lb), offset = log(binsize * vo
 ## Neg Bin, doesn't work
 fit_nb = function(df) MASS::glm.nb(TotalParticles ~ log(lb) + offset(log(vol * binsize)), data = df)
 safe_fit_nb <- safely(fit_nb)
+fit_nb_2 <- function(df) gam(TotalParticles ~ log(lb), offset = log(binsize * vol), data = df, family = "nb")
 
 ### Calculate particle size distribution, intercept and slope
 ## Takes EachSize, a data frame of particle size specific stuff, and Depth Summary, which is depth specific stuff
@@ -428,7 +429,7 @@ BianchiBins <- c(
   seq(from = 100, to = 200, by = 25),
   seq(from = 200, to = 1000, by = 50),
   seq(from = 1000, to = 2000, by = 100),
-  seq(from = 2000, to = 5000, by = 200)
+  seq(from = 2000, to = 5600, by = 200)
 ) %>% unique
 
 bin_depths <- function(x, DepthSummary = NULL, bins = BianchiBins){

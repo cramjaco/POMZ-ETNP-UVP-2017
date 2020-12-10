@@ -8,7 +8,7 @@ testModPipe <<- binned02 %>%
 
 test_go_in <- function(){
 testModPipe_in <<- binned02 %>%
-  filter_profile(profile = "stn_043") %>%
+  filter_profile(profile = "p16n_100") %>%
   diagnose_disaggregation_one_profile()
 }
 
