@@ -256,6 +256,8 @@ fit_model = function(df) glm(TotalParticles ~ log(lb), offset = log(binsize * vo
 ## Neg Bin, doesn't work
 fit_nb = function(df) MASS::glm.nb(TotalParticles ~ log(lb) + offset(log(vol * binsize)), data = df)
 safe_fit_nb <- safely(fit_nb)
+
+# I switched to gam because it can handle negative binomial. If one does this, one also needs to add the call `parametric = TRUE` to the tidy function
 fit_nb_2 <- function(df) gam(TotalParticles ~ log(lb), offset = log(binsize * vol), data = df, family = "nb")
 
 ### Calculate particle size distribution, intercept and slope
@@ -272,8 +274,8 @@ calc_psd <- function(x, DepthSummary = NULL){
   psdCalc01 <- EachSize %>% 
     group_by(project, profile, time, depth) %>%
     nest() %>%
-    mutate(model = map(data, fit_model)) %>%
-    mutate(tidied = map(model, tidy)) %>%
+    mutate(model = map(data, fit_nb_2)) %>%
+    mutate(tidied = map(model, tidy, parametric = TRUE)) %>%
     select(-data, -model) %>%
     unnest(tidied) %>%
     select(project, profile:estimate) %>%
@@ -298,8 +300,8 @@ calc_small_psd <- function(x, DepthSummary = NULL){
     filter(lb < 0.53) %>%
     group_by(project, profile, time, depth) %>%
     nest() %>%
-    mutate(model = map(data, fit_model)) %>%
-    mutate(tidied = map(model, tidy)) %>%
+    mutate(model = map(data, fit_nb_2)) %>%
+    mutate(tidied = map(model, tidy, parametric = TRUE)) %>%
     select(-data, -model) %>%
     unnest(tidied) %>%
     select(project, profile:estimate) %>%
@@ -323,8 +325,8 @@ calc_big_psd <- function(x, DepthSummary = NULL){
     filter(lb >= 0.53) %>%
     group_by(project, profile, time, depth) %>%
     nest() %>%
-    mutate(model = map(data, fit_model)) %>%
-    mutate(tidied = map(model, tidy)) %>%
+    mutate(model = map(data, fit_nb_2)) %>%
+    mutate(tidied = map(model, tidy, parametric = TRUE)) %>%
     select(-data, -model) %>%
     unnest(tidied) %>%
     select(project, profile:estimate) %>%
