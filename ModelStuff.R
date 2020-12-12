@@ -34,15 +34,15 @@ f_vec = C_f_global * lb_vec ^ alpha;
 
 ## Disagg functions
 
-remin_shuffle <- function(abun_in, DFpct, DeltaZ = 10, size = lb_vec, Cm = m1mm, Cw = w1mm, lbv = lb_vec, mv = m_vec, wv = w_vec,
+remin_shuffle <- function(abun_in, DFpct, DeltaZ = 10, Cm = m1mm, Cw = w1mm, lbv = lb_vec, mv = m_vec, wv = w_vec,
                           alpha = 0.52, gamma = 0.26, llb = little_lb){
- rn = abun_in * lb_vec
- ran = abun_in * lb_vec ^ alpha
+ rn = abun_in * lbv
+ ran = abun_in * lbv ^ alpha
  srn = sum(rn)
  sran = sum(ran)
  
- omega = lb_vec[1] ^ (2 * alpha)  * abun_in[1]/(lb_vec[1] ^ alpha - llb ^ alpha)
- #omega = lb_vec[1] ^ (2 * alpha)  * abun_in[1]/(llb ^ alpha - lb_vec[1] ^ alpha) # possible correction
+ omega = lbv[1] ^ (2 * alpha)  * abun_in[1]/(lbv[1] ^ alpha - llb ^ alpha)
+ #omega = lbv[1] ^ (2 * alpha)  * abun_in[1]/(llb ^ alpha - lbv[1] ^ alpha) # possible correction
  
  nmw = abun_in * mv * wv
  F1 = sum(nmw)
@@ -65,12 +65,12 @@ remin_shuffle <- function(abun_in, DFpct, DeltaZ = 10, size = lb_vec, Cm = m1mm,
   return(list(Cr = Cr, phi = phi, dnet = Delta_nj_net, din =  Delta_nj_in, dout = Delta_nj_out))
 }
 
-remin_shuffle_spec <- function(abun_in, ...){
-  core <- remin_shuffle(abun_in, ...)
+remin_shuffle_spec <- function(abun_in, DFpct, llb = lb_vec, mv = m_vec, wv = w_vec, ...){
+  core <- remin_shuffle(abun_in, DFpct, llb = llb, mv = mv, wv = wv, ...)
   abun_in + core$dnet
 }
 
-remin_smooth_shuffle <- function(abun_in, DFpct, Ipct = 0.9999, ...){
+remin_smooth_shuffle <- function(abun_in, DFpct, Ipct = 0.9999, llb = lb_vec, mv = m_vec, wv = w_vec, ...){
   # DFpct: Fractional mass retained between depths
   # Ipct: Fractional mass retained between iterations
   # ...: Passed to remin_shuffle
@@ -88,7 +88,7 @@ remin_smooth_shuffle <- function(abun_in, DFpct, Ipct = 0.9999, ...){
     Fpct = 1-(iterFlux-DFpct)
     
     for (i in 1:iters){
-      abun_est = remin_shuffle_spec(abun_in = abun_est, Ipct, ...)
+      abun_est = remin_shuffle_spec(abun_in = abun_est, DFpct = Ipct, llb = llb, mv = mv, wv = wv, ...)
     }
   }
   
@@ -99,26 +99,26 @@ remin_smooth_shuffle <- function(abun_in, DFpct, Ipct = 0.9999, ...){
     Fpct = 1 - (iterFlux - DFpct)
     
     for (i in 1:iters){
-      abun_est = remin_shuffle_spec(abun_in = abun_est, IMirror, ...)
+      abun_est = remin_shuffle_spec(abun_in = abun_est, DFpct = IMirror, llb = llb, mv = mv, wv = wv, ...)
     }
   }
   
   # Deal with remainder. In the case where the loss is less than ipct, or greater than 2-ipct (Imirror), just do this part
-  abun_est = remin_shuffle_spec(abun_in = abun_est, Fpct, ...)
+  abun_est = remin_shuffle_spec(abun_in = abun_est, DFpct = Fpct, llb = llb, mv = mv, wv = wv, ...)
   
   abun_est
 }
 
-shuffle_tune <- function(DFpct_toRemin, abun_in,  DFpct_target,...){
-  abun_out <- remin_smooth_shuffle(abun_in, DFpct_toRemin, ...)
-  flux_in <- sum(abun_in * C_f_global * lb_vec ^ ag_global)
-  flux_out <- sum(abun_out * C_f_global * lb_vec ^ ag_global)
+shuffle_tune <- function(DFpct_toRemin, abun_in,  DFpct_target, llb = lb_vec,...){
+  abun_out <- remin_smooth_shuffle(abun_in = abun_in, DFpct = DFpct_toRemin, llb = llb, mv = mv, wv = wv, ...)
+  flux_in <- sum(abun_in * C_f_global * llb ^ ag_global)
+  flux_out <- sum(abun_out * C_f_global * llb ^ ag_global)
   DFPct_actually_happened <- flux_out/flux_in
   rmse <- (DFPct_actually_happened - DFpct_target)^2
   rmse
 }
 
-optFun <- function(abun_in, DFpct){
-  opt <- optimize(shuffle_tune, c(0, 2), abun_in = abun_in, DFpct_target = DFpct)
+optFun <- function(abun_in, DFpct, llb = lb_vec, ...){
+  opt <- optimize(shuffle_tune, c(0, 2), abun_in = abun_in, DFpct_target = DFpct, llb = llb, mv = mv, wv = wv, ...)
   opt$minimum
 }

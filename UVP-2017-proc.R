@@ -57,6 +57,7 @@ binned02 <- binned01 %>%
   calc_small_psd() %>%
   calc_big_psd() %>%
   double_gam_smooth() %>%
+  diagnose_disaggregation() %>%
   #tp_quantiles(niter = 1000) %>%
   pass
 pt1 = proc.time()

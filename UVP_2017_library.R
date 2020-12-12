@@ -203,7 +203,7 @@ calc_particle_parameters <- function(x, DepthSummary = NULL){
   list(ES = EachSize2, DS = DepthSummary2)
 }
 
-## Seperate parameters for small < 53 micron and big > 53 micron particles
+## Seperate parameters for small < 530   micron and big > 530 micron particles
 calc_small_and_big <- function(x, DepthSummary = NULL){
   #Allow passing in either a two elemet list of Eachsize and DepthSummary, or passing in as two variables.
   
@@ -567,7 +567,6 @@ double_gam_smooth <- function(x, DepthSummary = NULL){
   
   return(list(ES = withGamFit, DS = DepthSummary_B))
   
-  # BOOKMARK
 }
 
 filter_profile <- function(x, DepthSummary = NULL, profile = "stn_043"){
@@ -588,6 +587,10 @@ diagnose_disaggregation_one_profile <- function(x, DepthSummary = NULL){
   EachSize = x2[[1]]
   DepthSummary = x2[[2]]
   
+  lb_vec <- sort(unique(EachSize$lb))
+  m_vec =  Cm * lb_vec ^ alpha;
+  w_vec = Cw * lb_vec ^ gamma;
+  
   specData <- EachSize %>% select(depth, lb, np_smooth, nnp_smooth, flux_smooth) %>%
     nest(spec_meta = c(lb, np_smooth, nnp_smooth, flux_smooth))
   
@@ -605,8 +608,8 @@ diagnose_disaggregation_one_profile <- function(x, DepthSummary = NULL){
   modelRun <- preparedData %>%
     .[-1,] %>%
     # fix flux leak here
-    mutate(use_this_DFP = map2_dbl(spec_prev, DFP, optFun)) %>%
-    mutate(spec_pred = map2(spec_prev, use_this_DFP, remin_smooth_shuffle))
+    mutate(use_this_DFP = map2_dbl(spec_prev, DFP, optFun, lbv = lb_vec, mv = m_vec, wv = w_vec)) %>%
+    mutate(spec_pred = map2(spec_prev, use_this_DFP, remin_smooth_shuffle, lbv = lb_vec, mv = m_vec, wv = w_vec))
   
   modelConcise <- modelRun %>%
     mutate(spec_meta = map2(spec_meta, spec_prev, ~tibble(.x, np_prev = .y))) %>%
