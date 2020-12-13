@@ -612,6 +612,8 @@ diagnose_disaggregation_one_profile <- function(x, DepthSummary = NULL){
     mutate(use_this_DFP = map2_dbl(spec_prev, DFP, optFun, lbv = lb_vec, mv = m_vec, wv = w_vec, llb = llb_01)) %>%
     mutate(spec_pred = map2(spec_prev, use_this_DFP, remin_smooth_shuffle, lbv = lb_vec, mv = m_vec, wv = w_vec, llb = llb_01))
   
+  modelRunFixLine1 <- bind_rows(preparedData[1,], modelRun)
+  
   modelConcise <- modelRun %>%
     mutate(spec_meta = map2(spec_meta, spec_prev, ~tibble(.x, np_prev = .y))) %>%
     mutate(spec_meta = map2(spec_meta, spec_pred, ~tibble(.x, np_pred = .y))) %>%
@@ -629,7 +631,7 @@ diagnose_disaggregation_one_profile <- function(x, DepthSummary = NULL){
   
   Tot <- modelPostCalc %>% 
     group_by(depth, depth_prev, DZ) %>%
-    summarize(DF = first(DF), DFP = first(DFP), first(use_this_DFP),
+    summarize(DF = first(DF), DFP = first(DFP), use_this_DFP =  first(use_this_DFP),
               Flux = sum(flux_smooth), 
               Flux_Prev = sum(flux_prev),
               Flux_Pred = sum(flux_pred))
@@ -667,7 +669,6 @@ diagnose_disaggregation_one_profile <- function(x, DepthSummary = NULL){
     
     EachSize_B <- EachSize %>%
       left_join(modelReduced, by = "depth")
-
 
   # Code does stuff here
   return(list(ES = EachSize_B, DS = DepthSummary_B))
