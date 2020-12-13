@@ -606,13 +606,17 @@ diagnose_disaggregation_one_profile <- function(x, DepthSummary = NULL){
            DZ = depth - depth_prev,
     )
   
+  minDepth = min(preparedData$depth)
+  
+  saveFirstDepth = preparedData %>% filter(depth == minDepth) %>% select(depth, spec_meta) %>% unnest(spec_meta)
+  
   modelRun <- preparedData %>%
     .[-1,] %>%
     # fix flux leak here
     mutate(use_this_DFP = map2_dbl(spec_prev, DFP, optFun, lbv = lb_vec, mv = m_vec, wv = w_vec, llb = llb_01)) %>%
     mutate(spec_pred = map2(spec_prev, use_this_DFP, remin_smooth_shuffle, lbv = lb_vec, mv = m_vec, wv = w_vec, llb = llb_01))
   
-  modelRunFixLine1 <- bind_rows(preparedData[1,], modelRun)
+  #modelRunFixLine1 <- bind_rows(preparedData[1,], modelRun)
   
   modelConcise <- modelRun %>%
     mutate(spec_meta = map2(spec_meta, spec_prev, ~tibble(.x, np_prev = .y))) %>%
@@ -620,18 +624,21 @@ diagnose_disaggregation_one_profile <- function(x, DepthSummary = NULL){
     select(depth, depth_prev, DZ, DF, DFP, use_this_DFP, spec_meta)
   
   modelUnnest <- modelConcise %>%
+    #select(depth, spec_meta) %>%
     unnest(spec_meta) %>%
     ungroup()
   
-  modelPostCalc <- modelUnnest %>%
+  modelUnnestWithFirstDepth <- bind_rows(saveFirstDepth, modelUnnest)
+  
+  modelPostCalc <- modelUnnestWithFirstDepth %>%
     mutate(
       flux_prev = np_prev * (C_f_global * lb ^ ag_global),
       flux_pred = np_pred * (C_f_global * lb ^ ag_global)
     )
   
   Tot <- modelPostCalc %>% 
-    group_by(depth, depth_prev, DZ) %>%
-    summarize(DF = first(DF), DFP = first(DFP), use_this_DFP =  first(use_this_DFP),
+    group_by(depth) %>%
+    summarize(depth_prev = first(depth_prev), DZ = first(DZ) ,DF = first(DF), DFP = first(DFP), use_this_DFP =  first(use_this_DFP),
               Flux = sum(flux_smooth), 
               Flux_Prev = sum(flux_prev),
               Flux_Pred = sum(flux_pred))
@@ -661,7 +668,7 @@ diagnose_disaggregation_one_profile <- function(x, DepthSummary = NULL){
            )
   
     DepthSummary_B <- DepthSummary %>%
-      left_join(All, by = "depth")
+      left_join(All, by = "depth") %>% rename(Flux_Smooth = Flux)
     
     modelReduced <- modelPostCalc %>% select(
       depth, flux_prev, flux_pred
@@ -669,7 +676,6 @@ diagnose_disaggregation_one_profile <- function(x, DepthSummary = NULL){
     
     EachSize_B <- EachSize %>%
       left_join(modelReduced, by = "depth")
-
   # Code does stuff here
   return(list(ES = EachSize_B, DS = DepthSummary_B))
 }

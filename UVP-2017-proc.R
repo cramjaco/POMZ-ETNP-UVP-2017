@@ -57,7 +57,7 @@ binned02 <- binned01 %>%
   calc_small_psd() %>%
   calc_big_psd() %>%
   double_gam_smooth() %>%
-  diagnose_disaggregation() %>%
+  #diagnose_disaggregation() %>%
   #tp_quantiles(niter = 1000) %>%
   pass
 pt1 = proc.time()
@@ -70,5 +70,7 @@ write_csv(binned02[["ES"]], "dataOut/binned_EachSize.csv")
 write_csv(binned02[["DS"]], "dataOut/binned_DepthSummary.csv")
 write_csv(unbinned[["ES"]], "dataOut/unbinned_EachSize.csv")
 write_csv(unbinned[["DS"]], "dataOut/unbinned_DepthSummary.csv")
+
+save.image("setupProc.RData")
 
 
