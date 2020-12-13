@@ -590,6 +590,7 @@ diagnose_disaggregation_one_profile <- function(x, DepthSummary = NULL){
   lb_vec <- sort(unique(EachSize$lb))
   m_vec =  Cm * lb_vec ^ alpha;
   w_vec = Cw * lb_vec ^ gamma;
+  llb_01 <- little_lb <- lb_vec[1] - (lb_vec[2] - lb_vec[1])/2
   
   specData <- EachSize %>% select(depth, lb, np_smooth, nnp_smooth, flux_smooth) %>%
     nest(spec_meta = c(lb, np_smooth, nnp_smooth, flux_smooth))
@@ -608,13 +609,13 @@ diagnose_disaggregation_one_profile <- function(x, DepthSummary = NULL){
   modelRun <- preparedData %>%
     .[-1,] %>%
     # fix flux leak here
-    mutate(use_this_DFP = map2_dbl(spec_prev, DFP, optFun, lbv = lb_vec, mv = m_vec, wv = w_vec)) %>%
-    mutate(spec_pred = map2(spec_prev, use_this_DFP, remin_smooth_shuffle, lbv = lb_vec, mv = m_vec, wv = w_vec))
+    mutate(use_this_DFP = map2_dbl(spec_prev, DFP, optFun, lbv = lb_vec, mv = m_vec, wv = w_vec, llb = llb_01)) %>%
+    mutate(spec_pred = map2(spec_prev, use_this_DFP, remin_smooth_shuffle, lbv = lb_vec, mv = m_vec, wv = w_vec, llb = llb_01))
   
   modelConcise <- modelRun %>%
     mutate(spec_meta = map2(spec_meta, spec_prev, ~tibble(.x, np_prev = .y))) %>%
     mutate(spec_meta = map2(spec_meta, spec_pred, ~tibble(.x, np_pred = .y))) %>%
-    select(depth, depth_prev, DZ, DF, DFP, spec_meta)
+    select(depth, depth_prev, DZ, DF, DFP, use_this_DFP, spec_meta)
   
   modelUnnest <- modelConcise %>%
     unnest(spec_meta) %>%
@@ -628,7 +629,7 @@ diagnose_disaggregation_one_profile <- function(x, DepthSummary = NULL){
   
   Tot <- modelPostCalc %>% 
     group_by(depth, depth_prev, DZ) %>%
-    summarize(DF = first(DF), DFP = first(DFP), 
+    summarize(DF = first(DF), DFP = first(DFP), first(use_this_DFP),
               Flux = sum(flux_smooth), 
               Flux_Prev = sum(flux_prev),
               Flux_Pred = sum(flux_pred))
@@ -697,11 +698,16 @@ diagnose_disaggregation<- function(x, DepthSummary = NULL){
   metaNest <- metaNest %>%
     mutate(ESDS_Mod_Safe = map(ESDS, diagnose_disaggregation_one_profile_safe))
   
+  metaNest01 <- metaNest %>% mutate(ESDS_Mod = map(ESDS_Mod_Safe, ~.[[1]]),
+                                    ESDS_Err = map(ESDS_Mod_Safe, ~.[[2]]),
+                                    ES01 = map(ESDS_Mod, ~.[[1]]),
+                                    DS01 = map(ESDS_Mod, ~.[[2]]))
+  
 
-  #
+  EachSize01 <- metaNest01 %>% select(project, profile, time, ES01) %>% unnest(ES01)
+  DepthSummary01 <- metaNest01 %>% select(project, profile, time, DS01) %>% unnest(DS01)
 
 
-  # Code does stuff here
-  #return(list(ES = EachSize, DS = DepthSummary))
+  return(list(ES = EachSize01, DS = DepthSummary01))
 }
 

@@ -109,7 +109,7 @@ remin_smooth_shuffle <- function(abun_in, DFpct, Ipct = 0.9999, llb = lb_vec, mv
   abun_est
 }
 
-shuffle_tune <- function(DFpct_toRemin, abun_in,  DFpct_target, llb = lb_vec,...){
+shuffle_tune <- function(DFpct_toRemin, abun_in,  DFpct_target, llb = lb_vec, mv = m_vec, wv = w_vec,...){
   abun_out <- remin_smooth_shuffle(abun_in = abun_in, DFpct = DFpct_toRemin, llb = llb, mv = mv, wv = wv, ...)
   flux_in <- sum(abun_in * C_f_global * llb ^ ag_global)
   flux_out <- sum(abun_out * C_f_global * llb ^ ag_global)
@@ -118,7 +118,7 @@ shuffle_tune <- function(DFpct_toRemin, abun_in,  DFpct_target, llb = lb_vec,...
   rmse
 }
 
-optFun <- function(abun_in, DFpct, llb = lb_vec, ...){
+optFun <- function(abun_in, DFpct, llb = lb_vec, mv = m_vec, wv = w_vec, ...){
   opt <- optimize(shuffle_tune, c(0, 2), abun_in = abun_in, DFpct_target = DFpct, llb = llb, mv = mv, wv = wv, ...)
   opt$minimum
 }

@@ -6,7 +6,7 @@ source("ModelStuff.R")
 dataP2 <- bring_in_p2()
 dataP16S100 <- bring_in_p16_s100()
 
-dataBoth <- combine_projects(dataP2, dataP16S100)
+dataBoth <- combine_projects(dataP2, dataP16S100) %>% filter(profile != "stn_041") # Station 041 has only one depth, so remvoed
 
   ## We will always have a data with information about each size, and a summary of each depth
 
