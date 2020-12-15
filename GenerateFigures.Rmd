@@ -90,6 +90,46 @@ plot_grid(PlotNParticles, PlotPSD)
 ```
 
 ```{r}
-uds %>% filter(profile %in% c("stn_043", "p16n_100")) %>% select()
+mainParticleComponents <- bds %>%
+  filter(profile %in% c("stn_043", "p16n_100")) %>%
+  select(project, profile, depth,
+         tot_nparticles, small_nparticles, big_nparticles,
+         tot_psd = psd, small_psd, big_psd,
+         tot_flux_fit, small_flux_fit, big_flux_fit) %>%
+  pivot_longer(cols = -c("project", "profile", "depth")) %>%
+  separate(name, c("size", "meas")) 
+
+PlotFlx <- mainParticleComponents %>% 
+  filter(meas != "psd") %>%
+  ggplot(aes(y = depth, x = value, col = project)) + facet_grid(size ~ meas, scales = "free_x") + geom_point() + scale_y_reverse(limits = c(2500, 0)) + scale_x_log10() + theme(axis.title.x = element_blank(), legend.position = "none", strip.background.y = element_blank(), strip.text.y = element_blank(), plot.margin = unit(c(7,0,7,7), "pt"))
+
+PlotPSD <- mainParticleComponents %>% 
+  filter(meas == "psd") %>%
+  ggplot(aes(y = depth, x = value, col = project)) + facet_grid(size~meas, scales = "free_x") + geom_point() + scale_y_reverse(limits = c(2500, 0)) +
+  theme(axis.title.x = element_blank(), axis.title.y = element_blank(), axis.line.y = element_blank(), axis.text.y = element_blank(), axis.ticks.y = element_blank(), plot.margin = unit(c(7,7,7,0), "pt"))
+
+plot_grid(PlotFlx, PlotPSD, rel_widths = c(3, 2))
+```
+
+```{r}
+eg_dataline <- bds %>% 
+  filter(profile == "stn_043", depth == 162.5)
+eg_slope =  eg_dataline %>% pull(psd)
+eg_icp = eg_dataline %>% pull(icp)
+eg_vol = eg_dataline %>% pull(vol)
+
+
+eg_lb = unique(bes$lb)
+eg_binsize = unique(bes$binsize)
+eg_nnp = exp(eg_icp + log(eg_lb) * eg_slope)
+
+eg_np = eg_nnp * eg_binsize
+eg_tp = eg_np * eg_vol
+eg_df <- tibble(lb = eg_lb, n_nparticles = eg_nnp)
+
+
+bes %>% filter(profile == "stn_043", depth == 162.5) %>%
+  ggplot(aes(x = lb, y = n_nparticles)) + geom_point() + scale_x_log10() + scale_y_log10() + 
+  geom_path(data = eg_df)
 ```
 
