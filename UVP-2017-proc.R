@@ -26,7 +26,7 @@ unbinned <- twin01 %>%
   calc_particle_parameters %>%
   calc_small_and_big() %>%
   calc_psd %>%
-  calc_psd_gam %>%
+  calc_psd_gam_multiprofile() %>%
   pred_tp_gam %>%
   calc_small_psd() %>%
   calc_big_psd() %>%
@@ -52,7 +52,7 @@ binned02 <- binned01 %>%
   calc_particle_parameters %>%
   calc_small_and_big() %>%
   calc_psd %>%
-  calc_psd_gam %>%
+  calc_psd_gam_multiprofile() %>%
   pred_tp_gam %>%
   calc_small_psd() %>%
   calc_big_psd() %>%

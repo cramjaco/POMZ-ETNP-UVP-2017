@@ -340,11 +340,14 @@ calc_big_psd <- function(x, DepthSummary = NULL){
   list(ES = EachSize, DS = DepthSummary2)
 }
 
+## Old Way
 calc_psd_gam <- function(x, DepthSummary = NULL){
+  # this currently slushes everything together. I need to nest and run over everything.
   
   x2 <- parse_jac_input2(x, DepthSummary)
   EachSize = x2[[1]]
   DepthSummary = x2[[2]]
+  
   
   psd_gam_model <- gam(psd ~ s(depth), data = DepthSummary)
   intercept_gam_model <- gam(icp ~ s(depth), data = DepthSummary)
@@ -357,6 +360,41 @@ calc_psd_gam <- function(x, DepthSummary = NULL){
                                        icp_gam = icp_pred$fit, icp_seg = icp_pred$se.fit) 
   
   list(ES = EachSize, DS = DepthSummary2)
+  
+}
+
+calc_psd_gam_multiprofile <- function(x, DepthSummary = NULL){
+  # this currently slushes everything together. I need to nest and run over everything.
+  
+  x2 <- parse_jac_input2(x, DepthSummary)
+  EachSize = x2[[1]]
+  DepthSummary = x2[[2]]
+  
+  DSN <- DepthSummary %>% group_by(project, profile, time) %>%
+    nest()
+  
+  
+  DSN$psd_gam_model <- map(DSN$data, ~ gam(psd ~ s(depth), data = .))
+  
+  
+  DSN$intercept_gam_model <- map(DSN$data, ~ gam(icp ~ s(depth), data = .))
+  
+  DSN$psd_pred = map2(DSN$psd_gam_model, DSN$data, ~predict(.x, .y, se.fit = TRUE))
+  DSN$icp_pred = map2(DSN$intercept_gam_model, DSN$data, ~predict(.x, .y, se.fit = TRUE))
+  
+  DSN$DepthSummary2 <- pmap(
+    .l = list(DSN$data, DSN$psd_pred, DSN$icp_pred),
+                            .f = function(DepthSummary, psd_pred, icp_pred){
+    bind_cols(DepthSummary,
+                                       psd_gam= psd_pred$fit, psd_seg = psd_pred$se.fit,
+                                       icp_gam = icp_pred$fit, icp_seg = icp_pred$se.fit) 
+  }
+  )
+  
+  DS2 <- DSN %>%
+    select(project, profile, time, DepthSummary2) %>% unnest(cols = c(DepthSummary2))
+  
+  list(ES = EachSize, DS = DS2)
   
   }
 

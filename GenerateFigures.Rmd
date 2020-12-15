@@ -33,18 +33,35 @@ scale_y_reverse() + scale_x_log10()
 PlotNParticles
 ```
 
+
+
 ```{r}
 PlotPSD <- uds %>% 
   filter(project == "ETNP") %>%
   ggplot(aes(x = psd, y = depth, col = profile)) +
  geom_point(alpha = 0.3, shape = 1) +
-  geom_path(aes(x = psd_gam)) + 
-scale_y_reverse(limits = c(2500, 0))
+  #geom_path(aes(x = psd_gam)) + 
+  #geom_ribbon(aes(x = psd_gam, xmin = psd_gam - 2 * psd_seg, xmax = psd_gam + 2 * psd_seg), alpha = 0.1) +
+scale_y_reverse()
 
 PlotPSD
 ```
 
-Heck. This is wrong...
+I wonder if I can show that the profiles aren't statistically significanlty different. Or that they are for that matter...
+I think in that case, I run a gam with and without a parameter for profile...
+And then quantify the effect size of that parameter
+
+```{r}
+PlotNParticles <- uds %>% 
+  filter(profile %in% c("stn_043", "p16n_100")) %>%
+  ggplot(aes(x = tot_nparticles, y = depth, col = project)) +
+ geom_point(alpha = 0.7, shape = 1) +
+  #geom_path(aes(x = tot_nparticles)) +
+  #geom_ribbon(aes(x = psd_gam, xmin = psd_gam - 2 * psd_seg, xmax = psd_gam + 2 * psd_seg), alpha = 0.1) +
+scale_y_reverse(limits = c(2500, 0)) + scale_x_log10()
+
+PlotNParticles
+```
 
 ```{r}
 PlotPSD <- uds %>% 
@@ -52,7 +69,10 @@ PlotPSD <- uds %>%
   ggplot(aes(x = psd, y = depth, col = project)) +
  geom_point(alpha = 0.7, shape = 1) +
   geom_path(aes(x = psd_gam)) +
+  geom_ribbon(aes(x = psd_gam, xmin = psd_gam - 2 * psd_seg, xmax = psd_gam + 2 * psd_seg), alpha = 0.1) +
 scale_y_reverse(limits = c(2500, 0)) 
 
 PlotPSD
 ```
+
+I may just cow these togther.
