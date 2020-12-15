@@ -7,6 +7,8 @@ library(broom)
 library(furrr)
 pass <- function(x, ...) {x}
 
+ParticleSizeCutoff <- 0.5
+
 ### Function to load in initial data and prepare a data frame.
 
 bring_in_p2 <- function(){
@@ -212,10 +214,10 @@ calc_small_and_big <- function(x, DepthSummary = NULL){
   DepthSummary = x2[[2]]
   
   small <- EachSize %>%
-    filter(lb < 0.53)
+    filter(lb < ParticleSizeCutoff)
   
   big <- EachSize %>%
-    filter(lb >= 0.53)
+    filter(lb >= ParticleSizeCutoff)
   
   small2 <- small %>%
     group_by(project, profile, time, depth) %>%
@@ -297,7 +299,7 @@ calc_small_psd <- function(x, DepthSummary = NULL){
   #fit_model = function(df) glm(TotalParticles ~ log(lb), offset = log(binsize * vol), data = df, family = "poisson")
   
   psdCalc01 <- EachSize %>% 
-    filter(lb < 0.53) %>%
+    filter(lb < ParticleSizeCutoff) %>%
     group_by(project, profile, time, depth) %>%
     nest() %>%
     mutate(model = map(data, fit_nb_2)) %>%
@@ -322,7 +324,7 @@ calc_big_psd <- function(x, DepthSummary = NULL){
   #fit_model = function(df) glm(TotalParticles ~ log(lb), offset = log(binsize * vol), data = df, family = "poisson")
   
   psdCalc01 <- EachSize %>% 
-    filter(lb >= 0.53) %>%
+    filter(lb >= ParticleSizeCutoff) %>%
     group_by(project, profile, time, depth) %>%
     nest() %>%
     mutate(model = map(data, fit_nb_2)) %>%
@@ -644,14 +646,14 @@ diagnose_disaggregation_one_profile <- function(x, DepthSummary = NULL){
               Flux_Pred = sum(flux_pred))
   
   Small <- modelPostCalc %>% 
-    filter(lb <= 0.53) %>%
+    filter(lb <= ParticleSizeCutoff) %>%
     group_by(depth) %>%
     summarize(DF = first(DF), DFP = first(DFP), 
               Flux = sum(flux_smooth), 
               Flux_Prev = sum(flux_prev),
               Flux_Pred = sum(flux_pred))
   Big <- modelPostCalc %>% 
-    filter(lb > 0.53) %>%
+    filter(lb > ParticleSizeCutoff) %>%
     group_by(depth) %>%
     summarize(DF = first(DF), DFP = first(DFP), 
               Flux = sum(flux_smooth), 
