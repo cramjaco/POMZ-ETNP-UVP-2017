@@ -394,6 +394,10 @@ calc_psd_gam_multiprofile <- function(x, DepthSummary = NULL){
   DS2 <- DSN %>%
     select(project, profile, time, DepthSummary2) %>% unnest(cols = c(DepthSummary2))
   
+  mods = DSN$psd_gam_model
+  names(mods) <- DSN$profile
+  
+  #list(out = list(ES = EachSize, DS = DS2), psd_gam_mod = mods)
   list(ES = EachSize, DS = DS2)
   
   }

@@ -40,8 +40,8 @@ PlotPSD <- uds %>%
   filter(project == "ETNP") %>%
   ggplot(aes(x = psd, y = depth, col = profile)) +
  geom_point(alpha = 0.3, shape = 1) +
-  #geom_path(aes(x = psd_gam)) + 
-  #geom_ribbon(aes(x = psd_gam, xmin = psd_gam - 2 * psd_seg, xmax = psd_gam + 2 * psd_seg), alpha = 0.1) +
+  geom_path(aes(x = psd_gam)) + 
+  geom_ribbon(aes(x = psd_gam, xmin = psd_gam - 2 * psd_seg, xmax = psd_gam + 2 * psd_seg), alpha = 0.1) +
 scale_y_reverse()
 
 PlotPSD
@@ -50,6 +50,14 @@ PlotPSD
 I wonder if I can show that the profiles aren't statistically significanlty different. Or that they are for that matter...
 I think in that case, I run a gam with and without a parameter for profile...
 And then quantify the effect size of that parameter
+
+Or follow this Gavin Simpson Post
+https://fromthebottomoftheheap.net/2017/10/10/difference-splines-i/
+
+or 
+anova.gam {mgcv}
+
+Calculate gams for each profile, and then run anova.gam to see if they are different...
 
 ```{r}
 PlotNParticles <- uds %>% 
@@ -76,3 +84,12 @@ PlotPSD
 ```
 
 I may just cow these togther.
+
+```{r}
+plot_grid(PlotNParticles, PlotPSD)
+```
+
+```{r}
+uds %>% filter(profile %in% c("stn_043", "p16n_100")) %>% select()
+```
+
