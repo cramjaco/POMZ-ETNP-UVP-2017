@@ -714,7 +714,6 @@ diagnose_disaggregation<- function(x, DepthSummary = NULL){
   EachSize01 <- metaNest01 %>% select(project, profile, time, ES01) %>% unnest(ES01)
   DepthSummary01 <- metaNest01 %>% select(project, profile, time, DS01) %>% unnest(DS01)
 
-  browser()
   return(list(ES = EachSize01, DS = DepthSummary01))
 }
 

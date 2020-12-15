@@ -5,8 +5,8 @@ test_go <- function(){
 testModPipe <<- binned02 %>% 
   diagnose_disaggregation()
 
-tmpes <- testModPipe$ES
-tmpds <- testModPipe$DS
+tmpes <<- testModPipe$ES
+tmpds <<- testModPipe$DS
 }
 
 test_go_in <- function(){
