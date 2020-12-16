@@ -581,7 +581,7 @@ double_gam_smooth <- function(x, DepthSummary = NULL){
   EachSize = x2[[1]]
   DepthSummary = x2[[2]]
   
-  withGamFit <- EachSize %>% group_by(profile) %>% nest() %>%
+  withGamFit <- EachSize %>% group_by(project) %>% nest() %>%
     mutate(mod = map(data, safe_double_gam),
            modOnly = map(mod, ~.[[1]]),
            pred = map2(modOnly, data, safely(predict), se.fit = TRUE),
