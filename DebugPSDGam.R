@@ -7,3 +7,7 @@ gamTestData <- binned01 %>%
 
 gtOut <- gamTestData %>%
   calc_psd_gam_multiprofile()
+
+gtOut1 <- gtOut$out
+
+gtMod <- gtOut$psd_gam_mod

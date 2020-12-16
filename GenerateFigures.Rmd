@@ -118,18 +118,54 @@ eg_slope =  eg_dataline %>% pull(psd)
 eg_icp = eg_dataline %>% pull(icp)
 eg_vol = eg_dataline %>% pull(vol)
 
+eg_datablock <- bes %>%
+  filter(profile == "stn_043", depth == 162.5)
 
-eg_lb = unique(bes$lb)
-eg_binsize = unique(bes$binsize)
+
+eg_lb = eg_datablock$lb
+eg_binsize = eg_datablock$binsize
 eg_nnp = exp(eg_icp + log(eg_lb) * eg_slope)
 
 eg_np = eg_nnp * eg_binsize
 eg_tp = eg_np * eg_vol
-eg_df <- tibble(lb = eg_lb, n_nparticles = eg_nnp)
+eg_df <- tibble(lb = eg_lb, n_nparticles = eg_nnp, nparticles = eg_np, TotalParticles = eg_tp)
 
 
-bes %>% filter(profile == "stn_043", depth == 162.5) %>%
+EgNNP <- eg_datablock %>%
   ggplot(aes(x = lb, y = n_nparticles)) + geom_point() + scale_x_log10() + scale_y_log10() + 
   geom_path(data = eg_df)
+
+EgNP <- eg_datablock %>%
+  ggplot(aes(x = lb, y = nparticles)) + geom_point() + scale_x_log10() + scale_y_log10() + 
+  geom_path(data = eg_df)
+
+EgTP <- eg_datablock %>%
+  ggplot(aes(x = lb, y = TotalParticles)) + geom_point() + scale_x_log10() + scale_y_log10() + 
+  geom_path(data = eg_df)
+
+plot_grid(EgNNP, EgNP)
 ```
 
+# Smooth flux and um disaggregation.
+
+```{r}
+bds %>% 
+  ggplot(aes(y = depth, x = Flux_Smooth, col = profile)) + facet_wrap(~project) + geom_point() + scale_y_reverse(limits = c(2500, 0)) + scale_x_log10()
+```
+
+```{r}
+bds %>% 
+  ggplot(aes(y = depth, x = DFP, col = profile)) + facet_wrap(~project) + geom_point() + scale_y_reverse(limits = c(2500, 0)) + geom_vline(xintercept = 1)
+```
+
+What the heck is going on with DFP here. Why is it usually > 1 shouldn't it be less than 1 when flux is decreasing?
+
+```{r}
+bds %>% 
+  ggplot(aes(y = depth, x = ospsDZ, col = profile)) + facet_wrap(~project) + geom_point() + scale_y_reverse(limits = c(500, 0)) + geom_vline(xintercept = 0)
+```
+
+```{r}
+bds %>% filter(project == "P16") %>%
+  ggplot(aes(y = depth, x = ospsDZ, col = profile)) + facet_wrap(~project) + geom_point() + scale_y_reverse(limits = c(500, 0)) + geom_vline(xintercept = 0)
+```

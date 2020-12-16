@@ -645,7 +645,8 @@ diagnose_disaggregation_one_profile <- function(x, DepthSummary = NULL){
            spec_prev = lag(spec_only),
            flux_prev = lag(smooth_flux_fit),
            DF = smooth_flux_fit - flux_prev,
-           DFP = 1 - DF/flux_prev, 
+           #DFP = 1 - DF/flux_prev,  # I was using this for a while.
+           DFP = smooth_flux_fit/flux_prev,
            depth_prev = lag(depth),
            DZ = depth - depth_prev,
     )
@@ -715,11 +716,11 @@ diagnose_disaggregation_one_profile <- function(x, DepthSummary = NULL){
       left_join(All, by = "depth") %>% rename(Flux_Smooth = Flux)
     
     modelReduced <- modelPostCalc %>% select(
-      depth, flux_prev, flux_pred
+      depth, lb, flux_prev, flux_pred
     )
     
     EachSize_B <- EachSize %>%
-      left_join(modelReduced, by = "depth")
+      left_join(modelReduced, by = c("depth", "lb"))
   # Code does stuff here
   return(list(ES = EachSize_B, DS = DepthSummary_B))
 }
