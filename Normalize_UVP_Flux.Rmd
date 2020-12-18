@@ -450,4 +450,3 @@ I'm feeling ok with this. Lets feed the aldredge optimized data into the remin m
 write_csv(binned_DepthSummary_ald, "dataOut/binned_DepthSummary_ald.csv")
 write_csv(binned_EachSize_ald, "dataOut/binned_EachSize_ald.csv")
 ```
-

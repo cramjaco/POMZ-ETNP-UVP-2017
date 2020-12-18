@@ -520,6 +520,51 @@ bin_depths <- function(x, DepthSummary = NULL, bins = BianchiBins){
   return(list(ES = EachSize4, DS = DepthSummary2))
 }
 
+# average profiles by summing TotalParticles and volume and then recalculating
+sum_profiles <- function(x, DepthSummary = NULL){
+  # Input from twin please.
+  #Allow passing in either a two elemet list of Eachsize and DepthSummary, or passing in as two variables.
+
+  x2 <- parse_jac_input2(x, DepthSummary)
+  EachSize = x2[[1]]
+  DepthSummary = x2[[2]]
+  
+  # dlb <- bins[1:length(bins)-1]
+  # dub <- bins[2:length(bins)]
+  # mids = (dlb + dub)/2
+  
+  #EachSize2 <- EachSize %>%  mutate(DepthBin = cut(depth, bins, labels = mids))
+  
+  # combines the profiiles, loosing npartincles and n_nparticles
+  EachSize3 <- EachSize %>%
+    select(-nparticles, -n_nparticles) %>%
+    group_by(project, depth, lb) %>%
+    summarize(vol = sum(vol), TotalParticles = sum(TotalParticles), ub = first(ub), binsize = first(binsize)) %>%
+    ungroup()
+  
+  # Recalculate nparticles and n_nparticles
+  EachSize4 <- EachSize3 %>%
+    mutate(nparticles = TotalParticles/vol,
+           n_nparticles = nparticles/binsize) %>%
+    #mutate(depth = as.numeric(as.character(DepthBin))) %>%
+    #select(-DepthBin) %>%
+    pass
+  
+  # Match DepthSummary
+  
+  DepthSummary2 <- DepthSummary %>%
+    #mutate(DepthBin = cut(depth, bins, labels = mids)) %>%
+    group_by(project, time, depth) %>%
+    summarize() %>%
+    ungroup() %>%
+    mutate(profile = "multiple")
+    #mutate(depth = as.numeric(as.character(DepthBin))) %>%
+    #select(-DepthBin)
+    pass
+  
+  return(list(ES = EachSize4, DS = DepthSummary))
+}
+
 
 
 # combine_timesteps <- function(x, DepthSummary = NULL){
@@ -762,3 +807,52 @@ diagnose_disaggregation<- function(x, DepthSummary = NULL){
   return(list(ES = EachSize01, DS = DepthSummary01))
 }
 
+## Functions about fitting flux
+
+fit_flux_es <- function(C_f, ag, ES){
+ES2 <- ES %>% mutate(flux2 = C_f * nparticles * lb ^ ag)
+ES2
+}
+
+fit_flux_ds <- function(C_f, ag, ES, DS){
+  DS2 <- ES %>%
+    group_by(project, profile, time, depth) %>%
+    summarize(tot_flux2 = sum(flux2))
+  
+  DS2 <- left_join(DS, DS2, by = c("project", "profile", "time", "depth"))
+}
+
+fit_flux <- function(C_f, ag, ES, DS){
+  ES2 <- fit_flux_es(C_f, ag, ES)
+  DS2 <- fit_flux_ds(C_f, ag, ES2, DS)
+  return(list(ES = ES2, DS = DS2))
+}
+
+RMSE <- function(mod){
+  RSS <- c(crossprod(mod$residuals))
+  MSE = RSS/ length(mod$residuals)
+  RMSE = sqrt(MSE)
+}
+
+flux_check <- function(DS){
+  #diff = log10(DS$tn_flux) - log10(DS$tot_flux2)
+  diff = log(DS$tn_flux) - log(DS$tot_flux2)
+  squares = diff ^2
+  rss = sum(squares)
+  mse = rss/length(rss)
+  rmse = sqrt(mse)
+  rmse
+}
+
+fit_check_flux <- function(C_f, ag, ES, DS){
+  FF <- fit_flux(C_f, ag, ES, DS)
+  FC <- flux_check(FF$DS)
+  FC
+}
+
+fc_wrap <- function(x, ES, DS){
+  C_f <- x[1]
+  ag <- x[2]
+  FC <- fit_check_flux(C_f, ag, ES, DS)
+  FC
+}
