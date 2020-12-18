@@ -7,6 +7,7 @@ output: html_notebook
 library(tidyverse)
 library(cowplot)
 theme_set(theme_cowplot())
+cb10 <- c('#a6cee3','#1f78b4','#b2df8a','#33a02c','#fb9a99','#e31a1c','#fdbf6f','#ff7f00','#cab2d6','#6a3d9a')
 ```
 
 
@@ -163,18 +164,22 @@ bds %>% filter(project == "ETNP") %>% select(profile, depth, Flux_Smooth) %>% pi
 Something is off. All of the flux profiles are identical.
 
 ```{r}
-bds %>% #filter(profile %in% c("stn_043", "p16n_100")) %>%
-  ggplot(aes(y = depth, x = DFP, col = profile)) + facet_wrap(~project) + geom_point() + scale_y_reverse(limits = c(2500, 0)) + geom_vline(xintercept = 1)
+cb10 <- c('#a6cee3','#1f78b4','#b2df8a','#33a02c','#fb9a99','#e31a1c','#fdbf6f','#ff7f00','#cab2d6','#6a3d9a')
+bds %>% filter(DFP > 1) %>% #filter(profile %in% c("stn_043", "p16n_100")) %>%
+  ggplot(aes(y = depth, x = DFP, col = factor(time), shape = factor(time))) + facet_wrap(~project) + geom_point() + scale_y_reverse(limits = c(2500, 0)) + geom_vline(xintercept = 1) +
+   scale_color_manual(values = c(rep("black", 5), rep("blue", 5))) + scale_shape_manual(values = rep(1:5, 2))
 ```
 
 What the heck is going on with DFP here. Why is it usually > 1 shouldn't it be less than 1 when flux is decreasing?
+This very deep increasing flux seems improbable to me.
+Lets check the smooths. Or only go to 1000m.
 
 ```{r}
 bds %>% 
-  ggplot(aes(y = depth, x = ospsDZ, col = profile)) + facet_wrap(~project) + geom_point() + scale_y_reverse(limits = c(500, 0)) + geom_vline(xintercept = 0)
+  ggplot(aes(y = depth, x = pracma::nthroot(ospsDZ, 3), col = factor(time), shape = factor(time))) + facet_wrap(~project) + geom_point() + scale_y_reverse(limits = c(1500, 0)) + geom_vline(xintercept = 0) + scale_color_manual(values = c(rep("black", 5), rep("blue", 5))) + scale_shape_manual(values = rep(1:5, 2))
 ```
 
 ```{r}
 bds %>% filter(project == "P16") %>%
-  ggplot(aes(y = depth, x = ospsDZ, col = profile)) + facet_wrap(~project) + geom_point() + scale_y_reverse(limits = c(500, 0)) + geom_vline(xintercept = 0)
+  ggplot(aes(y = depth, x = ospsDZ)) + facet_wrap(~project) + geom_point() + scale_y_reverse(limits = c(500, 0)) + geom_vline(xintercept = 0)
 ```
