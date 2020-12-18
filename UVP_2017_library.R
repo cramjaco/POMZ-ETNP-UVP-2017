@@ -599,7 +599,7 @@ sum_profiles <- function(x, DepthSummary = NULL){
 ## 24 November 2020
 
 my_double_gam <- function(df){
-  gam(TotalParticles ~s(log(lb), log(depth)), offset = log(vol * binsize), family = nb(), data = df)
+  gam(TotalParticles ~s(log(lb), log(depth), by = profile), offset = log(vol * binsize), family = nb(), data = df)
 }
 
 safe_double_gam <- safely(my_double_gam)
