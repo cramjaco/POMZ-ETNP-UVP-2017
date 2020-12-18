@@ -11,6 +11,18 @@ ParticleSizeCutoff <- 0.5
 
 ### Function to load in initial data and prepare a data frame.
 
+## Define global parameter
+
+C_f = 133 # SmoothsAndFlusRevisited.Rmd, calculated from trap flux
+ag = 2.00 # SmoothsAndFlusRevisited
+alpha = (ag + 1) / 2 # assuming spherical drag profile
+gamma = alpha - 1
+
+C_f_global <- C_f
+alpha_global <- alpha
+gamma_global <- gamma
+ag_global <- ag
+
 bring_in_p2 <- function(){
   
   # bring in metadata that specifies relevant files
@@ -178,17 +190,17 @@ calc_particle_parameters <- function(x, DepthSummary = NULL){
   # ag_fit = 0.26 # Fitted alpha + gamma parameter; hardcoded but copied from NormalizeUVP_Flux.Rmd
   # C_f_fit = 3.98 # Fitted C_f parameter
   
-  alpha = 0.52 # Alldredge
-  gamma = 0.26 # Alldredge & Gotschalk
-  C_f_fit = 10.51 # Normalize_UVP_Flux.Rmd, nonlinear for now
-  ag_fit = alpha + gamma # Zerod out for now; I'd like to clean this all up soon.
+  # alpha = 0.52 # Alldredge
+  # gamma = 0.26 # Alldredge & Gotschalk
+  # C_f_fit = 10.51 # Normalize_UVP_Flux.Rmd, nonlinear for now
+  # ag_fit = alpha + gamma # Zerod out for now; I'd like to clean this all up soon.
   
   EachSize2 <- EachSize %>% 
     mutate(
       biovolume = nparticles * lb ^ alpha,
       speed = lb ^ gamma,
       flux = biovolume * speed,
-      flux_fit = nparticles * C_f_fit * lb ^ ag_fit
+      flux_fit = nparticles * C_f_global * lb ^ ag_global
     )
   DepthSummary2 <- EachSize2 %>%
     group_by(project, profile, time, depth) %>%
@@ -630,10 +642,10 @@ double_gam_smooth <- function(x, DepthSummary = NULL){
     mutate(mod = map(data, safe_double_gam),
            modOnly = map(mod, ~.[[1]]),
            pred = map2(modOnly, data, safely(predict), se.fit = TRUE),
-           predOnly = map(pred, .[[1]]),
-           data01 = map2(data, pred,
-                         ~bind_cols(.x, link = .y$result$fit, lse = .y$result$se.fit))) %>%
-    select(profile, data01) %>%
+           predOnly = map(pred, ~.[[1]]),
+           data01 = map2(data, predOnly,
+                         ~bind_cols(.x, link = .y$fit, lse = .y$se.fit))) %>%
+    select(project, data01) %>%
     unnest(data01) %>%
     mutate(link_lower = link - lse,
            link_upper = link + lse,

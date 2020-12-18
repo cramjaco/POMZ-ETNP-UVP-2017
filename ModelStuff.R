@@ -15,10 +15,10 @@ m1mm = 3.3 * 10^-6; #%g % Alldgedge 1998 % mass of 1mm particle
 w1mm = 2; #% m/day # Alldredge and Gotschalk, methinks % sinking speed of 1mm particle
 micron = 1e-6;
 
-C_f = 10.51 # for now
-alpha = .52
-gamma = .26
-ag = alpha + gamma
+# C_f = 10.51 # for now
+# alpha = .52
+# gamma = .26
+# ag = alpha + gamma
 
 C_f_global <- C_f
 alpha_global <- alpha

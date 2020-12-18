@@ -177,3 +177,5 @@ oFF <- fit_flux(opt$par[1], opt$par[2], ES = PETE$ES, DS = PETE$DS)
 
 oFF$DS %>% pivot_longer(c(tn_flux, tot_flux2)) %>%
   ggplot(aes(x = value, y = depth, col = name)) + geom_point() + scale_y_reverse()
+
+# the tiger is out! Alpha = 2
