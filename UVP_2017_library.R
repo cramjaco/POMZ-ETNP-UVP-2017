@@ -598,11 +598,11 @@ sum_profiles <- function(x, DepthSummary = NULL){
 
 ## 24 November 2020
 
-my_double_gam <- function(df){
-  gam(TotalParticles ~s(log(lb), log(depth)), offset = log(vol * binsize), family = nb(), data = df)
-}
-
-safe_double_gam <- safely(my_double_gam)
+# my_double_gam <- function(df){
+#   gam(TotalParticles ~s(log(lb), log(depth)), offset = log(vol * binsize), family = nb(), data = df)
+# }
+# 
+# safe_double_gam <- safely(my_double_gam)
 
 expand_with_gam <- function(df, mod){
   loc_pred <- predict(mod, type = "link", se.fit = TRUE) %>% as.data.frame %>% mutate(lower = fit - 2 * se.fit, upper = fit + 2 * se.fit) %>% mutate(resp_fit = exp(fit), resp_lower = exp(lower), resp_upper = exp(upper))
@@ -630,6 +630,54 @@ nnp_size_ggplot_2d <- function(df){
      theme_bw()
 }
 
+# double_gam_smooth <- function(x, DepthSummary = NULL){
+#   # Input from twin please.
+#   #Allow passing in either a two elemet list of Eachsize and DepthSummary, or passing in as two variables.
+# 
+#   x2 <- parse_jac_input2(x, DepthSummary)
+#   EachSize = x2[[1]]
+#   DepthSummary = x2[[2]]
+#   
+#   withGamFit <- EachSize %>% group_by(project) %>% nest() %>%
+#     mutate(mod = map(data, safe_double_gam),
+#            modOnly = map(mod, ~.[[1]]),
+#            pred = map2(modOnly, data, safely(predict), se.fit = TRUE),
+#            predOnly = map(pred, ~.[[1]]),
+#            data01 = map2(data, predOnly,
+#                          ~bind_cols(.x, link = .y$fit, lse = .y$se.fit))) %>%
+#     select(project, data01) %>%
+#     unnest(data01) %>%
+#     mutate(link_lower = link - lse,
+#            link_upper = link + lse,
+#            nnp_smooth = exp(link),
+#            nnp_lower = exp(link_lower),
+#            nnp_upper = exp(link_upper),
+#            np_smooth = nnp_smooth * binsize,
+#            tp_smooth = np_smooth * vol,
+#            flux_smooth = np_smooth * (C_f_global * lb ^ ag_global)
+#     )
+#   
+#   TotalStuff <- withGamFit %>% group_by(project, profile, time, depth) %>%
+#     summarize(smooth_TotParticles = sum(tp_smooth),
+#            smooth_nparticles = sum(np_smooth),
+#            smooth_nnparticles = sum(nnp_smooth),
+#            smooth_flux_fit = sum(flux_smooth)
+#            )
+#   
+#   DepthSummary_B <- left_join(DepthSummary, TotalStuff, by = c("project", "profile", "time", "depth"))
+#   
+#   return(list(ES = withGamFit, DS = DepthSummary_B))
+#   
+# }
+
+## New smooth with profile, from SmoothsAndFluxRevisited
+my_double_gam <- function(df){
+  gam(TotalParticles ~s(log(lb), log(depth), by = factor(profile)), offset = log(vol * binsize), family = nb(), data = df)
+}
+
+safe_double_gam <- safely(my_double_gam)
+
+
 double_gam_smooth <- function(x, DepthSummary = NULL){
   # Input from twin please.
   #Allow passing in either a two elemet list of Eachsize and DepthSummary, or passing in as two variables.
@@ -638,13 +686,14 @@ double_gam_smooth <- function(x, DepthSummary = NULL){
   EachSize = x2[[1]]
   DepthSummary = x2[[2]]
   
+  
   withGamFit <- EachSize %>% group_by(project) %>% nest() %>%
     mutate(mod = map(data, safe_double_gam),
            modOnly = map(mod, ~.[[1]]),
            pred = map2(modOnly, data, safely(predict), se.fit = TRUE),
            predOnly = map(pred, ~.[[1]]),
-           data01 = map2(data, predOnly,
-                         ~bind_cols(.x, link = .y$fit, lse = .y$se.fit))) %>%
+           data01 = map2(data, pred,
+                         ~bind_cols(.x, link = .y$result$fit, lse = .y$result$se.fit))) %>%
     select(project, data01) %>%
     unnest(data01) %>%
     mutate(link_lower = link - lse,
