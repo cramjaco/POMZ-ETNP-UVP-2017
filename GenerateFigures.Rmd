@@ -409,10 +409,16 @@ summary(DFG3)$r.sq
 plot(TDG1)
 ```
 
+#Osps
 
+(u mol C / m^3 / day)
 ```{r}
 bds %>% 
-  ggplot(aes(y = depth, x = pracma::nthroot(ospsDZ, 3), col = factor(time), shape = factor(time))) + facet_wrap(~project) + geom_point() + scale_y_reverse(limits = c(1500, 0)) + geom_vline(xintercept = 0) + scale_color_manual(values = c(rep("black", 5), rep("blue", 5))) + scale_shape_manual(values = rep(1:5, 2))
+  ggplot(aes(y = depth, x = pracma::nthroot(ospsDZ, 3), shape = factor(day(time)), fill = hour(time), group = factor(time))) + facet_wrap(~project) + geom_point(size = 2) + scale_y_reverse(limits = c(1500, 0)) + geom_vline(xintercept = 0) +   scale_shape_manual(name = "Day of Month", values = rep(21:25, 2)) + labs(x = bquote("Flux Size Shift"~μmol/m^3/day)) +
+  scale_fill_gradientn(name = "Hour of Day", breaks = c(0, 6, 12, 18, 24), colors = c("black", "blue", "white", "orange", "black"))
+
+#ggsave("..figures/FluxSizeShift.svg")
+ggsave("..figures/FluxSizeShift.png")
 ```
 
 ```{r}
