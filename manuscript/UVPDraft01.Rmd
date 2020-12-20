@@ -29,13 +29,33 @@ Stuff that is known about zooplankton particle interactions.
 
 Stuff that is known about particle size distributions (esp, Guidi and Kiko)
 
+Particle size distributions can be compared to flux by normalizing to trap data (Guidi).
+
+In the ETNA, there is a weaker OMZ and particles were compared to acoustic profiles of organims. {Findings} (Kiko 2).
+
 ## But
-It is not known how migratory zooplankton affect particle size distributions, and if they lead to diel variability in particle flux that might affect overall transport into the deep ocean.
-It is not fully known how oxygen limitation affects particle size dynamics and flux.
+* The temporal dynamics of particle size distribution have not been examined in the open ocean or oxygen minimun zone at this time scale.
+* Particle size has not been normalized to observed flux in this region.
+* It is not known how migratory zooplankton affect particle size distributions, and if they lead to diel variability in particle flux that might affect overall transport into the deep ocean.
+* It is not fully known how oxygen limitation affects particle size dynamics and flux.
+* Nobody has quantified non remineralization like processes.
 
 ## Therefore
 
 We conducted the first ever time-series analysis of particles, in an oxygne minimum zone. With the goal of normalizing to observed flux, and comparing particle size data to acoustic data about the distributions of zooplankton and larger orgasnisms. 
+
+* We compare this data to acoustic signature of zooplankton.
+
+
+* We modified the a particle remineralization and sinking model (PRiSM) (Devries, Cram) to estemate particle size distribution changes that would occur under dynamics where particles only sink and remineralize, and compared observed distributions to ones expeced by the model. This allowed us to quantify the magnitude of non-PRiSM like processes
+
+## Scientific question:
+ * How do the particle size distribution at one location in the oligotrophic Eastern Tropical North Pacific evolve with respect to depth, and how does it vary over time?
+
+## We hypothesized
+ * Temporal day to day variability in paticle size distribution would be evident.
+ * This variability would relate to the location of migratory zooplankton, with a combenation of increased particle flux and disaggregation present where zooplankton occur.
+ * That there might also be temporal varibility in flux.
 
 # Methods
 All measurments were taken on board the R/V Sekuliaq from XX January 2017 thorugh XX January 2017 at XXX Lat XXX Long.

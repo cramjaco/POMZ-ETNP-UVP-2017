@@ -917,3 +917,35 @@ fc_wrap <- function(x, ES, DS){
   FC <- fit_check_flux(C_f, ag, ES, DS)
   FC
 }
+
+## Recode time variable
+
+# add_time_data <- function(x, DepthSummary = NULL){
+#   require(chron)
+#   require(lubridate)
+#   x2 <- parse_jac_input2(x, DepthSummary)
+#   EachSize = x2[[1]]
+#   DepthSummary = x2[[2]]
+# 
+#   timeDf <- tibble(time = unique(DepthSummary$time)) %>% 
+#     mutate(tod <- times(strftime(time,"%H:%M:%S")))
+#   
+#   # Recode into blocks of time
+#   
+#   # create breaks
+#   breaks <- hour(hm("21:00", "5:00", "9:00", "18:00", "20:59"))
+#   # labels for the breaks
+#   labels <- c("Night", "Morning", "Afternoon", "Evening")
+# 
+#   timeDf <- timeDf %>%
+#     mutate(timeBlock = cut(x=hour(time), breaks = breaks, labels = labels, include.lowest=TRUE)
+# )
+#   
+#   # hours from noon
+#   
+#   hour(timeDf$tod)
+#   
+#   
+#   
+#   return(list(ES = EachSize, DS = DepthSummary))
+# }

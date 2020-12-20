@@ -34,20 +34,113 @@ scale_y_reverse() + scale_x_log10()
 PlotNParticles
 ```
 
-
-
 ```{r}
-PlotPSD <- uds %>% 
+bdsAddTime <- bds %>%
+  mutate(Hour = hour(time), Day = day(time))
+
+FSG1 <- gam(tot_nparticles~ s(depth, k = 3) + s(Day, k = 3) + s(Hour, k = 4, bs = "cc"), knots = list(Hour = c(0, 24)), data = bdsAddTime %>% filter(depth >= 175 & depth <=500 & project == "ETNP"))
+
+FSG2 <- gam(tot_nparticles ~ s(depth, k = 3) + s(Day, k = 3), data = bdsAddTime %>% filter(depth >= 175 & depth <=500 & project == "ETNP"))
+
+FSG3 <- gam(tot_nparticles ~ s(depth, k = 3), data = bdsAddTime %>% filter(depth >= 175 & depth <=500 & project == "ETNP"))
+
+#FSG4 <- gam(tot_nparticles~ s(depth, k = 3)  + s(Hour, k = 4, bs = "cc"), knots = list(Hour = c(0, 24)), data = bdsAddTime %>% filter(depth >= 175 & depth <=500 & project == "ETNP"))
+
+summary(FSG1)
+#summary(FSG2)
+#summary(FSG3)
+#summary(FSG4)
+
+summary(FSG1)$r.sq - summary(FSG2)$r.sq
+summary(FSG2)$r.sq - summary(FSG3)$r.sq
+summary(FSG3)$r.sq
+```
+
+But there is between projects:
+```{r}
+ProjGam <- gam(tot_nparticles~ s(depth, k = 3) + factor(project), knots = list(Hour = c(0, 24)), data = bdsAddTime %>% filter(depth >= 175 & depth <=500))
+
+summary(ProjGam)
+```
+
+```{r fig.width = 12}
+PlotPSDmany <- uds %>% 
   filter(project == "ETNP") %>%
-  ggplot(aes(x = psd, y = depth, col = profile)) +
+  ggplot(aes(x = psd, y = depth, shape = factor(day(time)), fill = hour(time))) +
  
   #geom_path(aes(x = psd_gam)) + 
   #geom_ribbon(aes(x = psd_gam, xmin = psd_gam - 2 * psd_seg, xmax = psd_gam + 2 * psd_seg), alpha = 0.1, outline_type = "lower") +
-  geom_point(alpha = .7, shape = 1, size = 2, stroke = 1, fill = "white") +
-scale_y_reverse()
+  geom_point(alpha = .6, size = 2, stroke = 1) +
+  scale_y_reverse() + scale_shape_manual(values = c(21:25)) +
+  scale_fill_gradientn(breaks = c(0, 6, 12, 18, 24), colors = c("black", "blue", "white", "orange", "black")) 
 
-PlotPSD
+PlotParticlesmany <- uds %>% 
+  filter(project == "ETNP") %>%
+  ggplot(aes(x = tot_nparticles, y = depth, shape = factor(day(time)), fill = hour(time))) +
+ 
+  #geom_path(aes(x = psd_gam)) + 
+  #geom_ribbon(aes(x = psd_gam, xmin = psd_gam - 2 * psd_seg, xmax = psd_gam + 2 * psd_seg), alpha = 0.1, outline_type = "lower") +
+  geom_point(alpha = .6, size = 2, stroke = 1) +
+  scale_y_reverse() + scale_shape_manual(values = c(21:25)) +
+  scale_fill_gradientn(breaks = c(0, 6, 12, 18, 24), colors = c("black", "blue", "white", "orange", "black")) +
+  scale_x_log10() + theme(legend.position = "none")
+
+PlotFluxmany <- uds %>% 
+  filter(project == "ETNP") %>%
+  ggplot(aes(x = tot_flux_fit, y = depth, shape = factor(day(time)), fill = hour(time))) +
+ 
+  #geom_path(aes(x = psd_gam)) + 
+  #geom_ribbon(aes(x = psd_gam, xmin = psd_gam - 2 * psd_seg, xmax = psd_gam + 2 * psd_seg), alpha = 0.1, outline_type = "lower") +
+  geom_point(alpha = .6, size = 2, stroke = 1) +
+  scale_y_reverse() + scale_shape_manual(values = c(21:25)) +
+  scale_fill_gradientn(breaks = c(0, 6, 12, 18, 24), colors = c("black", "blue", "white", "orange", "black")) +
+  scale_x_log10() + theme(legend.position = "none")
+
+
+
+plot_grid(
+  PlotParticlesmany,
+  PlotPSDmany,
+  rel_widths = c(2, 3)
+  )
+
+ggsave("figures/ParticlesPSDMany.png")
+ggsave("figures/ParticlesPSDMany.svg")
+
 ```
+
+```{r}
+bdsAddTime <- bds %>%
+  mutate(Hour = hour(time), Day = day(time))
+
+FSG1 <- gam(psd~ s(depth, k = 3) + s(Day, k = 3) + s(Hour, k = 4, bs = "cc"), knots = list(Hour = c(0, 24)), data = bdsAddTime %>% filter(depth >= 175 & depth <=500 & project == "ETNP"))
+
+FSG2 <- gam(psd ~ s(depth, k = 3) + s(Day, k = 3), data = bdsAddTime %>% filter(depth >= 175 & depth <=500 & project == "ETNP"))
+
+FSG3 <- gam(psd ~ s(depth, k = 3), data = bdsAddTime %>% filter(depth >= 175 & depth <=500 & project == "ETNP"))
+
+FSG4 <- gam(psd~ s(depth, k = 3)  + s(Hour, k = 4, bs = "cc"), knots = list(Hour = c(0, 24)), data = bdsAddTime %>% filter(depth >= 175 & depth <=500 & project == "ETNP"))
+
+summary(FSG1)
+#summary(FSG2)
+#summary(FSG3)
+summary(FSG4)
+
+summary(FSG1)$r.sq - summary(FSG2)$r.sq
+summary(FSG2)$r.sq - summary(FSG3)$r.sq
+summary(FSG3)$r.sq
+```
+Not a significant difference in PSD with respect to time.
+
+But there is between projects:
+```{r}
+ProjGam <- gam(psd~ s(depth, k = 3) + factor(project), knots = list(Hour = c(0, 24)), data = bdsAddTime %>% filter(depth >= 175 & depth <=500))
+
+summary(ProjGam)
+```
+
+
+
 
 I wonder if I can show that the profiles aren't statistically significanlty different. Or that they are for that matter...
 I think in that case, I run a gam with and without a parameter for profile...
@@ -62,33 +155,41 @@ anova.gam {mgcv}
 Calculate gams for each profile, and then run anova.gam to see if they are different...
 
 ```{r}
-PlotNParticles <- uds %>% 
+PlotNParticlesEP <- uds %>% 
   filter(profile %in% c("stn_043", "p16n_100")) %>%
-  ggplot(aes(x = tot_nparticles, y = depth, col = project)) +
- geom_point(alpha = 0.7, shape = 1, size = 2) +
+  ggplot(aes(x = tot_nparticles, y = depth, col = project, shape = project)) +
+ geom_point(alpha = 0.7, size = 2, stroke = 1) +
   #geom_path(aes(x = tot_nparticles)) +
   #geom_ribbon(aes(x = psd_gam, xmin = psd_gam - 2 * psd_seg, xmax = psd_gam + 2 * psd_seg), alpha = 0.1) +
-scale_y_reverse(limits = c(2500, 0)) + scale_x_log10()
+scale_y_reverse(limits = c(2500, 0)) + scale_x_log10() + scale_color_manual(values = c("gray20", "brown")) +
+  labs(x = "Particles/L", y = "depth (m)") +
+  theme(legend.position = "none") +
+  scale_shape_manual(values = c(1:5)) 
 
-PlotNParticles
+PlotNParticlesEP
 ```
 
+I removed one outlyer from p16 for visualization purposes (300 particles/l at surface)
+
 ```{r}
-PlotPSD <- uds %>% 
+PlotPSDEP <- uds %>% 
   filter(profile %in% c("stn_043", "p16n_100")) %>%
-  ggplot(aes(x = psd, y = depth, col = project)) +
- geom_point(alpha = 0.7, shape = 1, size = 2) +
+  ggplot(aes(x = psd, y = depth, col = project, shape = project)) +
+ geom_point(alpha = 0.7, size = 2, stroke = 1) +
   geom_path(aes(x = psd_gam)) +
   geom_ribbon(aes(x = psd_gam, xmin = psd_gam - 2 * psd_seg, xmax = psd_gam + 2 * psd_seg), alpha = 0.1) +
-scale_y_reverse(limits = c(2500, 0)) 
+scale_y_reverse(limits = c(2500, 0)) + scale_color_manual(values = c("gray20", "brown"))  +
+  scale_shape_manual(values = c(1:5)) + labs(y = "")
 
-PlotPSD
+PlotPSDEP
 ```
 
 I may just cow these togther.
 
-```{r}
-plot_grid(PlotNParticles, PlotPSD)
+```{r fig.width = 10, fig.height = 4}
+plot_grid(PlotNParticlesEP, PlotPSDEP, rel_widths = c(2,3), labels = c("A", "B"))
+ggsave("figures/ParticlesAndPSD_ETNPVsP16.svg")
+ggsave("figures/ParticlesAndPSD_ETNPVsP16.png")
 ```
 
 ```{r}
@@ -99,18 +200,24 @@ mainParticleComponents <- bds %>%
          tot_psd = psd, small_psd, big_psd,
          tot_flux_fit, small_flux_fit, big_flux_fit) %>%
   pivot_longer(cols = -c("project", "profile", "depth")) %>%
-  separate(name, c("size", "meas")) 
+  separate(name, c("size", "meas")) %>%
+  mutate(meas = recode(meas, nparticles = "particles/L")) %>%
+  mutate(meas = factor(meas, levels = c("particles/L", "flux", "psd")))
 
 PlotFlx <- mainParticleComponents %>% 
   filter(meas != "psd") %>%
-  ggplot(aes(y = depth, x = value, col = project)) + facet_grid(size ~ meas, scales = "free_x") + geom_point() + scale_y_reverse(limits = c(2500, 0)) + scale_x_log10() + theme(axis.title.x = element_blank(), legend.position = "none", strip.background.y = element_blank(), strip.text.y = element_blank(), plot.margin = unit(c(7,0,7,7), "pt"))
+  ggplot(aes(y = depth, x = value, col = project, shape = project)) + facet_grid(size ~ meas, scales = "free_x") + geom_point(size = 2) + scale_y_reverse(limits = c(1000, 0)) + scale_x_log10() + theme(axis.title.x = element_blank(), legend.position = "none", strip.background.y = element_blank(), strip.text.y = element_blank(), plot.margin = unit(c(7,0,7,7), "pt")) + scale_color_manual(values = c("brown", "gray20")) + scale_shape_manual(values = c(1:5)) + theme(axis.text.x = element_text(angle = 90))
 
 PlotPSD <- mainParticleComponents %>% 
   filter(meas == "psd") %>%
-  ggplot(aes(y = depth, x = value, col = project)) + facet_grid(size~meas, scales = "free_x") + geom_point() + scale_y_reverse(limits = c(2500, 0)) +
-  theme(axis.title.x = element_blank(), axis.title.y = element_blank(), axis.line.y = element_blank(), axis.text.y = element_blank(), axis.ticks.y = element_blank(), plot.margin = unit(c(7,7,7,0), "pt"))
+  ggplot(aes(y = depth, x = value, col = project, shape = project)) + facet_grid(size~meas, scales = "free_x") + geom_point(size = 2) + scale_y_reverse(limits = c(1000, 0)) +
+  theme(axis.title.x = element_blank(), axis.title.y = element_blank(), axis.line.y = element_blank(), axis.text.y = element_blank(), axis.ticks.y = element_blank(), plot.margin = unit(c(7,7,26.5,0), "pt")) +
+  scale_color_manual(values = c("brown", "gray20")) +  scale_shape_manual(values = c(1:5)) +  theme(axis.text.x = element_text(angle = 90))
 
 plot_grid(PlotFlx, PlotPSD, rel_widths = c(3, 2))
+
+ggsave("figures/BigVsSmall.svg")
+ggsave("figures/BigVsSmall.png")
 ```
 
 Flux small and flux tot track so closely because ag > psd. since the size distribution of the flux sould be PSD + ag (psd is negative in this case). Yo ucan see the variance at the one depth where psd is flatest at the very top.
@@ -137,24 +244,49 @@ eg_df <- tibble(lb = eg_lb, n_nparticles = eg_nnp, nparticles = eg_np, TotalPart
 
 EgNNP <- eg_datablock %>%
   ggplot(aes(x = lb, y = n_nparticles)) + geom_point() + scale_x_log10() + scale_y_log10() + 
-  geom_path(data = eg_df)
+  geom_path(data = eg_df) + labs(y = "Binsize & Volume Normalized \n Particles (#/L/mm)")
 
 EgNP <- eg_datablock %>%
   ggplot(aes(x = lb, y = nparticles)) + geom_point() + scale_x_log10() + scale_y_log10() + 
-  geom_path(data = eg_df)
+  geom_path(data = eg_df) + labs(y = "Normalized Particles")
 
 EgTP <- eg_datablock %>%
   ggplot(aes(x = lb, y = TotalParticles)) + geom_point() + scale_x_log10() + scale_y_log10() + 
-  geom_path(data = eg_df)
+  geom_path(data = eg_df) + labs( y = "Total Particles Observed (#)")
 
-plot_grid(EgNNP, EgNP)
+plot_grid(EgNNP, EgTP, labels = c("A", "B"))
+ggsave("figures/ExamplePSD163m.png")
+ggsave("figures/ExamplePSD163m.svg")
+
 ```
 
 # Smooth flux and um disaggregation.
 
 ```{r}
 bds %>% 
-  ggplot(aes(y = depth, x = Flux_Smooth, col = profile)) + facet_wrap(~project) + geom_point() + scale_y_reverse(limits = c(2500, 0)) + scale_x_log10()
+  ggplot(aes(y = depth, x = Flux_Smooth, col = factor(time))) + facet_wrap(~project) + geom_point() + scale_y_reverse(limits = c(1000, 0)) + scale_x_log10()
+```
+
+
+
+
+```{r}
+bdsAddTime <- bds %>%
+  mutate(Hour = hour(time), Day = day(time))
+
+FSG1 <- gam(Flux_Smooth~ s(depth, k = 3) + s(Day, k = 3) + s(Hour, k = 4, bs = "cc"), knots = list(Hour = c(0, 24)), data = bdsAddTime %>% filter(depth >= 175 & depth <=500 & project == "ETNP"))
+
+FSG2 <- gam(Flux_Smooth ~ s(depth, k = 3) + s(Day, k = 3), data = bdsAddTime %>% filter(depth >= 175 & depth <=500 & project == "ETNP"))
+
+FSG3 <- gam(Flux_Smooth ~ s(depth, k = 3), data = bdsAddTime %>% filter(depth >= 175 & depth <=500 & project == "ETNP"))
+
+summary(FSG1)
+summary(FSG2)
+summary(FSG3)
+
+summary(FSG1)$r.sq - summary(FSG2)$r.sq
+summary(FSG2)$r.sq - summary(FSG3)$r.sq
+summary(FSG3)$r.sq
 ```
 
 ```{r}
@@ -162,21 +294,144 @@ bds %>% filter(project == "ETNP") %>% select(profile, depth, Flux_Smooth) %>% pi
 ```
 
 Something is off. All of the flux profiles are identical.
-
+Skip this
 ```{r}
 cb10 <- c('#a6cee3','#1f78b4','#b2df8a','#33a02c','#fb9a99','#e31a1c','#fdbf6f','#ff7f00','#cab2d6','#6a3d9a')
-bds %>% filter(DFP > 1) %>% #filter(profile %in% c("stn_043", "p16n_100")) %>%
-  ggplot(aes(y = depth, x = DFP, col = factor(time), shape = factor(time))) + facet_wrap(~project) + geom_point() + scale_y_reverse(limits = c(2500, 0)) + geom_vline(xintercept = 1) +
+plt1 <- bds %>% #filter(DFP > 1) %>% #filter(profile %in% c("stn_043", "p16n_100")) %>%
+  ggplot(aes(y = depth, x = DFP, col = factor(time), shape = factor(time))) + facet_wrap(~project) + geom_point() + scale_y_reverse(limits = c(1000, 0)) + xlim(c(0.5, 1.5))+ geom_vline(xintercept = 1) +
    scale_color_manual(values = c(rep("black", 5), rep("blue", 5))) + scale_shape_manual(values = rep(1:5, 2))
+
+plotly::ggplotly(plt1)
 ```
 
 What the heck is going on with DFP here. Why is it usually > 1 shouldn't it be less than 1 when flux is decreasing?
 This very deep increasing flux seems improbable to me.
 Lets check the smooths. Or only go to 1000m.
 
+```{r fig.width=6, fig.height=4}
+cb10 <- c('#a6cee3','#1f78b4','#b2df8a','#33a02c','#fb9a99','#e31a1c','#fdbf6f','#ff7f00','#cab2d6','#6a3d9a')
+pltFlx <- bds %>% #filter(DFP > 1) %>% #filter(profile %in% c("stn_043", "p16n_100")) %>%
+  ggplot(aes(y = depth, x = Flux_Smooth, shape = factor(day(time)), fill = hour(time), group = factor(time))) + facet_wrap(~project) + geom_point(size = 3, stroke = 1)+
+  geom_path() +
+  scale_y_reverse(limits = c(1000, 0))+
+  scale_x_log10() +
+   scale_color_gradient2(low = "darkgreen", mid = "gray80", high = "purple", midpoint = 10) + scale_shape_manual(name = "Day of Month", values = rep(21:25, 2)) + 
+  scale_fill_gradientn(name = "Hour of Day", breaks = c(0, 6, 12, 18, 24), colors = c("black", "blue", "white", "orange", "black")) +
+  theme(axis.text.x = element_text(angle = 90)) +
+labs(x = bquote(Smoothed~Flux~(µmol~C/m^2/d))) +
+  geom_rect(data = data.frame(project = "ETNP"), aes(xmin = 20, xmax = 180, ymin = 75, ymax = 500), colour = "red", fill = NA, inherit.aes = FALSE)
+
+
+
+pltFlxNoLegend <- pltFlx + theme(legend.position = "none")
+
+pltFlx
+#plotly::ggplotly(plt1)
+```
+
+```{r fig.width=6, fig.height=4}
+cb10 <- c('#a6cee3','#1f78b4','#b2df8a','#33a02c','#fb9a99','#e31a1c','#fdbf6f','#ff7f00','#cab2d6','#6a3d9a')
+pltFlxZoom <- bds %>% filter(project == "ETNP" & depth <= 500 & depth >= 75) %>% #filter(profile %in% c("stn_043", "p16n_100")) %>%
+  ggplot(aes(y = depth, x = Flux_Smooth, shape = factor(day(time)), fill = hour(time), group = factor(time))) + geom_point(size = 3, stroke = 1)+
+  geom_path() +
+  scale_y_reverse()+
+  #scale_x_log10() +
+  scale_x_log10(breaks = c(seq(from = 20, to = 50, by = 10), seq(from = 60, to = 180, by = 20)), limits = c(20, 180)) +
+   scale_color_gradient2(low = "darkgreen", mid = "gray80", high = "purple", midpoint = 10) + scale_shape_manual(values = rep(21:25, 2)) + 
+  scale_fill_gradientn(breaks = c(0, 6, 12, 18, 24), colors = c("black", "blue", "white", "orange", "black")) +
+  theme(axis.text.x = element_text(angle = 90)) +
+labs(x = "Smoothed Flux") + theme(legend.position = "none")
+
+pltFlxZoom
+#plotly::ggplotly(plt1)
+```
+
+
+
+```{r fig.width=6, fig.height=4}
+cb10 <- c('#a6cee3','#1f78b4','#b2df8a','#33a02c','#fb9a99','#e31a1c','#fdbf6f','#ff7f00','#cab2d6','#6a3d9a')
+pltDelta3 <- bds %>% #filter(DFP > 1) %>% #filter(profile %in% c("stn_043", "p16n_100")) %>%
+  ggplot(aes(y = depth, x = pracma::nthroot(DF/DZ, 5), shape = factor(day(time)), fill = hour(time), group = factor(time))) + facet_wrap(~project) + geom_point(size = 3, stroke = 1)+
+  geom_path() +
+  scale_y_reverse(limits = c(1000, 0))+
+  scale_x_continuous(limits = c(-4.5, 1)) +
+  #scale_x_log10() +
+   scale_color_gradient2(low = "darkgreen", mid = "gray80", high = "purple", midpoint = 10) + scale_shape_manual(name = "Day of Month", values = rep(21:25, 2)) + 
+  scale_fill_gradientn(name = "Hour", breaks = c(0, 6, 12, 18, 24), colors = c("black", "blue", "white", "orange", "black")) +
+  geom_vline(xintercept = 0) +
+  labs(x = bquote((DF/DZ)^{1/5}~(µmolC/m^3/d)^{1/5})) + theme(legend.pos = "none")
+  #labs(x = "(DF/DZ) ^ 1/5 (µmol C/m^3/d) ^ 1/5")
+
+pltDelta3
+#plotly::ggplotly(plt1pos)
+```
+
++ theme(plot.margin = unit(c(0, 0, 0, 0), units = "cm"))
+
+```{r fig.height=8, fig.width = 8}
+#plot_grid(pltFlxNoLegend, pltFlxZoom, pltDelta3, pltFlxLegend)
+
+pltFlxLegend <- get_legend(pltFlx + theme(legend.box.margin = margin(0, 0, 40, 10)))
+
+pgTop <- plot_grid(pltFlxNoLegend, pltFlxZoom + theme(plot.margin = unit(c(1, 0, 3, 0), units = "cm")), rel_widths = c(2, 1), labels = c("A", "B"))
+pgBottom <- plot_grid(pltDelta3, pltFlxLegend , rel_widths = c(3, 1), labels = c("C", ""))
+pgBoth <- plot_grid(pgTop, pgBottom, ncol = 1)
+
+pgBoth
+
+ggsave("figures/FluxDeepDive.png")
+ggsave("figures/FluxDeepDive.svg")
+
+```
+
+
+Test for day to day and hourly variability
+```{r}
+bdsAddTime <- bds %>%
+  mutate(Hour = hour(time), Day = day(time))
+
+DFG1 <- gam(DF/DZ~ s(depth, k = 3) + s(Day, k = 3) + s(Hour, k = 4, bs = "cc"), knots = list(Hour = c(0, 24)), data = bdsAddTime %>% filter(depth >= 175 & depth <=500 & project == "ETNP"))
+
+DFG2 <- gam(DF/DZ ~ s(depth, k = 3) + s(Day, k = 3), data = bdsAddTime %>% filter(depth >= 175 & depth <=500 & project == "ETNP"))
+
+DFG3 <- gam(DF/DZ ~ s(depth, k = 3), data = bdsAddTime %>% filter(depth >= 175 & depth <=500 & project == "ETNP"))
+
+summary(DFG1)
+summary(DFG2)
+summary(DFG3)
+
+summary(DFG1)$r.sq - summary(DFG2)$r.sq
+summary(DFG2)$r.sq - summary(DFG3)$r.sq
+summary(DFG3)$r.sq
+```
+
+```{r}
+plot(TDG1)
+```
+
+
 ```{r}
 bds %>% 
   ggplot(aes(y = depth, x = pracma::nthroot(ospsDZ, 3), col = factor(time), shape = factor(time))) + facet_wrap(~project) + geom_point() + scale_y_reverse(limits = c(1500, 0)) + geom_vline(xintercept = 0) + scale_color_manual(values = c(rep("black", 5), rep("blue", 5))) + scale_shape_manual(values = rep(1:5, 2))
+```
+
+```{r}
+bdsAddTime <- bds %>%
+  mutate(Hour = hour(time), Day = day(time))
+
+OZG1 <- gam(ospsDZ ~ s(depth, k = 3) + s(Day, k = 3) + s(Hour, k = 4, bs = "cc"), knots = list(Hour = c(0, 24)), data = bdsAddTime %>% filter(depth >= 175 & depth <=500 & project == "ETNP"))
+
+OZG2 <- gam(ospsDZ ~ s(depth, k = 3) + s(Day, k = 3), data = bdsAddTime %>% filter(depth >= 175 & depth <=500 & project == "ETNP"))
+
+OZG3 <- gam(ospsDZ ~ s(depth, k = 3), data = bdsAddTime %>% filter(depth >= 175 & depth <=500 & project == "ETNP"))
+
+summary(OZG1)
+summary(OZG2)
+summary(OZG3)
+
+summary(OZG1)$r.sq - summary(OZG2)$r.sq
+summary(OZG2)$r.sq - summary(OZG3)$r.sq
+summary(OZG3)$r.sq
 ```
 
 ```{r}
