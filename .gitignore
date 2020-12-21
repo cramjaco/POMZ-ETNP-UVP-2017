@@ -38,5 +38,5 @@ rsconnect/
 packrat/lib*/
 
 # humongous ek60 images
-figures/stationP2_EK60*
+figures/stationP2_EK60*.svg
 data/backscatter_table_go7.csv
