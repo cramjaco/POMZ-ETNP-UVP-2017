@@ -178,4 +178,31 @@ oFF <- fit_flux(opt$par[1], opt$par[2], ES = PETE$ES, DS = PETE$DS)
 oFF$DS %>% pivot_longer(c(tn_flux, tot_flux2)) %>%
   ggplot(aes(x = value, y = depth, col = name)) + geom_point() + scale_y_reverse()
 
+
 # the tiger is out! Alpha = 2
+
+### Data for figure
+
+BianchiMids <- ((BianchiBins + lag(BianchiBins)) / 2)[2:length(BianchiBins)]
+
+ExpandedB <- expand_grid(depth = BianchiMids, lb = lb_vvv) %>% left_join(lbbs, by = "lb")
+
+PredictedB <- predict(gamESE, ExpandedB, type = "link")
+
+EPB <- bind_cols(ExpandedB, link = PredictedB)
+
+EPB <- EPB %>%
+  mutate(n_nparticles = exp(link),
+         nparticles = n_nparticles * binsize) %>%
+  mutate(profile = "multiple", project = "ETNP", time = "togetawatch") %>%
+  mutate(flux = nparticles * (opt$par[1] * lb ^ opt$par[2]))
+
+EDB <- EPB %>% group_by(depth) %>% summarize(Flux = sum(flux))
+  
+
+write_csv(EPB, "dataOut/CombinedProfileFluxEst_ED.csv")
+write_csv(EDB, "dataOut/CombinedProfileFluxEst_DS.csv")
+
+# DP <- EP %>% group_by(depth) %>% summarize() %>% 
+#   mutate(profile = "multiple", project = "ETNP", time = "togetawatch")
+

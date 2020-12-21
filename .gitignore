@@ -36,3 +36,7 @@ vignettes/*.pdf
 rsconnect/
 .Rproj.user
 packrat/lib*/
+
+# humongous ek60 images
+figures/stationP2_EK60*
+data/backscatter_table_go7.csv
