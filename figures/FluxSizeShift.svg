@@ -181,6 +181,8 @@
 <polygon points='155.54,250.73 158.89,244.93 152.19,244.93 ' style='stroke-width: 0.71; fill: #FFFFFF;' clip-path='url(#cpNTYuMTd8MjM1LjAxfDI3Ni42NHwyNC42OQ==)' />
 <polygon points='154.91,269.06 158.26,263.25 151.56,263.25 ' style='stroke-width: 0.71; fill: #FFFFFF;' clip-path='url(#cpNTYuMTd8MjM1LjAxfDI3Ni42NHwyNC42OQ==)' />
 <line x1='152.69' y1='276.64' x2='152.69' y2='24.69' style='stroke-width: 1.07; stroke-linecap: butt;' clip-path='url(#cpNTYuMTd8MjM1LjAxfDI3Ni42NHwyNC42OQ==)' />
+<line x1='56.17' y1='52.18' x2='235.01' y2='52.18' style='stroke-width: 1.07; stroke: #006400; stroke-linecap: butt;' clip-path='url(#cpNTYuMTd8MjM1LjAxfDI3Ni42NHwyNC42OQ==)' />
+<line x1='56.17' y1='123.18' x2='235.01' y2='123.18' style='stroke-width: 1.07; stroke: #00008B; stroke-linecap: butt;' clip-path='url(#cpNTYuMTd8MjM1LjAxfDI3Ni42NHwyNC42OQ==)' />
 <defs>
   <clipPath id='cpMC4wMHw1MjUuMDB8MzI0LjAwfDAuMDA='>
     <rect x='0.00' y='0.00' width='525.00' height='324.00' />
@@ -229,6 +231,8 @@
 <circle cx='336.96' cy='246.86' r='2.49' style='stroke-width: 0.71; fill: #000000;' clip-path='url(#cpMjQxLjk4fDQyMC44MnwyNzYuNjR8MjQuNjk=)' />
 <circle cx='337.26' cy='265.19' r='2.49' style='stroke-width: 0.71; fill: #000000;' clip-path='url(#cpMjQxLjk4fDQyMC44MnwyNzYuNjR8MjQuNjk=)' />
 <line x1='338.50' y1='276.64' x2='338.50' y2='24.69' style='stroke-width: 1.07; stroke-linecap: butt;' clip-path='url(#cpMjQxLjk4fDQyMC44MnwyNzYuNjR8MjQuNjk=)' />
+<line x1='241.98' y1='52.18' x2='420.82' y2='52.18' style='stroke-width: 1.07; stroke: #006400; stroke-linecap: butt;' clip-path='url(#cpMjQxLjk4fDQyMC44MnwyNzYuNjR8MjQuNjk=)' />
+<line x1='241.98' y1='123.18' x2='420.82' y2='123.18' style='stroke-width: 1.07; stroke: #00008B; stroke-linecap: butt;' clip-path='url(#cpMjQxLjk4fDQyMC44MnwyNzYuNjR8MjQuNjk=)' />
 <defs>
   <clipPath id='cpMC4wMHw1MjUuMDB8MzI0LjAwfDAuMDA='>
     <rect x='0.00' y='0.00' width='525.00' height='324.00' />

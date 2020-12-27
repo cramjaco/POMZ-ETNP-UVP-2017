@@ -11,14 +11,15 @@ source("bring_in_ctd.R")
 ```{r}
 library(tidyverse)
 library(plotly)
+library(cowplot)
 ```
 
 
 ```{r}
 ctdP2 <- ctd.m %>% left_join(cast2 %>% select(pstation, cast), by = 'cast') %>% filter(pstation == 'P2')
 # bin by 10 m
-depthBins <- seq(from = 0, to = max(ctdP2$depth), by = 10)
-depthMids <- seq(from = 5, to = max(ctdP2$depth), by = 10)
+depthBins <- seq(from = 0, to = max(ctdP2$depth), by = 1)
+depthMids <- seq(from = 1, to = max(ctdP2$depth), by = 1)
 ctdP2$depthBin <- cut(ctdP2$depth, breaks = depthBins, labels = depthMids) %>% as.character %>% as.numeric
 ctdP2Binned <- ctdP2 %>% filter(is.finite(depthBin)) %>% group_by(cast, variable, depthBin) %>% summarise(value = mean(value)) #%>% group_by(variable, depthBin) %>% summarize(value = mean(value))
 ```
@@ -81,3 +82,78 @@ ggsave("figures/CTDSummary.svg")
 ```
 
 Cryptic warning mesage that seems to come from the fct_relevel, but that doenst have an effect
+
+
+# Non ggplot multiple axis
+
+```{r}
+plotData <- ctdP2Binned %>% rename(depth = depthBin) %>% filter(depth <= 1500, cast == 43) %>% ungroup() %>% select(-cast) %>%
+  pivot_wider(names_from = variable, values_from = value)
+```
+
+, at = seq(from = 0.1, to = 0.2, by = 0.05)
+```{r}
+#plot.new()
+par(mar = c(8,4,4,1))
+plot(plotData$oxygen, plotData$depth, type = "l", ylim = c(1500, 0), col = "blue", lwd = 5, ylab = "Depth (m)", xlab = "")
+mtext( "Oxygen", side = 1, line = 2)
+par(new = TRUE)
+plot(plotData$temperature, plotData$depth, type = "l", ylim = c(1500, 0), xlim = c(0, 30), col = "firebrick4", lwd = 2, ylab = "", xlab = "", axes = FALSE)
+axis(side = 1, line = 4)
+mtext( "Temperature (°C)", side = 1, line = 6)
+par(new = TRUE)
+plot(plotData$salinity, plotData$depth, type = "l", ylim = c(1500, 0), col = "gray20", lty = "dashed", lwd = 3, axes = FALSE, xlab = "", ylab = "")
+axis(side = 3)
+mtext("Salinity (ppt)", side = 3, line = 2)
+legend(x = "center", y = "bottom", legend = c("Temp", "Sal", "Oxygen"), lty = c("solid", "dashed", "solid"), col = c("firebrick4", "gray20", "blue"), lwd = c(2, 1, 5))
+```
+
+```{r}
+par(mar = c(8,4,4,1))
+plot(plotData$oxygen, plotData$depth, type = "l", ylim = c(1500, 0), col = "blue", lwd = 5, ylab = "Depth (m)", xlab = "")
+mtext( "Oxygen", side = 1, line = 2)
+
+par(new = TRUE)
+plot(plotData$beamAttenuation, plotData$depth, type = "l", ylim = c(1500, 0), col = "black", lwd = 3, ylab = "Depth (m)", xlab = "")
+mtext( "Oxygen", side = 1, line = 2)
+
+# plot(plotData$fluorescence, plotData$depth, type = "l", ylim = c(1500, 0), col = "darkgreen", lty = "solid", lwd = 2, axes = FALSE, xlab = "Fluorescence (RFU)", ylab = "Depth (m)")
+# #axis(side = 1, line = 4)
+# mtext("Fluorescence (RFU)", side = 1, line = 6.6)
+
+```
+
+```{r}
+par(mar = c(8,4,4,1))
+
+plot(plotData$oxygen, plotData$depth, type = "l", ylim = c(300, 0), col = "blue", lwd = 5, ylab = "Depth (m)", xlab = "")
+mtext( "Oxygen", side = 1, line = 2)
+
+par(new = TRUE)
+plot(plotData$fluorescence, plotData$depth, type = "l", ylim = c(300, 0), xlim = c(0, max(plotData$fluorescence)), col = "darkgreen", lty = "solid", lwd = 3, axes = FALSE, xlab = "", ylab = "")
+axis(side = 3, line = 0)
+mtext("Fluorescence (RFU)", side = 3, line = 2)
+
+```
+
+
+```{r}
+#plot.new()
+par(mar = c(8,4,4,1))
+plot(plotData$oxygen, plotData$depth, type = "l", ylim = c(1500, 0), col = "blue", lwd = 5, ylab = "Depth (m)", xlab = "")
+mtext( "Oxygen", side = 1, line = 2)
+par(new = TRUE)
+plot(plotData$fluorescence, plotData$depth, type = "l", ylim = c(1500, 0), col = "darkgreen", lty = "solid", lwd = 3, axes = FALSE, xlab = "", ylab = "")
+axis(side = 1, line = 4)
+mtext("Fluorescence (RFU)", side = 1, line = 6.6)
+par(new = TRUE)
+plot(plotData$sigmaT, plotData$depth, type = "l", ylim = c(1500, 0), col = "black", lty = "dashed", axes = FALSE, xlab = "", ylab = "")
+axis(side = 3)
+mtext("Beam Attenuation (/m)", side = 3, line = 2)
+legend(x = "center", y = "bottom", legend = c("Temp", "Sal", "σθ"), lty = c("solid", "dashed", "solid"), col = c("darkred", "black", "gray50"), lwd = c(2, 1, 4))
+```
+
+```{r}
+
+```
+

@@ -208,13 +208,13 @@ mainParticleComponents <- bds %>%
 
 PlotFlx <- mainParticleComponents %>% 
   filter(meas != "psd") %>%
-  ggplot(aes(y = depth, x = value, col = project, shape = project)) + facet_grid(size ~ meas, scales = "free_x") + geom_point(size = 2) + scale_y_reverse(limits = c(1000, 0)) + scale_x_log10() + theme(axis.title.x = element_blank(), legend.position = "none", strip.background.y = element_blank(), strip.text.y = element_blank(), plot.margin = unit(c(7,0,7,7), "pt")) + scale_color_manual(values = c("brown", "gray20")) + scale_shape_manual(values = c(1:5)) + theme(axis.text.x = element_text(angle = 90))
+  ggplot(aes(y = depth, x = value, col = project, shape = project)) + facet_grid(size ~ meas, scales = "free_x") + geom_point(size = 2) + scale_y_reverse(limits = c(1000, 0)) + scale_x_log10() + theme(axis.title.x = element_blank(), legend.position = "none", strip.background.y = element_blank(), strip.text.y = element_blank(), plot.margin = unit(c(7,0,7,7), "pt")) + scale_color_manual(values = c("brown", "gray20")) + scale_shape_manual(values = c(1:5)) + theme(axis.text.x = element_text(angle = 90)) + geom_hline(yintercept = 175, color = "darkgreen")
 
 PlotPSD <- mainParticleComponents %>% 
   filter(meas == "psd") %>%
   ggplot(aes(y = depth, x = value, col = project, shape = project)) + facet_grid(size~meas, scales = "free_x") + geom_point(size = 2) + scale_y_reverse(limits = c(1000, 0)) +
   theme(axis.title.x = element_blank(), axis.title.y = element_blank(), axis.line.y = element_blank(), axis.text.y = element_blank(), axis.ticks.y = element_blank(), plot.margin = unit(c(7,7,26.5,0), "pt")) +
-  scale_color_manual(values = c("brown", "gray20")) +  scale_shape_manual(values = c(1:5)) +  theme(axis.text.x = element_text(angle = 90))
+  scale_color_manual(values = c("brown", "gray20")) +  scale_shape_manual(values = c(1:5)) +  theme(axis.text.x = element_text(angle = 90)) + geom_hline(yintercept = 175, color = "darkgreen")
 
 plot_grid(PlotFlx, PlotPSD, rel_widths = c(3, 2))
 
@@ -386,6 +386,21 @@ ggsave("figures/FluxDeepDive.svg")
 
 ```
 
+```{r fig.height=8, fig.width = 8}
+#plot_grid(pltFlxNoLegend, pltFlxZoom, pltDelta3, pltFlxLegend)
+
+pltFlxLegend <- get_legend(pltFlx + theme(legend.box.margin = margin(0, 0, 40, 10)))
+
+pgTop <- plot_grid(pltFlxNoLegend + ylim(c(1000, 0)), pltFlxZoom + theme(plot.margin = unit(c(1, 0, 3, 0), units = "cm")), rel_widths = c(2, 1), labels = c("A", "B"))
+pgBottom <- plot_grid(pltDelta3 + ylim(c(1000, 0)), pltFlxLegend , rel_widths = c(3, 1), labels = c("C", ""))
+pgBoth <- plot_grid(pgTop, pgBottom, ncol = 1)
+
+pgBoth
+
+ggsave("figures/FluxShallowDive.png")
+ggsave("figures/FluxShallowDive.svg")
+
+```
 
 Test for day to day and hourly variability
 ```{r}
@@ -417,7 +432,7 @@ plot(DFG1)
 ```{r}
 bds %>% 
   ggplot(aes(y = depth, x = pracma::nthroot(ospsDZ, 3), shape = factor(day(time)), fill = hour(time), group = factor(time))) + facet_wrap(~project) + geom_point(size = 2) + scale_y_reverse(limits = c(2500, 0)) + geom_vline(xintercept = 0) +   scale_shape_manual(name = "Day of Month", values = rep(21:25, 2)) + labs(x = bquote("Flux Size Shift"~μmol/m^3/day)) +
-  scale_fill_gradientn(name = "Hour of Day", breaks = c(0, 6, 12, 18, 24), colors = c("black", "blue", "white", "orange", "black"))
+  scale_fill_gradientn(name = "Hour of Day", breaks = c(0, 6, 12, 18, 24), colors = c("black", "blue", "white", "orange", "black")) + geom_hline(yintercept = 175, color = "darkgreen") + geom_hline(yintercept = 950, color = "darkblue")
 
 #ggsave("..figures/FluxSizeShift.svg"
 
@@ -492,6 +507,144 @@ scale_shape_manual(values = c(25, 22))+
 ggsave("figures/FittedFlux.png")
 ggsave("figures/FittedFlux.svg")
 ```
+## Weber Bianchi Figs
+
+
+
+
+```{r}
+SameGam <- gam(TotalParticles ~s(log(lb), log(depth), by = factor(time)), offset = log(vol * binsize), family = nb(),
+    data = bes %>% filter(project == "ETNP"))
+```
+
+```{r}
+besE <- bes %>% filter(project == "ETNP")
+
+lb_new <- exp(seq(from = log(0.1), to = log(2.1), by = 0.05))
+ub_new <- lead(lb_new)
+binsize_new <- ub_new - lb_new
+
+lbbs <- tibble(lb = lb_new, ub = ub_new, binsize = binsize_new)
+
+Expanded <- expand_grid(lb = exp(seq(from = log(0.1), to = log(2), by = 0.05)), depth = seq(from = 20, to = 2000, by = 20), time = as.factor(unique(besE$time))) %>% left_join(lbbs, by = "lb")
+
+Pred <- exp(predict(SameGam, Expanded))
+ToPlot <- bind_cols(Expanded, nnparticles = Pred) %>% mutate(time = as.character(time)) %>% mutate(nparticles = nnparticles * binsize)
+```
+
+```{r}
+ToPlot %>% filter(lb <= 2) %>%  ggplot(aes(x = lb, y = depth, fill = log10(nnparticles), z = log10(nnparticles))) + geom_tile() + scale_fill_viridis_c() + scale_y_reverse() + scale_x_log10()  + facet_wrap(~time) + geom_contour(color = "black")
+```
+```{r}
+meanBese <- ToPlot %>% filter(lb <= 2) %>% group_by(lb, depth) %>% summarize(nparticles = mean(nparticles), nnparticles = mean(nnparticles))
+
+WBColorMap <- meanBese%>%
+   ggplot(aes(x = lb, y = depth, fill = log10(nnparticles), z = log10(nnparticles))) + geom_tile() + scale_fill_viridis_c(name = "log10(number density \n (normalized))") + scale_y_reverse() + scale_x_log10() + geom_contour(color = "black") + geom_hline(yintercept = 175, color = "darkgreen") + geom_hline(yintercept = 950, color = "darkblue")
+WBColorMap
+```
+Average of everything
+
+```{r}
+meanBese043 <- ToPlot %>% filter(lb <= 2, time == "2017-01-13 11:51:31")
+
+meanBese043%>%
+   ggplot(aes(x = lb, y = depth, fill = log10(nnparticles), z = log10(nnparticles))) + geom_tile() + scale_fill_viridis_c() + scale_y_reverse() + scale_x_log10() + geom_contour(color = "black") + geom_hline(yintercept = 175, color = "darkgreen")
+```
+Just 043
+
+```{r}
+mbGam <- meanBese %>% group_by(depth)  %>% nest() %>%
+  mutate(mod = map(data, ~gam(log(nnparticles) ~ log(lb), family = gaussian(), data = .))) %>% 
+  mutate(psd = map_dbl(mod, ~summary(.)$p.coeff[2]))
+```
+
+```{r}
+mbGam %>% ggplot(aes(x = psd, y = depth)) + geom_path() + scale_y_reverse() + geom_hline(yintercept = 175, color = "darkgreen") + geom_hline(yintercept =  950, color = "darkblue")
+```
+
+```{r}
+mbGam <- meanBese043 %>% group_by(depth)  %>% nest() %>%
+  mutate(mod = map(data, ~gam(log(nnparticles) ~ log(lb), family = gaussian(), data = .))) %>% 
+  mutate(psd = map_dbl(mod, ~summary(.)$p.coeff[2]))
+```
+
+```{r}
+pWBPSD <- mbGam %>% ggplot(aes(x = psd, y = depth)) + geom_path() + scale_y_reverse()  + geom_hline(yintercept = 175, color = "darkgreen") + geom_hline(yintercept =  950, color = "darkblue")
+pWBPSD
+```
+
+
+## Fig 5 WB
+
+bds %>% filter(profile == "stn_043", depth <= 2000) %>% ggplot(aes(x = psd_gam, xmin = psd_gam - psd_seg * 2, xmax = psd_gam + psd_seg * 2, y = depth)) + geom_path(size = 1) + scale_y_reverse() + geom_hline(yintercept = 175, color = "darkgreen") + geom_hline(yintercept = 950, color = "darkblue") + geom_ribbon(alpha = 0.2) + labs(x = "PSD slope")
+
+All of them
+
+```{r}
+bds %>% filter(profile == "stn_043", depth <= 2000) %>% ggplot(aes(x = psd_gam, xmin = psd_gam - psd_seg * 2, xmax = psd_gam + psd_seg * 2, y = depth)) + geom_path(size = 1) + scale_y_reverse() + geom_hline(yintercept = 175, color = "darkgreen") + geom_hline(yintercept = 950, color = "darkblue") + geom_ribbon(alpha = 0.2) + labs(x = "PSD slope")
+```
+043 only
+
+```{r}
+bds %>% filter(profile == "stn_043", depth <= 2000, depth > 175) %>% ggplot(aes(x = small_biovolume, y = depth)) + geom_path(size = 1) + scale_y_reverse() + geom_hline(yintercept = 175, color = "darkgreen") + geom_hline(yintercept = 950, color = "darkblue") + geom_point()
+```
+
+```{r}
+ubDf0 <- ToPlot %>% mutate(ubiomass = nparticles * lb ^ ag_global)
+ubDf <- ubDf0 %>% group_by(time, depth) %>% summarize(ubiomass = sum(ubiomass)) %>% ungroup %>% group_by(depth)
+photicBiomass <- ubDf %>% filter(depth <= 180, depth >= 160) %>% summarize(ubiomass = mean(ubiomass)) %>% pull(ubiomass)
+ubDf <- ubDf %>% mutate(nbiomass = ubiomass/photicBiomass)
+ubDf %>% ggplot(aes(x = nbiomass, y = depth , group = time, col = time)) + geom_path() + scale_y_reverse() + scale_x_continuous(limits = c(0,1))
+```
+
+
+ 
+```{r}
+ubDf <- ToPlot %>% mutate(ubiomass = nparticles * lb ^ ag_global) %>% group_by(time, depth) %>% summarize(ubiomass = sum(ubiomass)) %>% ungroup %>% group_by(depth)  %>% summarise(ubiomass = mean(ubiomass))
+photicBiomass <- ubDf %>% filter(depth <= 180, depth >= 160) %>% summarize(ubiomass = mean(ubiomass)) %>% pull(ubiomass)
+ubDf <- ubDf %>% mutate(nbiomass = ubiomass/photicBiomass)
+ubDf %>% ggplot(aes(x = nbiomass, y = depth)) + geom_path() + scale_y_reverse() + scale_x_continuous(limits = c(0,1)) + geom_hline(yintercept = 175, color = "darkgreen")
+```
+
+
+### Small particles biomass
+
+```{r}
+PubDf <- ToPlot %>% mutate(ubiomass = nparticles * lb ^ ag_global) %>% filter(lb < 0.5) %>% group_by(time, depth) %>% summarize(ubiomass = sum(ubiomass)) %>% ungroup %>% group_by(depth)  %>% summarise(ubiomass = mean(ubiomass))
+photicBiomass <- PubDf %>% filter(depth <= 180, depth >= 160) %>% summarize(ubiomass = mean(ubiomass)) %>% pull(ubiomass)
+PubDf <- PubDf %>% mutate(nbiomass = ubiomass/photicBiomass)
+pWBS <- PubDf %>% ggplot(aes(x = nbiomass, y = depth)) + geom_path() + scale_y_reverse() + scale_x_continuous(limits = c(0,1.2)) + geom_hline(yintercept = 175, color = "darkgreen") + geom_vline(xintercept = 1, color = "gray50") + geom_vline(xintercept = 0, color = "gray50") + geom_hline(yintercept = 950, color = "darkblue") + labs( x = "Small particle mass (norm.)")
+pWBS
+```
+
+```{r}
+LubDf <- ToPlot %>% mutate(ubiomass = nparticles * lb ^ ag_global) %>% filter(lb >= 0.5) %>% group_by(time, depth) %>% summarize(ubiomass = sum(ubiomass)) %>% ungroup %>% group_by(depth)  %>% summarise(ubiomass = mean(ubiomass))
+photicBiomass <- LubDf %>% filter(depth <= 180, depth >= 160) %>% summarize(ubiomass = mean(ubiomass)) %>% pull(ubiomass)
+LubDf <- LubDf %>% mutate(nbiomass = ubiomass/photicBiomass)
+pWBL <- LubDf %>% ggplot(aes(x = nbiomass, y = depth)) + geom_path() + scale_y_reverse() + scale_x_continuous(limits = c(0,1)) + geom_hline(yintercept = 175, color = "darkgreen") + labs( x = "Large particle mass (norm.)") + geom_vline(xintercept = 1, color = "gray50") + geom_vline(xintercept = 0, color = "gray50") + geom_hline(yintercept = 950, color = "darkblue")
+pWBL
+```
+
+For tom and danielle
+```{r}
+WBColorMap
+pWBPSD
+pWBS
+pWBL
+```
+
+```{r, fig.width = 10, fig.height=3}
+WBFig5 <- plot_grid(pWBPSD, pWBS,pWBL, nrow = 1, labels = c("B", "C", "D"))
+WBFig5
+```
+
+```{r fig.height = 6, fig.width = 8}
+WBcombined <- plot_grid(WBColorMap + theme(plot.margin = unit(c(0,3,0, 3), "cm")), WBFig5, ncol = 1, labels = c("A", ""))
+WBcombined
+
+ggsave("figures/WBModelValidation.png")
+```
+
 
 ## EK60
 
