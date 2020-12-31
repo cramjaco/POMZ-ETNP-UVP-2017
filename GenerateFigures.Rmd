@@ -8,6 +8,7 @@ library(tidyverse)
 library(cowplot)
 library(lubridate)
 library(mgcv)
+source("UVP_2017_library.R")
 theme_set(theme_cowplot())
 cb10 <- c('#a6cee3','#1f78b4','#b2df8a','#33a02c','#fb9a99','#e31a1c','#fdbf6f','#ff7f00','#cab2d6','#6a3d9a')
 ```
@@ -310,18 +311,24 @@ What the heck is going on with DFP here. Why is it usually > 1 shouldn't it be l
 This very deep increasing flux seems improbable to me.
 Lets check the smooths. Or only go to 1000m.
 
+, legend.background = element_blank(), legend.box.background = element_rect()
 ```{r fig.width=6, fig.height=4}
+scientific_10 <- function(x) {parse(text=gsub("e\\+*", " %*% 10^", scales::scientific_format()(x))) }
+#https://stackoverflow.com/questions/10762287/how-can-i-format-axis-labels-with-exponents-with-ggplot2-and-scales
+#jacob_magnitude <- function(x){expression(10^round(log10(x)))}
+
 cb10 <- c('#a6cee3','#1f78b4','#b2df8a','#33a02c','#fb9a99','#e31a1c','#fdbf6f','#ff7f00','#cab2d6','#6a3d9a')
-pltFlx <- bds %>% #filter(DFP > 1) %>% #filter(profile %in% c("stn_043", "p16n_100")) %>%
-  ggplot(aes(y = depth, x = Flux_Smooth, shape = factor(day(time)), fill = hour(time), group = factor(time))) + facet_wrap(~project) + geom_point(size = 3, stroke = 1)+
+pltFlx <- bds %>% filter(project == "ETNP") %>% #filter(DFP > 1) %>% #filter(profile %in% c("stn_043", "p16n_100")) %>%
+  ggplot(aes(y = depth, x = Flux_Smooth, shape = factor(day(time)), fill = hour(time), group = factor(time)))  + geom_point(size = 3, stroke = 1)+
   geom_path() +
-  scale_y_reverse(limits = c(2500, 0))+
-  scale_x_log10() +
+  scale_y_reverse(limits = c(1000, 0))+
+  scale_x_log10(label = scientific_10) +
    scale_color_gradient2(low = "darkgreen", mid = "gray80", high = "purple", midpoint = 10) + scale_shape_manual(name = "Day of Month", values = rep(21:25, 2)) + 
   scale_fill_gradientn(name = "Hour of Day", breaks = c(0, 6, 12, 18, 24), colors = c("black", "blue", "white", "orange", "black")) +
-  theme(axis.text.x = element_text(angle = 90)) +
-labs(x = bquote(Smoothed~Flux~(µmol~C/m^2/d))) +
-  geom_rect(data = data.frame(project = "ETNP"), aes(xmin = 20, xmax = 180, ymin = 75, ymax = 500), colour = "red", fill = NA, inherit.aes = FALSE)
+  
+labs(x = bquote(Smoothed~Flux~(µmol~C/m^2/d)), y = "Depth (m)") +
+  geom_rect(data = data.frame(project = "ETNP"), aes(xmin = 20, xmax = 180, ymin = 75, ymax = 500), colour = "red", fill = NA, inherit.aes = FALSE) +
+  theme(axis.text.x = element_text(angle = 90, vjust = .3), legend.spacing = unit(.1, "cm"))
 
 
 
@@ -342,7 +349,7 @@ pltFlxZoom <- bds %>% filter(project == "ETNP" & depth <= 500 & depth >= 75) %>%
    scale_color_gradient2(low = "darkgreen", mid = "gray80", high = "purple", midpoint = 10) + scale_shape_manual(values = rep(21:25, 2)) + 
   scale_fill_gradientn(breaks = c(0, 6, 12, 18, 24), colors = c("black", "blue", "white", "orange", "black")) +
   theme(axis.text.x = element_text(angle = 90)) +
-labs(x = "Smoothed Flux") + theme(legend.position = "none")
+labs(x = "Smoothed Flux", y = "Depth") + theme(legend.position = "none")
 
 pltFlxZoom
 #plotly::ggplotly(plt1)
@@ -352,53 +359,91 @@ pltFlxZoom
 
 ```{r fig.width=6, fig.height=4}
 cb10 <- c('#a6cee3','#1f78b4','#b2df8a','#33a02c','#fb9a99','#e31a1c','#fdbf6f','#ff7f00','#cab2d6','#6a3d9a')
-pltDelta3 <- bds %>% #filter(DFP > 1) %>% #filter(profile %in% c("stn_043", "p16n_100")) %>%
-  ggplot(aes(y = depth, x = pracma::nthroot(DF/DZ, 5), shape = factor(day(time)), fill = hour(time), group = factor(time))) + facet_wrap(~project) + geom_point(size = 3, stroke = 1)+
+pltDelta3 <- bds %>% filter(project == "ETNP") %>% #filter(DFP > 1) %>% #filter(profile %in% c("stn_043", "p16n_100")) %>%
+  ggplot(aes(y = depth, x = pracma::nthroot(DF/DZ, 5), shape = factor(day(time)), fill = hour(time), group = factor(time)))  + geom_point(size = 3, stroke = 1)+
   geom_path() +
-  scale_y_reverse(limits = c(2500, 0))+
-  scale_x_continuous(limits = c(-4.5, 1)) +
+  scale_y_reverse(limits = c(1000, 0))+
+  scale_x_continuous(limits = c(-2.1, .6), breaks = seq(from = -2, to = .75, by = 0.5)) +
   #scale_x_log10() +
    scale_color_gradient2(low = "darkgreen", mid = "gray80", high = "purple", midpoint = 10) + scale_shape_manual(name = "Day of Month", values = rep(21:25, 2)) + 
   scale_fill_gradientn(name = "Hour", breaks = c(0, 6, 12, 18, 24), colors = c("black", "blue", "white", "orange", "black")) +
   geom_vline(xintercept = 0) +
-  labs(x = bquote((DF/DZ)^{1/5}~(µmolC/m^3/d)^{1/5})) + theme(legend.pos = "none")
+  labs(x = bquote((DF/DZ)^{1/5}~(µmolC/m^3/d)^{1/5}), y = "Depth (m)") + theme(legend.pos = "none")
   #labs(x = "(DF/DZ) ^ 1/5 (µmol C/m^3/d) ^ 1/5")
 
 pltDelta3
 #plotly::ggplotly(plt1pos)
 ```
 
-+ theme(plot.margin = unit(c(0, 0, 0, 0), units = "cm"))
+
 
 ```{r fig.height=8, fig.width = 8}
-#plot_grid(pltFlxNoLegend, pltFlxZoom, pltDelta3, pltFlxLegend)
+# #plot_grid(pltFlxNoLegend, pltFlxZoom, pltDelta3, pltFlxLegend)
+# 
+# pltFlxLegend <- get_legend(pltFlx + theme(legend.box.margin = margin(0, 0, 40, 10)))
+# 
+# pgTop <- plot_grid(pltFlxNoLegend, pltFlxZoom + theme(plot.margin = unit(c(1, 0, 3, 0), units = "cm")), rel_widths = c(2, 1), labels = c("A", "B"))
+# pgBottom <- plot_grid(pltDelta3, pltFlxLegend , rel_widths = c(3, 1), labels = c("C", ""), label_size = 14)
+# pgBoth <- plot_grid(pgTop, pgBottom, ncol = 1)
+# 
+# pgBoth
+# 
+# ggsave("figures/FluxDeepDive.png")
+# ggsave("figures/FluxDeepDive.svg")
 
-pltFlxLegend <- get_legend(pltFlx + theme(legend.box.margin = margin(0, 0, 40, 10)))
+```
 
-pgTop <- plot_grid(pltFlxNoLegend, pltFlxZoom + theme(plot.margin = unit(c(1, 0, 3, 0), units = "cm")), rel_widths = c(2, 1), labels = c("A", "B"))
-pgBottom <- plot_grid(pltDelta3, pltFlxLegend , rel_widths = c(3, 1), labels = c("C", ""))
-pgBoth <- plot_grid(pgTop, pgBottom, ncol = 1)
 
+Within panel drawing
+
+
+```{r fig.height = 5, fig.width = 5}
+pgTop <- ggdraw(pltFlxNoLegend 
+       ) +
+  draw_plot(pltFlxZoom, .4, .25, .55, .60) +
+  draw_plot_label(
+    c("","B"),
+    c(.05, 0.55),
+    c(1, 0.85),
+    size = 16
+  )
+pgTop
+```
+pgBottom <- plot_grid(pltDelta3, pltFlxLegend , rel_widths = c(3, 1), labels = c("C", ""), label_size = 14)
+```{r}
+
+```
+
+
+
+I don't know whats going on below here
+
+```{r fig.height = 9, fig.width = 5}
+pgBottom <- pltDelta3  + geom_rect(aes(xmin = -2, xmax = -1.15, ymin = 170, ymax = 1000), colour = "gray50", fill = NA, inherit.aes = FALSE) + draw_plot(pltFlxLegend , -1.95, -650, .7)
+pgBoth <- plot_grid(pgTop + theme(plot.margin = unit(c(0, 0, 0, 0), units = "cm")),
+                    pgBottom + theme(plot.margin = unit(c(0, 0, 0, 0), units = "cm")),
+                    ncol = 1, rel_heights = c(4, 4), labels = c("A", "C"), label_size = 16)
 pgBoth
 
 ggsave("figures/FluxDeepDive.png")
 ggsave("figures/FluxDeepDive.svg")
-
 ```
 
+
+
 ```{r fig.height=8, fig.width = 8}
-#plot_grid(pltFlxNoLegend, pltFlxZoom, pltDelta3, pltFlxLegend)
-
-pltFlxLegend <- get_legend(pltFlx + theme(legend.box.margin = margin(0, 0, 40, 10)))
-
-pgTop <- plot_grid(pltFlxNoLegend + ylim(c(1000, 0)), pltFlxZoom + theme(plot.margin = unit(c(1, 0, 3, 0), units = "cm")), rel_widths = c(2, 1), labels = c("A", "B"))
-pgBottom <- plot_grid(pltDelta3 + ylim(c(1000, 0)), pltFlxLegend , rel_widths = c(3, 1), labels = c("C", ""))
-pgBoth <- plot_grid(pgTop, pgBottom, ncol = 1)
-
-pgBoth
-
-ggsave("figures/FluxShallowDive.png")
-ggsave("figures/FluxShallowDive.svg")
+# #plot_grid(pltFlxNoLegend, pltFlxZoom, pltDelta3, pltFlxLegend)
+# 
+# pltFlxLegend <- get_legend(pltFlx + theme(legend.box.margin = margin(0, 0, 40, 10)))
+# 
+# pgTop <- plot_grid(pltFlxNoLegend + ylim(c(1000, 0)), pltFlxZoom + theme(plot.margin = unit(c(1, 0, 3, 0), units = "cm")), rel_widths = c(2, 1), labels = c("A", "B"))
+# pgBottom <- plot_grid(pltDelta3 + ylim(c(1000, 0)), pltFlxLegend , rel_widths = c(3, 1), labels = c("C", ""))
+# pgBoth <- plot_grid(pgTop, pgBottom, ncol = 1)
+# 
+# pgBoth
+# 
+# #ggsave("figures/FluxShallowDive.png")
+# #ggsave("figures/FluxShallowDive.svg")
 
 ```
 
@@ -429,9 +474,11 @@ plot(DFG1)
 #Osps
 
 (u mol C / m^3 / day)
-```{r}
-bds %>% 
-  ggplot(aes(y = depth, x = pracma::nthroot(ospsDZ, 3), shape = factor(day(time)), fill = hour(time), group = factor(time))) + facet_wrap(~project) + geom_point(size = 2) + scale_y_reverse(limits = c(2500, 0)) + geom_vline(xintercept = 0) +   scale_shape_manual(name = "Day of Month", values = rep(21:25, 2)) + labs(x = bquote("Flux Size Shift"~μmol/m^3/day)) +
+```{r fig.width = 6, fig.height = 4}
+bds %>% filter(project == "ETNP") %>%
+  ggplot(aes(y = depth, x = pracma::nthroot(ospsDZ, 3), shape = factor(day(time)), fill = hour(time), group = factor(time))) + geom_point(size = 2) + scale_y_reverse(limits = c(1000, 0)) +
+  scale_x_continuous(limits = c(-1, 1)) +
+  geom_vline(xintercept = 0) +   scale_shape_manual(name = "Day of Month", values = rep(21:25, 2)) + labs(x = bquote("Dissaggregation-Like Flux Shift"~μmol/m^3/day)) +
   scale_fill_gradientn(name = "Hour of Day", breaks = c(0, 6, 12, 18, 24), colors = c("black", "blue", "white", "orange", "black")) + geom_hline(yintercept = 175, color = "darkgreen") + geom_hline(yintercept = 950, color = "darkblue")
 
 #ggsave("..figures/FluxSizeShift.svg"
@@ -539,7 +586,7 @@ ToPlot %>% filter(lb <= 2) %>%  ggplot(aes(x = lb, y = depth, fill = log10(nnpar
 meanBese <- ToPlot %>% filter(lb <= 2) %>% group_by(lb, depth) %>% summarize(nparticles = mean(nparticles), nnparticles = mean(nnparticles))
 
 WBColorMap <- meanBese%>%
-   ggplot(aes(x = lb, y = depth, fill = log10(nnparticles), z = log10(nnparticles))) + geom_tile() + scale_fill_viridis_c(name = "log10(number density \n (normalized))") + scale_y_reverse() + scale_x_log10() + geom_contour(color = "black") + geom_hline(yintercept = 175, color = "darkgreen") + geom_hline(yintercept = 950, color = "darkblue")
+   ggplot(aes(x = lb, y = depth, fill = log10(nnparticles), z = log10(nnparticles))) + geom_tile() + scale_fill_viridis_c(name = "log10(number density \n (normalized))") + scale_y_reverse() + scale_x_log10() + geom_contour(color = "black") + geom_hline(yintercept = 160, color = "darkgreen") + geom_hline(yintercept = 850, color = "darkblue")
 WBColorMap
 ```
 Average of everything
@@ -548,7 +595,7 @@ Average of everything
 meanBese043 <- ToPlot %>% filter(lb <= 2, time == "2017-01-13 11:51:31")
 
 meanBese043%>%
-   ggplot(aes(x = lb, y = depth, fill = log10(nnparticles), z = log10(nnparticles))) + geom_tile() + scale_fill_viridis_c() + scale_y_reverse() + scale_x_log10() + geom_contour(color = "black") + geom_hline(yintercept = 175, color = "darkgreen")
+   ggplot(aes(x = lb, y = depth, fill = log10(nnparticles), z = log10(nnparticles))) + geom_tile() + scale_fill_viridis_c() + scale_y_reverse() + scale_x_log10() + geom_contour(color = "black") + geom_hline(yintercept = 160, color = "darkgreen")
 ```
 Just 043
 
@@ -559,7 +606,7 @@ mbGam <- meanBese %>% group_by(depth)  %>% nest() %>%
 ```
 
 ```{r}
-mbGam %>% ggplot(aes(x = psd, y = depth)) + geom_path() + scale_y_reverse() + geom_hline(yintercept = 175, color = "darkgreen") + geom_hline(yintercept =  950, color = "darkblue")
+mbGam %>% ggplot(aes(x = psd, y = depth)) + geom_path() + scale_y_reverse() + geom_hline(yintercept = 160, color = "darkgreen") + geom_hline(yintercept =  850, color = "darkblue")
 ```
 
 ```{r}
@@ -569,7 +616,7 @@ mbGam <- meanBese043 %>% group_by(depth)  %>% nest() %>%
 ```
 
 ```{r}
-pWBPSD <- mbGam %>% ggplot(aes(x = psd, y = depth)) + geom_path() + scale_y_reverse()  + geom_hline(yintercept = 175, color = "darkgreen") + geom_hline(yintercept =  950, color = "darkblue")
+pWBPSD <- mbGam %>% ggplot(aes(x = psd, y = depth)) + geom_path() + scale_y_reverse()  + geom_hline(yintercept = 160, color = "darkgreen") + geom_hline(yintercept =  850, color = "darkblue")
 pWBPSD
 ```
 
@@ -611,17 +658,17 @@ ubDf %>% ggplot(aes(x = nbiomass, y = depth)) + geom_path() + scale_y_reverse() 
 
 ```{r}
 PubDf <- ToPlot %>% mutate(ubiomass = nparticles * lb ^ ag_global) %>% filter(lb < 0.5) %>% group_by(time, depth) %>% summarize(ubiomass = sum(ubiomass)) %>% ungroup %>% group_by(depth)  %>% summarise(ubiomass = mean(ubiomass))
-photicBiomass <- PubDf %>% filter(depth <= 180, depth >= 160) %>% summarize(ubiomass = mean(ubiomass)) %>% pull(ubiomass)
+photicBiomass <- PubDf %>% filter(depth <= 165, depth >= 155) %>% summarize(ubiomass = mean(ubiomass)) %>% pull(ubiomass)
 PubDf <- PubDf %>% mutate(nbiomass = ubiomass/photicBiomass)
-pWBS <- PubDf %>% ggplot(aes(x = nbiomass, y = depth)) + geom_path() + scale_y_reverse() + scale_x_continuous(limits = c(0,1.2)) + geom_hline(yintercept = 175, color = "darkgreen") + geom_vline(xintercept = 1, color = "gray50") + geom_vline(xintercept = 0, color = "gray50") + geom_hline(yintercept = 950, color = "darkblue") + labs( x = "Small particle mass (norm.)")
+pWBS <- PubDf %>% ggplot(aes(x = nbiomass, y = depth)) + geom_path() + scale_y_reverse() + scale_x_continuous(limits = c(0,1.2)) + geom_hline(yintercept = 160, color = "darkgreen") + geom_vline(xintercept = 1, color = "gray50") + geom_vline(xintercept = 0, color = "gray50") + geom_hline(yintercept = 850, color = "darkblue") + labs( x = "Small particle mass (norm.)")
 pWBS
 ```
 
 ```{r}
 LubDf <- ToPlot %>% mutate(ubiomass = nparticles * lb ^ ag_global) %>% filter(lb >= 0.5) %>% group_by(time, depth) %>% summarize(ubiomass = sum(ubiomass)) %>% ungroup %>% group_by(depth)  %>% summarise(ubiomass = mean(ubiomass))
-photicBiomass <- LubDf %>% filter(depth <= 180, depth >= 160) %>% summarize(ubiomass = mean(ubiomass)) %>% pull(ubiomass)
+photicBiomass <- LubDf %>% filter(depth <= 165, depth >=155) %>% summarize(ubiomass = mean(ubiomass)) %>% pull(ubiomass)
 LubDf <- LubDf %>% mutate(nbiomass = ubiomass/photicBiomass)
-pWBL <- LubDf %>% ggplot(aes(x = nbiomass, y = depth)) + geom_path() + scale_y_reverse() + scale_x_continuous(limits = c(0,1)) + geom_hline(yintercept = 175, color = "darkgreen") + labs( x = "Large particle mass (norm.)") + geom_vline(xintercept = 1, color = "gray50") + geom_vline(xintercept = 0, color = "gray50") + geom_hline(yintercept = 950, color = "darkblue")
+pWBL <- LubDf %>% ggplot(aes(x = nbiomass, y = depth)) + geom_path() + scale_y_reverse() + scale_x_continuous(limits = c(0,1)) + geom_hline(yintercept = 160, color = "darkgreen") + labs( x = "Large particle mass (norm.)") + geom_vline(xintercept = 1, color = "gray50") + geom_vline(xintercept = 0, color = "gray50") + geom_hline(yintercept = 850, color = "darkblue")
 pWBL
 ```
 
@@ -666,12 +713,18 @@ timeLabels <- format(timeBreaks)
 
 
 ```{r}
-dataBinned_01 %>% filter(frequency == 18000) %>% ggplot(aes(x = timeMex, y = depth_bin, fill = value)) + geom_tile() + scale_y_reverse() + scale_fill_viridis_c(limits = c(-165, -75), oob = scales::squish) +
-  scale_x_datetime(breaks = timeBreaks, date_labels = "%d::%H") + labs(x = "day::hour", y = "depth (m)", fill = "backscatter (dB)") + theme_bw() + theme(axis.text.x = element_text(angle = 90, vjust = 0.5))
-
+plot18k <- dataBinned_01 %>% filter(frequency == 18000) %>% ggplot(aes(x = timeMex, y = depth_bin, fill = value)) + geom_tile() + scale_y_reverse() + scale_fill_viridis_c(limits = c(-165, -75), oob = scales::squish) +
+  scale_x_datetime(breaks = timeBreaks, date_labels = "%d::%H") + labs(x = "day::hour", y = "depth (m)", fill = "backscatter (dB)") + theme_bw() + theme(axis.text.x = element_text(angle = 90, vjust = 0.5)) + geom_hline(yintercept = 160, color = "darkgreen") +
+  geom_hline(yintercept = 850, color = "darkblue")
+plot18k
 #ggsave("figures/stationP2_EK60_18kOnly.svg")
 ggsave("figures/stationP2_EK60_18kOnly.png")
 ```
+
+```{r}
+plot18k + scale_y_reverse(limits = c(500, 200))
+```
+
 
 ```{r fig.height=20, fig.width = 8}
 dataBinned_01 %>% ggplot(aes(x = timeMex, y = depth_bin, fill = value)) + geom_tile() + scale_y_reverse() + scale_fill_viridis_c(limits = c(-165, -75), oob = scales::squish) +

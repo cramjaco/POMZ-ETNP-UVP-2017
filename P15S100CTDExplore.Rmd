@@ -1,0 +1,22 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+Theres no ctd data
+
+```{r}
+wodChl <- read_csv("data/WODatabaseP16/ocldb1609210048.8085.OSD.csv", skip = 18, n_max = 25, col_names = FALSE) %>% select(Depth = X2, Flu = X5)
+```
+```{r}
+wodChl %>% ggplot(aes(y = Depth, x = Flu)) + geom_point() + scale_y_reverse()
+```
+
+
+```{r}
+wodChl <- read_csv("data/WODatabaseP16/ocldb1609210461.10411.OSD.csv", skip = 18, n_max = 25, col_names = FALSE) %>% select(Depth = X2, Flu = X5)
+```
+
+```{r}
+wodChl %>% ggplot(aes(y = Depth, x = Flu)) + geom_point() + scale_y_reverse()
+```

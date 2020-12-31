@@ -24,6 +24,14 @@ ctdP2$depthBin <- cut(ctdP2$depth, breaks = depthBins, labels = depthMids) %>% a
 ctdP2Binned <- ctdP2 %>% filter(is.finite(depthBin)) %>% group_by(cast, variable, depthBin) %>% summarise(value = mean(value)) #%>% group_by(variable, depthBin) %>% summarize(value = mean(value))
 ```
 
+```{r}
+depthBins <- seq(from = 0, to = max(ctdP2$depth), by = 5)
+depthMids <- seq(from = 1, to = max(ctdP2$depth), by = 5)
+ctdP2$depthBin <- cut(ctdP2$depth, breaks = depthBins, labels = depthMids) %>% as.character %>% as.numeric
+ctdP2BinnedCourse <- ctdP2 %>% filter(is.finite(depthBin)) %>% group_by(cast, variable, depthBin) %>% summarise(value = mean(value)) #%>% group_by(variable, depthBin) %>% summarize(value = mean(value))
+```
+
+
 Variability in fluorescence
 ```{r}
 ctdP2Binned %>% filter(variable == "fluorescence") %>%
@@ -89,71 +97,218 @@ Cryptic warning mesage that seems to come from the fct_relevel, but that doenst 
 ```{r}
 plotData <- ctdP2Binned %>% rename(depth = depthBin) %>% filter(depth <= 1500, cast == 43) %>% ungroup() %>% select(-cast) %>%
   pivot_wider(names_from = variable, values_from = value)
+plotDataCourse <- ctdP2BinnedCourse %>% rename(depth = depthBin) %>% filter(depth <= 1500, cast == 43) %>% ungroup() %>% select(-cast) %>%
+  pivot_wider(names_from = variable, values_from = value)
 ```
 
-, at = seq(from = 0.1, to = 0.2, by = 0.05)
-```{r}
+Oxygen, Salinity Temperature
+```{r fig.width = 4, fig.height = 5}
+GlobalAdjust = -.5
 #plot.new()
-par(mar = c(8,4,4,1))
-plot(plotData$oxygen, plotData$depth, type = "l", ylim = c(1500, 0), col = "blue", lwd = 5, ylab = "Depth (m)", xlab = "")
-mtext( "Oxygen", side = 1, line = 2)
-par(new = TRUE)
-plot(plotData$temperature, plotData$depth, type = "l", ylim = c(1500, 0), xlim = c(0, 30), col = "firebrick4", lwd = 2, ylab = "", xlab = "", axes = FALSE)
-axis(side = 1, line = 4)
-mtext( "Temperature (°C)", side = 1, line = 6)
-par(new = TRUE)
-plot(plotData$salinity, plotData$depth, type = "l", ylim = c(1500, 0), col = "gray20", lty = "dashed", lwd = 3, axes = FALSE, xlab = "", ylab = "")
-axis(side = 3)
-mtext("Salinity (ppt)", side = 3, line = 2)
-legend(x = "center", y = "bottom", legend = c("Temp", "Sal", "Oxygen"), lty = c("solid", "dashed", "solid"), col = c("firebrick4", "gray20", "blue"), lwd = c(2, 1, 5))
+plotTempSalOxy <- function(){
+  par(mar = c(7,4,4,1))
+  plot(plotDataCourse$oxygen, plotDataCourse$depth, type = "l", ylim = c(1200, 0), col = "slateblue1", lwd = 8, ylab = "", xlab = "", xaxt = "n", yaxt = "n")
+  axis(side = 3, padj = 1, tcl = .5)
+  mtext( "Oxygen (µM)", side = 3, line = 1.25)
+  #axis(side = 2, padj = 1, tcl = 0.5, at = seq(from = 0, to = 1200, by = 200))
+  axis(side = 2, padj = .5, tcl = 0.5, las = 2, mgp = c(0, .3, 0))
+   mtext("Depth (m)", side = 2, line = 2, cex = 1.25)
+  abline(h = 850, col = "darkblue") 
+  abline(h = 170, col = "darkgreen")
+  #text(y = 1050, x = 175, labels = "Bottom of OMZ\n (850 m)")
+  par(new = TRUE)
+  plot(plotDataCourse$temperature, plotDataCourse$depth, type = "l", ylim = c(1200, 0), xlim = c(0, 30), col = "firebrick4", lwd = 2, ylab = "", xlab = "", axes = FALSE)
+  axis(side = 1, line = 0, padj = GlobalAdjust, tcl = .5)
+  mtext( "Temperature (°C)", side = 1, line = 2 + GlobalAdjust)
+  par(new = TRUE)
+  plot(plotDataCourse$salinity, plotDataCourse$depth, type = "l", ylim = c(1200, 0), col = "gray20", lty = "dashed", lwd = 3, axes = FALSE, xlab = "", ylab = "")
+  axis(side = 1, line = 3.5, padj = -1, tcl = .5)
+  mtext("Salinity (ppt)", side = 1, line = 5 + GlobalAdjust/2)
+  legend(x = 33.95, y = 900, legend = c("Oxygen", "Temp", "Sal"), lty = c("solid", "solid", "dashed"), col = c("slateblue1", "firebrick4", "gray20"), lwd = c(8, 2, 3))
+  mtext(expression(bold("B")), side = 3, line = 1.3, adj = 0, cex = 2)
+}
+plotTempSalOxy()
+```
+
+Oxygen, Beam, Sigma T
+```{r fig.width = 4, fig.height = 5}
+plotBeamSTOxy <- function(){
+  par(mar = c(7,4,4,1))
+  
+  plot(plotDataCourse$sigmaT, plotDataCourse$depth, type = "l", ylim = c(1200, 0), col = "gray40", lty = "dotted", lwd = 5, axes = FALSE, xlab = "", ylab = "")
+  #axis(side = 1, line = 2, at = 21:26)
+  axis(side = 2, padj = 1, tcl = 0.5)
+   mtext("Depth (m)", side = 2, line = 2, cex = 1.25)
+  axis(side = 1, line = 3,  padj = GlobalAdjust, tcl = .5)
+  #mtext(expression(Density~σθ~(kg/m^3)), side = 1, line = 2.2, adj = 1)
+  mtext(expression(Density~σθ~(kg/m^3)), side = 1, line = 4.75)
+  mtext("Depth (m)", side = 2, line = 2, cex = 1.25)
+  par(new = TRUE)
+  plot(plotDataCourse$oxygen, plotDataCourse$depth, type = "l", ylim = c(1200, 0), col = "slateblue1", lwd = 8, lty = "solid", ylab = "", xlab = "", axes = FALSE)
+  axis(side = 3, padj = 1, tcl = .5)
+  mtext( "Oxygen (µM)", side = 3, line = 1.25)
+  
+  par(new = TRUE)
+  plot(plotDataCourse$beamAttenuation, plotDataCourse$depth, type = "l", ylim = c(1200, 0), col = "black", lwd = 3, ylab = "", xlab = "", xaxt = "n", yaxt = "n")
+  #axis(side = 1, at = seq(from = 0.075, to = 0.175, by = 0.025))
+  axis(side = 1, at = seq(from = 0.075, to = 0.225, by = 0.025), padj = GlobalAdjust, tcl = .5)
+  #mtext( "Beam Attenuation (/m)", side = 1, line = .1, adj = 1)
+  mtext( "Beam Attenuation (/m)", side = 1, line = 2 + GlobalAdjust)
+  abline(h = 160, col = "darkgreen")
+  abline(h = 850, col = "darkblue")
+  legend(x = .11, y = 900, legend = c("Oxygen", "Beam", "σθ"), lty = c("solid", "solid", "dashed"), col = c("slateblue1", "black", "gray40"), lwd = c(8, 3, 5))
+  mtext(expression(bold("D")), side = 3, line = 1.3, adj = 0, cex = 2)
+}
+plotBeamSTOxy()
+
+```
+
+Oxyen, Fluo, Sigma T
+```{r fig.width = 4, fig.height = 5}
+
+plotFluSTOxy <- function(){
+  par(mar = c(8,3,4,0), cex.axis = 1.3)
+  plot(plotData$sigmaT, plotData$depth, type = "l", ylim = c(200, 0), col = "gray40", lty = "dotted", lwd = 5, xlab = "", ylab = "", xaxt = "n", yaxt = "n")
+  axis(side = 2, padj = 1, tcl = 0.5, at = c(0, 50, 100, 150, 200))
+   mtext("Depth (m)", side = 2, line = 2, cex = 1.25)
+  axis(side = 1, line = 4 + GlobalAdjust, padj = GlobalAdjust, tcl = .5)
+  mtext(expression(Density~σθ~(kg/m^3)), side = 1, line = 7 + GlobalAdjust * 2)
+  par(new = TRUE)
+  plot(plotData$oxygen, plotData$depth, type = "l", ylim = c(200, 0), col = "slateblue1", lwd = 8, ylab = "", xlab = "", axes = FALSE)
+  axis(side = 3, padj = 1, tcl = .5)
+  mtext("Oxygen (µM)", side = 3, line = 1.5)
+  
+  par(new = TRUE)
+  plot(plotData$fluorescence, plotData$depth, type = "l", ylim = c(200, 0), xlim = c(0, max(plotData$fluorescence) * 1.2), col = "darkgreen", lty = "solid", lwd = 3, axes = FALSE, xlab = "", ylab = "")
+  axis(side = 1, line = 0, padj = GlobalAdjust, tcl = .5)
+  mtext("Fluorescence (RFU)", side = 1, line = 1.5)
+  abline(h = 160, col = "darkgreen")
+  #text(labels = "Base of\nPhotic Zone\n(160 m)", x = 1.9, y = 215)
+  
+  legend(x = .6, y = 130, legend = c("Oxygen", "Fluo", "σθ"), lty = c("solid", "solid", "dotted"), col = c("slateblue1", "darkgreen", "gray40"), lwd = c(8, 3, 5))
+  mtext(expression(bold("C")), side = 3, line = 1.3, adj = 0, cex = 2)
+}
+plotFluSTOxy()
+```
+
+Map
+```{r}
+library(imager)
+ETNPmap <- load.image("figures/ETNP.png")
+plotMap <- function(){
+  par(mar = c(0,2,2,0))
+  plot(ETNPmap, axes = FALSE)
+  mtext(expression(bold("A")), side = 3, line = 0, adj = 0, cex = 2)
+}
+plotMap()
+```
+
+
+
+
+
+
+```{r, fig.width = 10, fig.height = 8}
+StationInfoPlot <- function(){
+layout(matrix(c(1, 1, 1, 1, 1, 1, 2, 2, 2, 2,
+                1, 1, 1, 1, 1, 1, 2, 2, 2, 2,
+                3, 3, 3, 3, 3, 4, 4, 4, 4, 4, 
+                3, 3, 3, 3, 3, 4, 4, 4, 4, 4, 
+                3, 3, 3, 3, 3, 4, 4, 4, 4, 4
+)
+,5, 10, byrow = TRUE))
+plotMap()
+plotFluSTOxy()
+plotTempSalOxy()
+plotBeamSTOxy()
+}
+StationInfoPlot()
+```
+
+
+I'm bored, and going to futz with this more later.
+
+# Another attempt
+Same figure A. 
+B is as before
+C we remove density
+D we remove oxygen, density to axis 2
+
+Oxyen, Fluo
+```{r fig.width = 4, fig.height = 5}
+
+plotFluOxy <- function(){
+  par(mar = c(4,3,4,0), cex.axis = 1.3)
+
+  plot(plotData$oxygen, plotData$depth, type = "l", xlim = c(0, 210), ylim = c(200, 0), col = "slateblue1", lwd = 8, ylab = "", xlab = "", axes = FALSE)
+  #axis(side = 2, padj = 1, tcl = 0.5, at = c(0, 50, 100, 150, 200))
+  axis(side = 2, padj = .5, tcl = 0.5, las = 2, mgp = c(0, .3, 0), at = c(0, 50, 100, 150, 200))
+   mtext("Depth (m)", side = 2, line = 2, cex = 1.25)
+  axis(side = 3, padj = 1, tcl = .5, at = c(0, 50, 100, 150, 200))
+  mtext("Oxygen (µM)", side = 3, line = 1.5)
+  
+  par(new = TRUE)
+  plot(plotData$fluorescence, plotData$depth, type = "l", ylim = c(200, 0), xlim = c(0, max(plotData$fluorescence) * 1.2), col = "darkgreen", lty = "solid", lwd = 3, axes = FALSE, xlab = "", ylab = "")
+  axis(side = 1, line = 0, padj = GlobalAdjust, tcl = .5)
+  mtext("Fluorescence (RFU)", side = 1, line = 1.5)
+  abline(h = 160, col = "darkgreen")
+  #text(labels = "Base of\nPhotic Zone\n(160 m)", x = 1.9, y = 215)
+  
+  legend(x = .6, y = 130, legend = c("Oxygen", "Fluo"), lty = c("solid", "solid"), col = c("slateblue1", "darkgreen"), lwd = c(8, 3))
+  mtext(expression(bold("C")), side = 3, line = 1.3, adj = 0, cex = 2)
+}
+plotFluOxy()
+```
+
+Beam, Sigma T
+```{r fig.width = 4, fig.height = 5}
+plotBeamST <- function(){
+  par(mar = c(7,4,4,1))
+  
+  plot(plotDataCourse$sigmaT, plotDataCourse$depth, type = "l", ylim = c(1200, 0), col = "gray40", lty = "dotted", lwd = 5, axes = FALSE, xlab = "", ylab = "")
+  #axis(side = 1, line = 2, at = 21:26)
+  axis(side = 2, padj = .5, tcl = 0.5, las = 2, mgp = c(0, .3, 0))
+   mtext("Depth (m)", side = 2, line = 2, cex = 1.25)
+  axis(side = 3, line = 0,  padj = 1, tcl = .5)
+  #mtext(expression(Density~σθ~(kg/m^3)), side = 1, line = 2.2, adj = 1)
+  mtext(expression(Density~σθ~(kg/m^3)), side = 3, line = 1)
+  
+  
+  par(new = TRUE)
+  plot(plotDataCourse$beamAttenuation, plotDataCourse$depth, type = "l", ylim = c(1200, 0), col = "black", lwd = 3, ylab = "", xlab = "", xaxt = "n", yaxt = "n")
+  #axis(side = 1, at = seq(from = 0.075, to = 0.175, by = 0.025))
+  axis(side = 1, at = seq(from = 0.075, to = 0.225, by = 0.025), padj = -1, tcl = .5)
+  #mtext( "Beam Attenuation (/m)", side = 1, line = .1, adj = 1)
+  mtext( "Beam Attenuation (/m)", side = 1, line = 2 + GlobalAdjust)
+  abline(h = 160, col = "darkgreen")
+  abline(h = 850, col = "darkblue")
+  legend(x = .11, y = 900, legend = c("Beam", "σθ"), lty = c("solid", "dashed"), col = c( "black", "gray40"), lwd = c(8, 3, 5))
+  mtext(expression(bold("D")), side = 3, line = 1.3, adj = 0, cex = 2)
+}
+plotBeamST()
+
+```
+
+
+```{r, fig.width = 10, fig.height = 8}
+StationInfoPlot <- function(){
+layout(matrix(c(1, 1, 1, 1, 1, 1, 2, 2, 2, 2,
+                1, 1, 1, 1, 1, 1, 2, 2, 2, 2,
+                3, 3, 3, 3, 3, 4, 4, 4, 4, 4, 
+                3, 3, 3, 3, 3, 4, 4, 4, 4, 4, 
+                3, 3, 3, 3, 3, 4, 4, 4, 4, 4
+)
+,5, 10, byrow = TRUE))
+plotMap()
+plotFluOxy()
+plotTempSalOxy()
+plotBeamST()
+}
+StationInfoPlot()
 ```
 
 ```{r}
-par(mar = c(8,4,4,1))
-plot(plotData$oxygen, plotData$depth, type = "l", ylim = c(1500, 0), col = "blue", lwd = 5, ylab = "Depth (m)", xlab = "")
-mtext( "Oxygen", side = 1, line = 2)
-
-par(new = TRUE)
-plot(plotData$beamAttenuation, plotData$depth, type = "l", ylim = c(1500, 0), col = "black", lwd = 3, ylab = "Depth (m)", xlab = "")
-mtext( "Oxygen", side = 1, line = 2)
-
-# plot(plotData$fluorescence, plotData$depth, type = "l", ylim = c(1500, 0), col = "darkgreen", lty = "solid", lwd = 2, axes = FALSE, xlab = "Fluorescence (RFU)", ylab = "Depth (m)")
-# #axis(side = 1, line = 4)
-# mtext("Fluorescence (RFU)", side = 1, line = 6.6)
-
+png(filename = "./figures/CombinedP2Info.png", width = 10, height = 8, units = "in", res = 200)
+StationInfoPlot()
+dev.off()
 ```
-
-```{r}
-par(mar = c(8,4,4,1))
-
-plot(plotData$oxygen, plotData$depth, type = "l", ylim = c(300, 0), col = "blue", lwd = 5, ylab = "Depth (m)", xlab = "")
-mtext( "Oxygen", side = 1, line = 2)
-
-par(new = TRUE)
-plot(plotData$fluorescence, plotData$depth, type = "l", ylim = c(300, 0), xlim = c(0, max(plotData$fluorescence)), col = "darkgreen", lty = "solid", lwd = 3, axes = FALSE, xlab = "", ylab = "")
-axis(side = 3, line = 0)
-mtext("Fluorescence (RFU)", side = 3, line = 2)
-
-```
-
-
-```{r}
-#plot.new()
-par(mar = c(8,4,4,1))
-plot(plotData$oxygen, plotData$depth, type = "l", ylim = c(1500, 0), col = "blue", lwd = 5, ylab = "Depth (m)", xlab = "")
-mtext( "Oxygen", side = 1, line = 2)
-par(new = TRUE)
-plot(plotData$fluorescence, plotData$depth, type = "l", ylim = c(1500, 0), col = "darkgreen", lty = "solid", lwd = 3, axes = FALSE, xlab = "", ylab = "")
-axis(side = 1, line = 4)
-mtext("Fluorescence (RFU)", side = 1, line = 6.6)
-par(new = TRUE)
-plot(plotData$sigmaT, plotData$depth, type = "l", ylim = c(1500, 0), col = "black", lty = "dashed", axes = FALSE, xlab = "", ylab = "")
-axis(side = 3)
-mtext("Beam Attenuation (/m)", side = 3, line = 2)
-legend(x = "center", y = "bottom", legend = c("Temp", "Sal", "σθ"), lty = c("solid", "dashed", "solid"), col = c("darkred", "black", "gray50"), lwd = c(2, 1, 4))
-```
-
-```{r}
-
-```
-
