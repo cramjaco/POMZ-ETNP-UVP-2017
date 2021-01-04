@@ -25,6 +25,11 @@ ues <- read_csv("dataOut/unbinned_EachSize.csv")
 uds <- read_csv("dataOut/unbinned_DepthSummary.csv")
 ```
 
+```{r}
+PhoticBase <- 160
+OMZBase <- 850
+```
+
 
 # Summary Statistics
 ```{r}
@@ -75,7 +80,8 @@ PlotPSDmany <- uds %>%
   #geom_ribbon(aes(x = psd_gam, xmin = psd_gam - 2 * psd_seg, xmax = psd_gam + 2 * psd_seg), alpha = 0.1, outline_type = "lower") +
   geom_point(alpha = .6, size = 2, stroke = 1) +
   scale_y_reverse() + scale_shape_manual(values = c(21:25)) +
-  scale_fill_gradientn(breaks = c(0, 6, 12, 18, 24), colors = c("black", "blue", "white", "orange", "black")) 
+  scale_fill_gradientn(breaks = c(0, 6, 12, 18, 24), colors = c("black", "blue", "white", "orange", "black")) +
+  labs(x = "Depth (m)", y = "Particle Size Distribution Slope")
 
 PlotParticlesmany <- uds %>% 
   filter(project == "ETNP") %>%
@@ -86,7 +92,8 @@ PlotParticlesmany <- uds %>%
   geom_point(alpha = .6, size = 2, stroke = 1) +
   scale_y_reverse() + scale_shape_manual(values = c(21:25)) +
   scale_fill_gradientn(breaks = c(0, 6, 12, 18, 24), colors = c("black", "blue", "white", "orange", "black")) +
-  scale_x_log10() + theme(legend.position = "none")
+  scale_x_log10() + theme(legend.position = "none") +
+  labs(x = "Depth (m)", y = "Particles / L")
 
 PlotFluxmany <- uds %>% 
   filter(project == "ETNP") %>%
@@ -165,7 +172,7 @@ PlotNParticlesEP <- uds %>%
   #geom_path(aes(x = tot_nparticles)) +
   #geom_ribbon(aes(x = psd_gam, xmin = psd_gam - 2 * psd_seg, xmax = psd_gam + 2 * psd_seg), alpha = 0.1) +
 scale_y_reverse(limits = c(2500, 0)) + scale_x_log10() + scale_color_manual(values = c("gray20", "brown")) +
-  labs(x = "Particles/L", y = "depth (m)") +
+  labs(x = "Particles/L", y = "Depth (m)") +
   theme(legend.position = "none") +
   scale_shape_manual(values = c(1:5)) 
 
@@ -182,7 +189,7 @@ PlotPSDEP <- uds %>%
   geom_path(aes(x = psd_gam)) +
   geom_ribbon(aes(x = psd_gam, xmin = psd_gam - 2 * psd_seg, xmax = psd_gam + 2 * psd_seg), alpha = 0.1) +
 scale_y_reverse(limits = c(2500, 0)) + scale_color_manual(values = c("gray20", "brown"))  +
-  scale_shape_manual(values = c(1:5)) + labs(y = "")
+  scale_shape_manual(values = c(1:5)) + labs(y = "", x = "Particle Size Distribution Slope")
 
 PlotPSDEP
 ```
@@ -247,15 +254,15 @@ eg_df <- tibble(lb = eg_lb, n_nparticles = eg_nnp, nparticles = eg_np, TotalPart
 
 EgNNP <- eg_datablock %>%
   ggplot(aes(x = lb, y = n_nparticles)) + geom_point() + scale_x_log10() + scale_y_log10() + 
-  geom_path(data = eg_df) + labs(y = "Binsize & Volume Normalized \n Particles (#/L/mm)")
+  geom_path(data = eg_df) + labs(y = "Binsize & Volume Normalized \n Particles (#/L/mm)", x = "Size (mm)")
 
 EgNP <- eg_datablock %>%
   ggplot(aes(x = lb, y = nparticles)) + geom_point() + scale_x_log10() + scale_y_log10() + 
-  geom_path(data = eg_df) + labs(y = "Normalized Particles")
+  geom_path(data = eg_df) + labs(y = "Normalized Particles" , x = "Size (mm)")
 
 EgTP <- eg_datablock %>%
   ggplot(aes(x = lb, y = TotalParticles)) + geom_point() + scale_x_log10() + scale_y_log10() + 
-  geom_path(data = eg_df) + labs( y = "Total Particles Observed (#)")
+  geom_path(data = eg_df) + labs( y = "Total Particles Observed (#)", x = "Size (mm)")
 
 plot_grid(EgNNP, EgTP, labels = c("A", "B"))
 ggsave("figures/ExamplePSD163m.png")
@@ -333,6 +340,7 @@ labs(x = bquote(Smoothed~Flux~(µmol~C/m^2/d)), y = "Depth (m)") +
 
 
 pltFlxNoLegend <- pltFlx + theme(legend.position = "none")
+pltFlxLegend <- get_legend(pltFlx)
 
 pltFlx
 #plotly::ggplotly(plt1)
@@ -410,16 +418,14 @@ pgTop <- ggdraw(pltFlxNoLegend
 pgTop
 ```
 pgBottom <- plot_grid(pltDelta3, pltFlxLegend , rel_widths = c(3, 1), labels = c("C", ""), label_size = 14)
-```{r}
 
-```
 
 
 
 I don't know whats going on below here
 
 ```{r fig.height = 9, fig.width = 5}
-pgBottom <- pltDelta3  + geom_rect(aes(xmin = -2, xmax = -1.15, ymin = 170, ymax = 1000), colour = "gray50", fill = NA, inherit.aes = FALSE) + draw_plot(pltFlxLegend , -1.95, -650, .7)
+pgBottom <- pltDelta3  + geom_rect(aes(xmin = -2, xmax = -1.15, ymin = 170, ymax = 1000), colour = "gray50", fill = NA, inherit.aes = FALSE) + draw_plot(pltFlxLegend , -1.9, -575, .7)
 pgBoth <- plot_grid(pgTop + theme(plot.margin = unit(c(0, 0, 0, 0), units = "cm")),
                     pgBottom + theme(plot.margin = unit(c(0, 0, 0, 0), units = "cm")),
                     ncol = 1, rel_heights = c(4, 4), labels = c("A", "C"), label_size = 16)
@@ -466,9 +472,26 @@ summary(DFG1)$r.sq - summary(DFG2)$r.sq
 summary(DFG2)$r.sq - summary(DFG3)$r.sq
 summary(DFG3)$r.sq
 ```
+png(filename = "./figures/CombinedP2Info.png", width = 10, height = 8, units = "in", res = 200)
+StationInfoPlot()
+dev.off()
+```{r fig.height = 8, fig.width = 10}
+#plot.new()
+FluxGamPlot <- function(){
+  par(mfrow = c(2,2))
+  plot(DFG1)
+  mtext(expression(bold("C")), side = 3, line = 0, adj = 0, cex = 2)
+  par(mfg = c(1,1))
+  mtext(expression(bold("A")), side = 3, line = 0, adj = 0, cex = 2)
+  par(mfg = c(1,2))
+  mtext(expression(bold("B")), side = 3, line = 0, adj = 0, cex = 2)
+}
 
-```{r}
-plot(DFG1)
+FluxGamPlot()
+
+png(filename = "./figures/FluxGamPlot.png", width = 10, height = 8, units = "in", res = 200)
+FluxGamPlot()
+dev.off()
 ```
 
 #Osps
@@ -478,7 +501,7 @@ plot(DFG1)
 bds %>% filter(project == "ETNP") %>%
   ggplot(aes(y = depth, x = pracma::nthroot(ospsDZ, 3), shape = factor(day(time)), fill = hour(time), group = factor(time))) + geom_point(size = 2) + scale_y_reverse(limits = c(1000, 0)) +
   scale_x_continuous(limits = c(-1, 1)) +
-  geom_vline(xintercept = 0) +   scale_shape_manual(name = "Day of Month", values = rep(21:25, 2)) + labs(x = bquote("Dissaggregation-Like Flux Shift"~μmol/m^3/day)) +
+  geom_vline(xintercept = 0) +   scale_shape_manual(name = "Day of Month", values = rep(21:25, 2)) + labs(x = bquote("Observed - Modeled Small Particle Flux"~(μmol/m^3/day))) +
   scale_fill_gradientn(name = "Hour of Day", breaks = c(0, 6, 12, 18, 24), colors = c("black", "blue", "white", "orange", "black")) + geom_hline(yintercept = 175, color = "darkgreen") + geom_hline(yintercept = 950, color = "darkblue")
 
 #ggsave("..figures/FluxSizeShift.svg"
@@ -507,6 +530,28 @@ summary(OZG3)$r.sq
 ```
 
 ```{r}
+OSMSGamPlot <- function(){
+  par(mfrow = c(1,2))
+  plot(OZG2)
+  mtext(expression(bold("B")), side = 3, line = 0, adj = 0, cex = 2)
+  par(mfg = c(1,1))
+  mtext(expression(bold("A")), side = 3, line = 0, adj = 0, cex = 2)
+}
+
+OSMSGamPlot()
+
+png(filename = "./figures/OSMSGamPlot.png", width = 10, height = 6, units = "in", res = 200)
+OSMSGamPlot()
+
+dev.off()
+```
+
+```{r}
+plot(OZG2)
+```
+
+
+```{r}
 bds %>% filter(project == "P16") %>%
   ggplot(aes(y = depth, x = ospsDZ)) + facet_wrap(~project) + geom_point() + scale_y_reverse(limits = c(500, 0)) + geom_vline(xintercept = 0)
 ```
@@ -515,6 +560,7 @@ bds %>% filter(project == "P16") %>%
 ```{r}
 trapFlux3 <- read_csv("dataOut/fluxMS_distilled.csv")
 UVPFluxComb <- read_csv("dataOut/CombinedProfileFluxEst_DS.csv")
+UVPFluxOE <- read_csv("dataOut/ObservedVsExpectedFlux.csv")
 
 ```
 
@@ -551,9 +597,58 @@ scale_shape_manual(values = c(25, 22))+
         legend.margin = margin(-10, 5, 10, 5)
   ) +
   geom_rect(data = data.frame(project = "ETNP"), aes(xmin = 15, xmax = 32, ymin = 45, ymax = 195), colour = "red", fill = NA, inherit.aes = FALSE)
+# ggsave("figures/FittedFlux.png")
+# ggsave("figures/FittedFlux.svg")
+```
+
+```{r}
+UVPFluxComb %>%
+  ggplot(aes(y = depth))  + scale_y_reverse(limits = c(1000, 0)) +
+  scale_x_continuous(limits = c(0, 200)) +
+  geom_point(aes(y = Depth, x = C_flux_umol, fill = SampleType, shape = TrapType),
+             colour = "black", stroke = 1, size = 5, data = fluxMS_distilled_toPlot) +
+  geom_line(aes(x = Flux), size = 1, color = "black") +
+  geom_point(aes(x = -1, y = -1, size = "UVP Estimate")) + # dummy point for the legend
+  geom_point(aes(x = tot_flux2), size = 3, shape = 21, color = "white", fill = "black", data = UVPFluxOE) +
+scale_shape_manual(values = c(25, 22))+
+  scale_size_manual(values = 1, name = "") +
+  ylab("Depth (m)") + xlab("Flux µmolC/m^2/day") +
+  guides(fill = guide_legend(override.aes = list(shape = 21))) +
+  theme_cowplot() + 
+  theme(
+        legend.position = c(0.5, 0.4),
+        legend.box.background = element_rect(color = "black", size = 0.5),
+        legend.margin = margin(-10, 5, 10, 5)
+  ) +
+  geom_rect(data = data.frame(project = "ETNP"), aes(xmin = 15, xmax = 32, ymin = 45, ymax = 195), colour = "red", fill = NA, inherit.aes = FALSE)
 ggsave("figures/FittedFlux.png")
 ggsave("figures/FittedFlux.svg")
 ```
+
+## Example particle size distribution
+
+horizontalGamPlot <- dataGamHorizontal %>% ggplot(aes(x = resp_fit, y = depth, col = log(lb), group = lb)) + scale_y_reverse() + geom_point() + scale_x_log10(limits = c(10^-8, NA)) + scale_color_viridis_c() + geom_path() + geom_vline(xintercept = 1) + geom_vline(xintercept = 5)  + geom_errorbar(aes(xmin = resp_lower, xmax = resp_upper), width = 10, alpha = 0.5)+ theme_bw()
+
+```{r fig.width= 10}
+TPPlot <- bes %>% filter(profile == "stn_043") %>% group_by(lb) %>% ggplot(aes(x = TotalParticles, y = depth, col = log(lb), group = lb)) + scale_y_reverse(limits = c(1000, 0)) + geom_point() + scale_x_log10() + scale_color_viridis_c() + geom_path() + geom_vline(xintercept = 1) + geom_vline(xintercept = 5) + labs(y = "Depth (m)", x = "TotalParticles Observed (#)")
+
+nnpPlot <- bes %>% filter(profile == "stn_043") %>% group_by(lb) %>% ggplot(aes(x = n_nparticles, y = depth, col = log(lb), group = lb)) + scale_y_reverse(limits = c(1000, 0)) + geom_point() + scale_x_log10() + scale_color_viridis_c() + geom_path() + geom_vline(xintercept = 1) + geom_vline(xintercept = 5) + labs(y = "Depth (m)", x = "Binsize and Volume Normalized Particles (#/L/mm)")
+
+FitPlot <- bes %>% filter(profile == "stn_043") %>% group_by(lb) %>% ggplot(aes(x = nnp_smooth, xmin = nnp_lower, xmax = nnp_upper, y = depth, col = log(lb), group = lb)) + scale_y_reverse(limits = c(1000, 0)) + geom_point() + scale_x_log10() + scale_color_viridis_c() + geom_path() + geom_vline(xintercept = 1) + geom_vline(xintercept = 5) + labs(y = "Depth (m)", x = "Smoothed - Normalized Particles (#/L/mm)") + geom_errorbar(width = 10, alpha = 0.5)
+
+npLegend <- get_legend(FitPlot + theme(legend.box.margin = margin(0, 0, 40, 200)) + labs(col = expression(log[e](Size (mm)))))
+
+plot_grid(
+  TPPlot + theme(legend.position = "none"),
+  nnpPlot + theme(legend.position = "none"),
+  npLegend ,
+  FitPlot + theme(legend.position = "none")
+)
+
+ggsave("figures/AllParticleSizes.svg")
+```
+
+
 ## Weber Bianchi Figs
 
 
@@ -690,6 +785,75 @@ WBcombined <- plot_grid(WBColorMap + theme(plot.margin = unit(c(0,3,0, 3), "cm")
 WBcombined
 
 ggsave("figures/WBModelValidation.png")
+```
+
+## P16 Flux 
+
+```{r fig.width=6, fig.height=4}
+scientific_10 <- function(x) {parse(text=gsub("e\\+*", " %*% 10^", scales::scientific_format()(x))) }
+#https://stackoverflow.com/questions/10762287/how-can-i-format-axis-labels-with-exponents-with-ggplot2-and-scales
+#jacob_magnitude <- function(x){expression(10^round(log10(x)))}
+
+cb10 <- c('#a6cee3','#1f78b4','#b2df8a','#33a02c','#fb9a99','#e31a1c','#fdbf6f','#ff7f00','#cab2d6','#6a3d9a')
+pltFlxP16 <- bds %>% filter(project == "P16") %>% #filter(DFP > 1) %>% #filter(profile %in% c("stn_043", "p16n_100")) %>%
+  ggplot(aes(y = depth, x = Flux_Smooth, group = factor(time)))  + geom_point(size = 3, stroke = 1)+
+  geom_path() +
+  scale_y_reverse(limits = c(1000, 0))+
+  scale_x_log10(limits = c(35, 150),breaks = seq(from = 20, to = 150, by = 20)) +
+   scale_color_gradient2(low = "darkgreen", mid = "gray80", high = "purple", midpoint = 10) + scale_shape_manual(name = "Day of Month", values = rep(21:25, 2)) + 
+  scale_fill_gradientn(name = "Hour of Day", breaks = c(0, 6, 12, 18, 24), colors = c("black", "blue", "white", "orange", "black")) +
+  
+labs(x = bquote(Smoothed~Flux~(µmol~C/m^2/d)), y = "Depth (m)") +
+  geom_hline(yintercept = 200, color = "darkgreen") +
+  theme(axis.text.x = element_text(angle = 90, vjust = .3), legend.spacing = unit(.1, "cm"))
+# 
+# 
+# 
+# pltFlxNoLegend <- pltFlx + theme(legend.position = "none")
+# pltFlxLegend <- get_legend(pltFlx)
+# 
+pltFlxP16
+# #plotly::ggplotly(plt1)
+```
+
+```{r fig.width=6, fig.height=4}
+cb10 <- c('#a6cee3','#1f78b4','#b2df8a','#33a02c','#fb9a99','#e31a1c','#fdbf6f','#ff7f00','#cab2d6','#6a3d9a')
+pltDelta3P16 <- bds %>% filter(project == "P16") %>% #filter(DFP > 1) %>% #filter(profile %in% c("stn_043", "p16n_100")) %>%
+  ggplot(aes(y = depth, x = pracma::nthroot(DF/DZ, 5), group = factor(time)))  + geom_point(size = 3, stroke = 1)+
+  geom_path() +
+  scale_y_reverse(limits = c(1000, 0))+
+  scale_x_continuous(limits = c(-1, .1), breaks = seq(from = -2, to = .75, by = 0.5)) +
+  #scale_x_log10() +
+   scale_color_gradient2(low = "darkgreen", mid = "gray80", high = "purple", midpoint = 10) + scale_shape_manual(name = "Day of Month", values = rep(21:25, 2)) + 
+  scale_fill_gradientn(name = "Hour", breaks = c(0, 6, 12, 18, 24), colors = c("black", "blue", "white", "orange", "black")) +
+  geom_vline(xintercept = 0) +
+  geom_hline(yintercept = 200, color = "darkgreen")+
+  labs(x = bquote((DF/DZ)^{1/5}~(µmolC/m^3/d)^{1/5}), y = "Depth (m)") + theme(legend.pos = "none")
+  #labs(x = "(DF/DZ) ^ 1/5 (µmol C/m^3/d) ^ 1/5")
+
+pltDelta3P16
+#plotly::ggplotly(plt1pos)
+```
+
+```{r fig.width = 6, fig.height = 4}
+osms_p16 <- bds %>% filter(project == "P16") %>%
+  ggplot(aes(y = depth, x = pracma::nthroot(ospsDZ, 3), group = factor(time))) + geom_point(size = 3) + geom_path() + scale_y_reverse(limits = c(1000, 0)) +
+  scale_x_continuous(limits = c(-1, 1)) +
+  geom_vline(xintercept = 0) +   scale_shape_manual(name = "Day of Month", values = rep(21:25, 2)) + labs(x = "Observed - Modeled Small Particle Flux \n µmol/m^3/day") +
+  scale_fill_gradientn(name = "Hour of Day", breaks = c(0, 6, 12, 18, 24), colors = c("black", "blue", "white", "orange", "black")) + geom_hline(yintercept = 175, color = "darkgreen") 
+osms_p16
+#ggsave("..figures/FluxSizeShift.svg"
+
+```
+
+```{r fig.width = 8, fig.height=8}
+plot_grid(
+  pltFlxP16,
+  pltDelta3P16,
+  osms_p16
+)
+
+ggsave("figures/P16FluxRelate.svg")
 ```
 
 

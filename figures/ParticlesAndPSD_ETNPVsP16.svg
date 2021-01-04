@@ -1057,7 +1057,7 @@
 <g clip-path='url(#cpMC4wMHw3MjAuMDB8Mjg4LjAwfDAuMDA=)'><text x='203.24' y='262.19' style='font-size: 12.00px; font-family: Arimo;' textLength='20.02px' lengthAdjust='spacingAndGlyphs'>100</text></g>
 <g clip-path='url(#cpMC4wMHw3MjAuMDB8Mjg4LjAwfDAuMDA=)'><text x='249.84' y='262.19' style='font-size: 12.00px; font-family: Arimo;' textLength='20.02px' lengthAdjust='spacingAndGlyphs'>300</text></g>
 <g clip-path='url(#cpMC4wMHw3MjAuMDB8Mjg4LjAwfDAuMDA=)'><text x='136.01' y='277.95' style='font-size: 14.00px; font-family: Arimo;' textLength='65.36px' lengthAdjust='spacingAndGlyphs'>Particles/L</text></g>
-<g clip-path='url(#cpMC4wMHw3MjAuMDB8Mjg4LjAwfDAuMDA=)'><text transform='translate(16.61,157.17) rotate(-90)' style='font-size: 14.00px; font-family: Arimo;' textLength='59.91px' lengthAdjust='spacingAndGlyphs'>depth (m)</text></g>
+<g clip-path='url(#cpMC4wMHw3MjAuMDB8Mjg4LjAwfDAuMDA=)'><text transform='translate(16.61,158.33) rotate(-90)' style='font-size: 14.00px; font-family: Arimo;' textLength='62.23px' lengthAdjust='spacingAndGlyphs'>Depth (m)</text></g>
 <g clip-path='url(#cpMC4wMHw3MjAuMDB8Mjg4LjAwfDAuMDA=)'><text x='5.06' y='14.45' style='font-size: 14.00px; font-weight: bold; font-family: Arimo;' textLength='10.11px' lengthAdjust='spacingAndGlyphs'>A</text></g>
 <defs>
   <clipPath id='cpMjg4LjAwfDcyMC4wMHwyODguMDB8MC4wMA=='>
@@ -2107,7 +2107,7 @@
 <g clip-path='url(#cpMC4wMHw3MjAuMDB8Mjg4LjAwfDAuMDA=)'><text x='368.92' y='262.19' style='font-size: 12.00px; font-family: Arimo;' textLength='10.67px' lengthAdjust='spacingAndGlyphs'>-5</text></g>
 <g clip-path='url(#cpMC4wMHw3MjAuMDB8Mjg4LjAwfDAuMDA=)'><text x='467.47' y='262.19' style='font-size: 12.00px; font-family: Arimo;' textLength='10.67px' lengthAdjust='spacingAndGlyphs'>-4</text></g>
 <g clip-path='url(#cpMC4wMHw3MjAuMDB8Mjg4LjAwfDAuMDA=)'><text x='566.02' y='262.19' style='font-size: 12.00px; font-family: Arimo;' textLength='10.67px' lengthAdjust='spacingAndGlyphs'>-3</text></g>
-<g clip-path='url(#cpMC4wMHw3MjAuMDB8Mjg4LjAwfDAuMDA=)'><text x='483.26' y='277.95' style='font-size: 14.00px; font-family: Arimo;' textLength='22.57px' lengthAdjust='spacingAndGlyphs'>psd</text></g>
+<g clip-path='url(#cpMC4wMHw3MjAuMDB8Mjg4LjAwfDAuMDA=)'><text x='398.84' y='277.95' style='font-size: 14.00px; font-family: Arimo;' textLength='191.42px' lengthAdjust='spacingAndGlyphs'>Particle Size Distribution Slope</text></g>
 <g clip-path='url(#cpMC4wMHw3MjAuMDB8Mjg4LjAwfDAuMDA=)'><text x='658.71' y='113.20' style='font-size: 14.00px; font-family: Arimo;' textLength='42.02px' lengthAdjust='spacingAndGlyphs'>project</text></g>
 <circle cx='666.38' cy='129.60' r='2.84' style='stroke-width: 1.42; stroke: #333333; stroke-opacity: 0.70;' clip-path='url(#cpMC4wMHw3MjAuMDB8Mjg4LjAwfDAuMDA=)' />
 <line x1='660.24' y1='129.60' x2='672.51' y2='129.60' style='stroke-width: 1.07; stroke: #333333; stroke-linecap: butt;' clip-path='url(#cpMC4wMHw3MjAuMDB8Mjg4LjAwfDAuMDA=)' />
