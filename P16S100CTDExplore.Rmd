@@ -187,6 +187,25 @@ v(chl.360.crop, cbpos = "r", pal = "jet", zlim = c(0,.4), cb.xlab = expression("
 
 
 # All
+```{r}
+library(imager)
+```
+
+```{r}
+getwd()
+```
+
+
+```{r}
+P16map <- load.image("figures/P16MapManualExport.png")
+plotMapP16 <- function(){
+  par(mar = c(0,2,2,0))
+  plot(P16map, axes = FALSE)
+  mtext(expression(bold("A")), side = 3, line = 0, adj = 0, cex = 2)
+}
+plotMapP16()
+```
+
 
 ```{r, fig.width = 10, fig.height = 8}
 StationInfoPlot <- function(){
@@ -197,7 +216,7 @@ layout(matrix(c(1, 1, 1, 1, 1, 1, 2, 2, 2, 2,
                 3, 3, 3, 3, 3, 4, 4, 4, 4, 4
 )
 ,5, 10, byrow = TRUE))
-mapP16()
+plotMapP16()
 plotFluOxyP16()
 plotTempSalOxyP16()
 plotBeamSTP16()
@@ -205,4 +224,8 @@ plotBeamSTP16()
 StationInfoPlot()
 ```
 
-
+```{r}
+png(filename = "./figures/CombinedP16S100Info.png", width = 10, height = 8, units = "in", res = 200)
+StationInfoPlot()
+dev.off()
+```

@@ -33,13 +33,15 @@ bring_in_p2 <- function(){
   # bring in particle data
   uvp_data_path <- "data/uvpdata"
   particleData <- uvpMetaP2 %>% pull(`Particle filename`) %>%
-    map(~read_tsv(file.path(uvp_data_path, .), locale = locale(encoding = "latin1"))) %>%
+    map(~read_tsv(file.path(uvp_data_path, .), locale = locale(encoding = "latin1", tz="Mexico/General"))) %>%
     reduce(rbind)
   
   # some initial processing
   particleNumbers <- particleData %>%
     select(profile = Profile, time = `yyyy-mm-dd hh:mm`, depth = `Depth [m]`, vol = `Sampled volume[L]`, `LPM (102-128 µm)[#/L]`:`LPM (>26 mm)[#/L]`) %>%
-    gather(key = "sizeclass", value = "nparticles", `LPM (102-128 µm)[#/L]`:`LPM (>26 mm)[#/L]`)
+    gather(key = "sizeclass", value = "nparticles", `LPM (102-128 µm)[#/L]`:`LPM (>26 mm)[#/L]`) %>%
+    # convert to central time, originals are in UTC
+    mutate(time = lubridate::with_tz(time, tzone = "Mexico/General"))
   
   #
   classData <- particleNumbers %>% select(sizeclass) %>% unique() %>%
