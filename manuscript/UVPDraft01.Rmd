@@ -36,9 +36,66 @@ A model of particle remineralization and shrinking was used to diagnose whether 
 Our data suggest a role of zooplantkon in transporting biomass in the form of fecal pellets, into the core of the OMZ, but also in disaggregating particles in this same region. We further observe that there is temporal varibility in flux transport, but that this variability is small, only accounting for ~X % of the variability in flux, and not accounting for variability in particle numbers or size distribution over the one week time period studied.
 
 # Introduction
+
+## Outline:
+
+* A
+  + The biological pump is a key part of the global carbon cycle, in which, sinking particles transport carbon from the surface into the deep ocean. (Turner 2015; Neuer 2014)
+  + Transfer efficiency, the flux between the base of the photic zone and the deep ocean (Francois 2002) is  important in particular, because the depth to which carbon is transported may affect global atmospheric carbon levels (Kwon)
+  + Zooplankton can affect particle flux multiple several ways (Turner 2015; Steinberg and Landry 2017), and by extension the efficincy of the biogical pump (Cavan 2017).
+    + (1) They repackages particles into fecal pellets which have different properties from the original particls Steinberg and Landry)
+    + (2) They consuming particles in surface depths and releasing at others zooplankton actively transport carbon (usually downward) (Steinberg et al., 2000; Hannides et al., 2009; Bianchi et al., 2013; Stukel et al., 2018b; Archibald et al., 2019; {<- All from stukel et al 2019}, Kiko recent).
+    - (3) Zooplankton may consume particles in the mesopelegic and respire much of their biomass (Stukel et al. 2019)
+    - (4) Zooplankton may large partiles into smaller ones, through sloppy feeding (Cavin), or by generating turbulance that beraks downs particles (in Turner 2015 ->  Goldthwait et al. 2004), or part of a compex "gardening" (Mayor 2014).
+
+   + Particle size resolved models of TEFF in the oceans suggest that temperature, size and oxygen play a big role. (Cram et al.; Weber and DeVries)
+     - And regional differences in particle ballast plays a smaller role. (Cram et al.)
+     -These models models assume that zooplankton play a small role, and therefore assume no transport through the mesopelegic, and no disaggregation.
+     -They therefore predict attenuation of small particles and not large ones.
+      + A questionalbe assumption, given the established importance of zooplankton.
+     - However, These models particle size predictions generate a useful null hypothesis that can be compared against.
+
+   + Particle data provide valuable information about particle transport.
+     - When performed in concert with traps, they can be used to predict flux in places where traps aren't. (Guidi) They can give resolved information about particle flux variability accross space and time. (Guidi, Kiko A)
+     - They can tell us about the relationship between particle size and sinking speed. (Guidi)
+
+   + A recent modeling study posed three hypotheses, each with a prediction about particle size distributions (Bianchi and Weber)
+
+   + Recently, Zooplankton transport in a week OMZ has been examined, and the zooplankton appeared to respond (somehow) to oxygen. It was postuated that in more anoxic regions zooplankton might not migrate as deep. (Kiko B).
+
+
+   + Measurements of particle size and flux hold promise in further constraining models.
+   + Most OMZ are in the oligotrophic ocean, where productivity is low. {Put somewhere}
+
+* B
+  * Previous analyses of particles don't look directly at the particle size distribution slope
+  * TEFF models currently do not do a good job of predicting observed particle numbers
+  * There isn't much data about particle size throughout the ETNP OMZ.
+    * There isn't much data from oligotrophic, but very anoxic OMZs in general.
+  * There isn't much resoved temporal data, which makes it hard to deconvolve ongoing processes from temporal variability in particle production at the surface.
+  * Only one study to our knoledge combined measurments of traps, particles and acoustic data together
+    * and none have traps at exactly the same time as the particle data.
+  * The data to test the Bianchi-Weber models didn't previously exist.
+  * Nobody has compared predictions of models to observed particle flux, and how those vary through the water column.
+
+* T
+  * We collected particle size data at high temporal resolution over a week
+  * We compare it to observed flux measurments, and acoustic data.
+  * We describe particle size distrubtion slope.
+  * We test the Bianchi-Weber models.
+  * We quantify, thoughout the water column, how changes in size distribution deviate from changes that would be predicted by remineralization and sinking only models.
+  * Together, these analyses will provide more detailed informaiton about the relationship between particle transport and zooplankton in the ETNP OMZ.
+
+
 ## And:
 
 Pelegic oxygen minimum zones are expanding[@strammaExpandingOxygenMinimumZones2008], and this expansion is likely to effect ocean chemistry, the habitat of marine organisms, and the interactions between between organisms and chemistry [@gillyOceanographicBiologicalEffects2013]. Models and chemical data suggest that oxygen minimum zones may enhance carbon transport to the deep ocean, by inhibiting microbial degredation of sinking marine particles [@cramRoleParticleSize2018]. However, biologial organic mater transport is modulated by zooplankton [@steinbergBacterialVsZooplankton2008; @steinbergZooplanktonOceanCarbon2017]  which feed on, produce and disaggregate particles, and whose interactions on particle flux in pelegic OMZs are only beginning to be explored [@kikoZooplanktonMediatedFluxesEastern2020].
+
+
+
+
+
+
 
 ### The biological pump's interaction with OMZs interaction is consequential
 
