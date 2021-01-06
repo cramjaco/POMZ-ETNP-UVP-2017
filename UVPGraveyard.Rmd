@@ -1,0 +1,85 @@
+---
+title: "Graveyard File"
+output: html_notebook
+---
+
+For text that is removed from UVPDraft.Rmd
+
+### The biological pump's interaction with OMZs interaction is consequential
+
+
+Sinking particles and transport of organic matter by zooplankton, in processes known as the biological pump and the {whatsit} both play a key role in transporting carbon to depth. The rates of these processes are crytical in regulating atmospheric carbon (Kwon). The sinking particles that make up the biologial pump are a combenation of marine microaggregates and marine snow (Simon), and are comprised of aggregates of dead phytoplankton, fecal pellets from zooplankton, discarded larvacean houses, diseased organisms, and aggregates of other substances, usually of a biological origin (Alldredge). Two recent studyies suggested that, ignoring effects of zooplankton on marine snow, it is possible to broadly predict patterns of flux into the deep ocean as a function of global variations in particle size as well as the effects of temperature and oxygen on the metabolism of microorganisms that live on and break down particles (Cram, DeVries and Weber). One study further considered particle ballasting by carbonate and silicate and water viscosity and found those to have a substantially smaller effect on flux (Cram). However studies like these assume that particles only sink and remineralize, predict that small particles become scarce in the mid-water column (DeVries), a pattern that is often not observed in observational data (Kiko mid ocean, Guidi). They also predict that flux always decreases in the ocean while observations suggest that sometimes flux increases in the photic zone.
+
+<!-- {Microaggregates, are particles smaller than 500 microns, and marine snow, particles larger than 500 microns. While marine snow where/are thought to be the primary contributors to carbon flux (Ref), some studies suggest that microaggregates may contribute to an even greater share of the flux.} -->
+
+
+
+
+Particle size, 
+the dependence of particle degrading microorganisms on temperature and oxygen concentrations,
+the dependence of particle sinking speed on water viscocity and temperature,
+faster particle sinking due to ballasting by heavy materials such as carbonate and silicate,
+particle compositoin affecting breadown rates -- for instance carbonate has been suggested to protect surrounding POM from degredation by bacteria
+alternatively particles in some region, or some kinds of particles may be more resistant to microbial degredation due to differences in POM content
+particle shape and porosity may also affect breakdown and sinking
+
+* Zooplankton modulate organic mater flux this flux by repackaging particles (steinberg and refs therein), feeding at the surface and excreeting at depth (bianchi 2013 and others), thereby facilitating flux of carbon, and dying at depth (Steinberg and refs therein).
+* Zooplankton can further modulate flux by altering the particle size distribution. They can consume particles of a rane of sizes and repackage them into more uniform, perhaps faster sinking fecal pellets. Conversely, through sloppy feeding they can break large particles into multiple, slower sinking, smaller particles. {merge with point above}
+
+* Oxygen minimum zones are expanding (ref) and have been postulated to play a role in changing biogeochemical cycles.
+
+They have unique effects on zooplankton because they limit the ability of anoxia sensitive zooplankton to migrate (ref) and also limit the ability of some anoxia sensitive predators. The limiting oxygen enviornment may also impact the behavior of zooplankton that are there as they avoid oxygen requiring behavior such as feeding. 
+Community structure is distinct in the OMZ  and characterized by XXX (Maas). 
+
+
+### Predicitons
+
+#### Bianchi weber
+* Models suggest that organic mater flux into the deep ocean is *more* efficient in oxygen minimum zones (Cram, Deveries and Weber).
+
+
+#### Kiko
+Particle transport has also been postulated to be effected by zooplankton.
+Bianchi ref.
+Kiko et al. explored zooplankotn distributions and particle size distributions in the eastern tropical north atlantic, which has a weak oxygen minimum zone. They found transport into the omz core by zooplankton. They postuated, that this was possible becaues there was still oxygen. *but* similar analysis of particle size distributions and estemates of flux haven't been done in the OMZ core. (kiko). 
+
+
+### Methods Background
+
+Underwater vision profilers have provided important insights into particle size distributions in the ocean.
+Flux profiles measured by traps can be compared to UVP measurments to estimate the size to mass and sinking speeed relationships of particles (ref).
+They can show useful things about spatial (guidi, kiko A) and temporal (kikoA and B) variability in the ocean. Indeed these data were critical in constraining a model (cram).
+
+Traps tell us a lot about flux.
+
+Acoustic data can tell us a lot about nekton distributions, and even those of plankton.
+
+The meausurements have synergistic effects, as demonstrated by Kiko et al in the ETNA (damn them). 
+
+
+## But
+* Weber and bianchi's model hasn't been validated against real data.
+* Particle size has not been normalized to observed flux in this region.
+
+* The temporal dynamics at diel time scales have not been examined in the ETNP, or any other truly anoxic open ocean region. They have also never before been related to diel migration patterns.
+
+* It is not known how migratory zooplankton affect particle size distributions -- either by tranport of particles, nor by disaggregaton processes.
+
+* It is not fully known how oxygen limitation affects particle size dynamics and flux.
+
+* Acoustic data, traps, and UVP measurments have not been combined in this region.
+
+
+## Therefore
+
+We conducted the first ever time-series analysis of particles, in the oligotrophic region of the ETNP oxygen minimum zone. With the goal of normalizing to observed flux, and comparing particle size data to acoustic data about the distributions of zooplankton and larger orgasnisms. 
+
+* We compare this data to acoustic signature of diel migrators, of mulitple size classes
+
+* We modified the a particle remineralization and sinking model (PRiSM) (Devries, Cram) to estemate particle size distribution changes that would occur under dynamics where particles only sink and remineralize, and compared observed distributions to ones expeced by the model. This allowed us to quantify the magnitude of non-PRiSM like processes.
+
+* We compared our results to those seen at a station at similar latitude in a non limiting region of the tropical north pacific.
+
+### Our site
+The ETNP is the biggist baddist OMZ (ref). While many OMZ, especially coastal ones, are characterized by high productivity which leads to carbon flux which removes oxygen from mid water depths (ref), the bulk of the ETNP OMZ is characterized by low productivity , with the low oxygen caused by slow ocean circulation through the OMZ region (refs clara sent). Many previous charicterizations of flux at this site, happened in coastal regions (that paper I used in my talks). Flux has not been previously characterized in this region (unless meg gets her paper out first). 
+The site is characterized by nitrogen loss processes by both anammox and cannonical dentitrification processes. (Fuchsman cyano paper, probably many others). 
