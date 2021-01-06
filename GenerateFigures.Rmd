@@ -384,7 +384,6 @@ pltDelta3
 ```
 
 
-
 ```{r fig.height=8, fig.width = 8}
 # #plot_grid(pltFlxNoLegend, pltFlxZoom, pltDelta3, pltFlxLegend)
 # 
@@ -652,6 +651,7 @@ plot_grid(
 )
 
 ggsave("figures/AllParticleSizes.svg")
+ggsave("figures/AllParticleSizes.png")
 ```
 
 
@@ -860,6 +860,7 @@ plot_grid(
 )
 
 ggsave("figures/P16FluxRelate.svg")
+ggsave("figures/P16FluxRelate.png")
 ```
 
 
