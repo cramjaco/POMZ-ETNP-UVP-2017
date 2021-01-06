@@ -237,7 +237,7 @@ Eqn. 3
 
 In the above equation $\Delta Z$ is the distance, in meters, between the current depth bin and the previous depth bin, whose particle size distribution is fed into the predictive model.
 
-OSMS was positive between the photic zone and 500m, meaning that less small flux attenuated than would be expected from the PRiSM model in this region. There was some variability in the OSMS parameter between casts. A general additive model, after factoring out the effect of depth, found that there was a statistically significant relationship between day of the cast and OSMS with highest values near day 10 of the study (which is when flux attenuation in this region was lowest) (*p*=0.01). However there was not a statistically significant relationship between hour of the day and OSMS. 
+OSMS was positive between the photic zone and 500m, meaning that less small flux attenuated than would be expected from the PRiSM model in this region. There was some variability in the OSMS parameter between casts. A general additive model, after factoring out the effect of depth, found that there was a statistically significant relationship between day of the cast and OSMS with highest values near day 10 of the study (which is when flux attenuation in this region was lowest) (*p*=0.01) (Figure S10). However there was not a statistically significant relationship between hour of the day and OSMS. 
 
 Below 500m, OSMS was negative. There were only two casts that reached below 500m at this station, and so an analysis of the dynamics of OSMS in this region are not possible.
 
@@ -331,66 +331,57 @@ Figure 9. Quantification of non remineralization and sinking like processes. Poi
 # Supplemental Figs
 [move to supplement]
 
+![](../figures/CombinedP16S100Info.png)
+
+Figure S1. Physical and chemical data from P16 Station 100. Located at 16.5°N 152.0°W. (A) Map of the nearby tropical pacific station P6 Station 100. Colors indicate chlorophyll concentrations at the surface, averaged over all MODIS images. The red circle indicates the location of Station P2. (B-D) Oceanographic parameters. The thin horizontal green line shows the location of the base of the photic zone (200m m). **A** Oxygen, and fluorescence. Because the fluorometer was broken on this cruise, fluorescence data were pulled from world ocean atlas. **B** Oxygen temperature and salinity. **(C)** Beam attenuation and density, calculated from the salininity temperature and pressure data.
+
 ![](../figures/stationP2_EK60_go7.png)
 
-Figure S1. Acoustic data, measured by EK60, measured over the course of the experiment. Shown are data from the all frequency bands. Values are in return signal intensity and have not been normalized to observed biomass.
+Figure S2. Acoustic data, measured by EK60, measured over the course of the experiment. Shown are data from the all frequency bands. Values are in return signal intensity and have not been normalized to observed biomass.
 
 ![](../figures/AllParticleSizes.png)
 
-Figure S2. A profile of particle abundances at different sizes and depths. **(A)** Numbers of observed particles and **(B)** particle numbers normalized to volume sampled and particle size bin width. **(C)** Smoothed and extrapolated particle abundances, based on a negative bionomial gam that predicts particle abundance form size and depth.
+Figure S3. A profile of particle abundances at different sizes and depths. **(A)** Numbers of observed particles and **(B)** particle numbers normalized to volume sampled and particle size bin width. **(C)** Smoothed and extrapolated particle abundances, based on a negative bionomial gam that predicts particle abundance form size and depth.
 
 ![](../figures/ExamplePSD163m.png)
 
 
 
-Figure S2. An example of observed particle size distribution spectra. These are depth binned data from between X and X m deep in the water column from the cast that occurred at *DATETIME for stn_043*. A total volume of XXX L of water are sampled herein. Points indicate **(A)** total numbers of observed particles and **(B)** particle numbers normalized to volume sampled and particle size bin width. The line indicates the predicted best fit line of the data. The line was fit on the bin and volume normalized data by a negative-binomial general linear model. The line in panel **A** indicates predictions from this same model, rescaled into absolute particle space.
+Figure S4. An example of observed particle size distribution spectra. These are depth binned data from between X and X m deep in the water column from the cast that occurred at *DATETIME for stn_043*. A total volume of XXX L of water are sampled herein. Points indicate **(A)** total numbers of observed particles and **(B)** particle numbers normalized to volume sampled and particle size bin width. The line indicates the predicted best fit line of the data. The line was fit on the bin and volume normalized data by a negative-binomial general linear model. The line in panel **A** indicates predictions from this same model, rescaled into absolute particle space.
 
 
 
 ![](../figures/ParticlesPSDMany.png)
-Figure S3. (A) Observed, volume normalized total particle numbers from 9 casts taken at different times of the day at ETNP station P2. (B) Calculated particle size distribution slopes of those particles. These data have not been binnedby depth.
-
-![](../figures/CombinedP16S100Info.png)
-
-Figure S4. Physical and chemical data from P16 Station 100. Located at 16.5°N 152.0°W. (A) Map of the nearby tropical pacific station P6 Station 100. Colors indicate chlorophyll concentrations at the surface, averaged over all MODIS images. The red circle indicates the location of Station P2. (B-D) Oceanographic parameters. The thin horizontal green line shows the location of the base of the photic zone (200m m). **A** Oxygen, and fluorescence. Because the fluorometer was broken on this cruise, fluorescence data were pulled from world ocean atlas. **B** Oxygen temperature and salinity. **(C)** Beam attenuation and density, calculated from the salininity temperature and pressure data.
-
-
-![](../figures/ParticlesAndPSD_ETNPVsP16.png)
- Figure S5. As above, but for the final cast taken at ETNP station P2 and the only cast collected from the P16 transect at the station 100. P16 Station 100 was chosen because it is at a similar latitude to ETNP station P2. (A) Total particle numbers, (B) Particle size distribution. **{Cut to 1000m}**
- 
- 
-![](../figures/P16FluxRelate.png)
-Figure S6. Flux profiles and flux attenuation at P2 Station 100. **(A)** Flux profile **(B)** Fifth-root transformed depth normalized rate of flux decrease. **(C)** Difference between observed and modeled results. Higher values suggest more disaggregation-like processes.
-
-
-
+Figure S5. (A) Observed, volume normalized total particle numbers from 9 casts taken at different times of the day at ETNP station P2. (B) Calculated particle size distribution slopes of those particles. These data have not been binnedby depth.
 
 
 ![](../figures/FluxGamPlot.png)
-Figure S_. Gam predicted effects of **A** Depth, **B** Day of the month in January 2017, and **C** hour of the day on the fifth-root transformed, depth normalized, rate of change of flux. Y axis indicates the value of the component smooth functions effect on Flux. Positive values associate with times and regions of the water column where flux is increasing, holding other factors constant, and negative ones where it is decreasing.
+
+Figure S6. Gam predicted effects of **A** Depth, **B** Day of the month in January 2017, and **C** hour of the day on the fifth-root transformed, depth normalized, rate of change of flux. Y axis indicates the value of the component smooth functions effect on Flux. Positive values associate with times and regions of the water column where flux is increasing, holding other factors constant, and negative ones where it is decreasing.
+
+![](../figures/ParticlesAndPSD_ETNPVsP16.png)
+ Figure S7. As above, but for the final cast taken at ETNP station P2 and the only cast collected from the P16 transect at the station 100. P16 Station 100 was chosen because it is at a similar latitude to ETNP station P2. (A) Total particle numbers, (B) Particle size distribution. **{Cut to 1000m}**
+ 
+ ![](../figures/BigVsSmall.png)
+Figure S8. Depth binned particle number (volume normalized), particle size slope (psd), and flux (estimated as in Fig. 4) for large ($>= 500\, \mu m$), small ($< 500 \, \mu m$) and total particles, at the oxic and anoxic site
+ 
+![](../figures/P16FluxRelate.png)
+Figure S9. Flux profiles and flux attenuation at P2 Station 100. **(A)** Flux profile **(B)** Fifth-root transformed depth normalized rate of flux decrease. **(C)** Difference between observed and modeled results. Higher values suggest more disaggregation-like processes.
+
+
+
+
+
+
 
 
 ![](../figures/OSMSGamPlot.png)
 
-Figure S_. Gam predicted effects of **A** Depth, **B** Day of the month in January 2017 Y axis indicates the value of the component smooth functions effect on the difference between observed and modeled flux. Thus higher values correspond with greater flux of small particles than predicted by the model.
-
-
-
-![](../figures/BigVsSmall.png)
-Figure S6. Depth binned particle number (volume normalized), particle size slope (psd), and flux (estimated as in Fig. 4) for large ($>= 500\, \mu m$), small ($< 500 \, \mu m$) and total particles, at the oxic and anoxic site
+Figure S10. Gam predicted effects of **A** Depth, **B** Day of the month in January 2017 Y axis indicates the value of the component smooth functions effect on the difference between observed and modeled flux. Thus higher values correspond with greater flux of small particles than predicted by the model.
 
 
 
 
-
-
-#MOVED
-Maybe skip?
-{done, notadded}
-Figure S1. A profile of data generated by the UVP. At each depth the abundance of particles at each size are color coded on a log scale. Particle sizes where no particles in that sample were seen are represented with a smaller black dot.
-
-{done not added}
-Figure S2. Comparason of total particle number and particle size distributions of all casts taken at the ETNP station P2. Points indicate individual samples, while ribbons indicate confedence intervals of those sampeles. The overlapping confedence intervals suggest that there is not a statistically detectable difference between the different casts at the same station. {I'd like a more quantitative metric}.
 
 
 
