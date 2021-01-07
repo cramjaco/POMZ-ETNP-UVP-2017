@@ -66,11 +66,11 @@ remin_shuffle <- function(abun_in, DFpct, DeltaZ = 10, Cm = m1mm, Cw = w1mm, lbv
 }
 
 remin_shuffle_spec <- function(abun_in, DFpct, lbv = lb_vec, mv = m_vec, wv = w_vec, llb = little_lb, ...){
-  core <- remin_shuffle(abun_in, DFpct, llb = llb, mv = mv, wv = wv, ...)
+  core <- remin_shuffle(abun_in, DFpct, lbv = lbv, mv = mv, wv = wv, llb = llb, ...)
   abun_in + core$dnet
 }
 
-remin_smooth_shuffle <- function(abun_in, DFpct, Ipct = 0.9999, llb = lb_vec, mv = m_vec, wv = w_vec, ...){
+remin_smooth_shuffle <- function(abun_in, DFpct, Ipct = 0.9999, lbv = lb_vec, mv = m_vec, wv = w_vec, llb = little_lb, ...){
   # DFpct: Fractional mass retained between depths
   # Ipct: Fractional mass retained between iterations
   # ...: Passed to remin_shuffle
@@ -88,7 +88,7 @@ remin_smooth_shuffle <- function(abun_in, DFpct, Ipct = 0.9999, llb = lb_vec, mv
     Fpct = 1-(iterFlux-DFpct)
     
     for (i in 1:iters){
-      abun_est = remin_shuffle_spec(abun_in = abun_est, DFpct = Ipct, llb = llb, mv = mv, wv = wv, ...)
+      abun_est = remin_shuffle_spec(abun_in = abun_est, DFpct = Ipct, lbv = lbv, llb = llb, mv = mv, wv = wv, ...)
     }
   }
   

@@ -876,11 +876,17 @@ ggsave("figures/P16FluxRelate.png")
 # Flux attenuation example
 
 ```{r}
-loc_DFP <- bds %>% filter(profile == "stn_043", depth %in% c(275)) %>% pull(DFP)
-loc_use_DFP <- bds %>% filter(profile == "stn_043", depth %in% c(275)) %>% pull(use_this_DFP)
-for_single_disag <- bes %>% filter(profile == "stn_043", depth %in% c(225, 275)) %>% select(depth, lb, nnp_smooth) %>% mutate(depth = recode(depth, `225` = "Shallow", `275` = "Deep")) %>%
+source("ModelStuff.R")
+```
+
+
+```{r}
+loc_DFP <- bds %>% filter(profile == "stn_035", depth %in% c(275)) %>% pull(DFP)
+loc_use_DFP <- bds %>% filter(profile == "stn_035", depth %in% c(275)) %>% pull(use_this_DFP)
+for_single_disag <- bes %>% filter(profile == "stn_035", depth %in% c(225, 275)) %>% select(depth, lb, nnp_smooth) %>% mutate(depth = recode(depth, `225` = "Shallow", `275` = "Deep")) %>%
   pivot_wider(names_from = depth, values_from = nnp_smooth)
-remin_smooth_
+remin_smooth_shuffle(for_single_disag$Shallow,loc_use_DFP)
+remin_shuffle(for_single_disag$Shallow,loc_use_DFP)
 ```
 
 
