@@ -79,9 +79,11 @@ PlotPSDmany <- uds %>%
   #geom_path(aes(x = psd_gam)) + 
   #geom_ribbon(aes(x = psd_gam, xmin = psd_gam - 2 * psd_seg, xmax = psd_gam + 2 * psd_seg), alpha = 0.1, outline_type = "lower") +
   geom_point(alpha = .6, size = 2, stroke = 1) +
-  scale_y_reverse() + scale_shape_manual(values = c(21:25)) +
+  scale_y_reverse(limits = c(1200, 0)) + scale_shape_manual(values = c(21:25)) +
   scale_fill_gradientn(breaks = c(0, 6, 12, 18, 24), colors = c("black", "blue", "white", "orange", "black")) +
-  labs(x = "Depth (m)", y = "Particle Size Distribution Slope")
+  labs(x = "Depth (m)", y = "Particle Size Distribution Slope") + 
+  geom_hline(yintercept = 175, color = "darkgreen") +
+  geom_hline(yintercept = 850, color = "darkblue") 
 
 PlotParticlesmany <- uds %>% 
   filter(project == "ETNP") %>%
@@ -90,21 +92,23 @@ PlotParticlesmany <- uds %>%
   #geom_path(aes(x = psd_gam)) + 
   #geom_ribbon(aes(x = psd_gam, xmin = psd_gam - 2 * psd_seg, xmax = psd_gam + 2 * psd_seg), alpha = 0.1, outline_type = "lower") +
   geom_point(alpha = .6, size = 2, stroke = 1) +
-  scale_y_reverse() + scale_shape_manual(values = c(21:25)) +
+  scale_y_reverse(limits = c(1200, 0)) + scale_shape_manual(values = c(21:25)) +
   scale_fill_gradientn(breaks = c(0, 6, 12, 18, 24), colors = c("black", "blue", "white", "orange", "black")) +
   scale_x_log10() + theme(legend.position = "none") +
-  labs(x = "Depth (m)", y = "Particles / L")
+  labs(x = "Depth (m)", y = "Particles / L") + 
+  geom_hline(yintercept = 175, color = "darkgreen") +
+  geom_hline(yintercept = 850, color = "darkblue") 
 
-PlotFluxmany <- uds %>% 
-  filter(project == "ETNP") %>%
-  ggplot(aes(x = tot_flux_fit, y = depth, shape = factor(day(time)), fill = hour(time))) +
- 
-  #geom_path(aes(x = psd_gam)) + 
-  #geom_ribbon(aes(x = psd_gam, xmin = psd_gam - 2 * psd_seg, xmax = psd_gam + 2 * psd_seg), alpha = 0.1, outline_type = "lower") +
-  geom_point(alpha = .6, size = 2, stroke = 1) +
-  scale_y_reverse() + scale_shape_manual(values = c(21:25)) +
-  scale_fill_gradientn(breaks = c(0, 6, 12, 18, 24), colors = c("black", "blue", "white", "orange", "black")) +
-  scale_x_log10() + theme(legend.position = "none")
+# PlotFluxmany <- uds %>% 
+#   filter(project == "ETNP") %>%
+#   ggplot(aes(x = tot_flux_fit, y = depth, shape = factor(day(time)), fill = hour(time))) +
+#  
+#   #geom_path(aes(x = psd_gam)) + 
+#   #geom_ribbon(aes(x = psd_gam, xmin = psd_gam - 2 * psd_seg, xmax = psd_gam + 2 * psd_seg), alpha = 0.1, outline_type = "lower") +
+#   geom_point(alpha = .6, size = 2, stroke = 1) +
+#   scale_y_reverse() + scale_shape_manual(values = c(21:25)) +
+#   scale_fill_gradientn(breaks = c(0, 6, 12, 18, 24), colors = c("black", "blue", "white", "orange", "black")) +
+#   scale_x_log10() + theme(legend.position = "none")
 
 
 
@@ -171,10 +175,13 @@ PlotNParticlesEP <- uds %>%
  geom_point(alpha = 0.7, size = 2, stroke = 1) +
   #geom_path(aes(x = tot_nparticles)) +
   #geom_ribbon(aes(x = psd_gam, xmin = psd_gam - 2 * psd_seg, xmax = psd_gam + 2 * psd_seg), alpha = 0.1) +
-scale_y_reverse(limits = c(2500, 0)) + scale_x_log10() + scale_color_manual(values = c("gray20", "brown")) +
+scale_y_reverse(limits = c(1000, 0)) + scale_x_log10() + scale_color_manual(values = c("gray20", "brown")) +
   labs(x = "Particles/L", y = "Depth (m)") +
   theme(legend.position = "none") +
-  scale_shape_manual(values = c(1:5)) 
+  scale_shape_manual(values = c(1:5)) +
+  geom_hline(yintercept = 175, color = "darkgreen") +
+  geom_hline(yintercept = 200, color = "darkgreen") +
+  geom_hline(yintercept = 850, color = "darkblue") 
 
 PlotNParticlesEP
 ```
@@ -188,8 +195,11 @@ PlotPSDEP <- uds %>%
  geom_point(alpha = 0.7, size = 2, stroke = 1) +
   geom_path(aes(x = psd_gam)) +
   geom_ribbon(aes(x = psd_gam, xmin = psd_gam - 2 * psd_seg, xmax = psd_gam + 2 * psd_seg), alpha = 0.1) +
-scale_y_reverse(limits = c(2500, 0)) + scale_color_manual(values = c("gray20", "brown"))  +
-  scale_shape_manual(values = c(1:5)) + labs(y = "", x = "Particle Size Distribution Slope")
+scale_y_reverse(limits = c(1000, 0)) + scale_color_manual(values = c("gray20", "brown"))  +
+  scale_shape_manual(values = c(1:5)) + labs(y = "", x = "Particle Size Distribution Slope") +
+  geom_hline(yintercept = 175, color = "darkgreen") +
+  geom_hline(yintercept = 200, color = "darkgreen") +
+  geom_hline(yintercept = 850, color = "darkblue") 
 
 PlotPSDEP
 ```

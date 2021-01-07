@@ -1,10 +1,11 @@
 ---
-title: "Manuscript Outline"
-author: "Cram"
+title: "Particle size and abundance measurements suggest temporally variable biotic transport and disaggregation in the Eastern Tropical North Pacific Oxygen Minimum Zone"
+author: "Jacob A. Cram"
 output:
   pdf_document: default
   html_document: null
 bibliography: ../references.bib
+date: date: "`r format(Sys.time(), '%d %B, %Y')`"
 ---
 # Title:
 
@@ -27,16 +28,17 @@ Andrew McDonnel
 
 Models and observations suggest that that particle flux attenuation is lower across the mesopelagic zone of anoxic environments compared to oxic ones. This attenuation is likely a function of microbial metabolism, as well as agregation and disaggregation by zooplankton. Analysis of particle size spectra provide insight into the relative roles of aggregation, disaggregation and remineralization.
 
-We measured particle size profiles at a station in the core of the Eastern Tropical North Pacific Oxygen Minimum Zone (ETNP OMZ) using an underwater vision profiler (UVP) multiple times of day, at different times of day, over the course of a week. We normalized our UVP measurements by comparing them to particle flux measurements measured by sediment traps. We also explored how our measurements related to acoustic observations of migratory marine species. We also compared our observations to UVP measurements from a site at a similar latitudes but with non limiting oxygen concentrations.
+We measured particle size profiles at a station in the core of the Eastern Tropical North Pacific Oxygen Minimum Zone (ETNP OMZ) using an underwater vision profiler (UVP) multiple times of day, at different times of day, over the course of a week. We normalized our UVP measurements by comparing them to particle flux measurements measured by sediment traps. We also explored how our measurements related to acoustic observations of migratory marine species. We compared our observations to UVP measurements from a site at the same latitude but different longitude, where oxygen concentrations were non-limiting.
 
+Particle numbers remain constant through 500m and then decrease through 1000m. Particle size distribution slopes steepen untill 500m, suggesting a higher proportion of small particles, flatten below 500m, and then steepen again below the OMZ.
 
-Particle numbers and size distributions showed a non monotocinc trend, with sharp decreases in particle numbers the photic zone and the lower 500m of the OMZ, but increases in the top 350 m of the OMZ and below the OMZ. These increases in particle number generally concurred with increases in the particle size distribution slope suggesting that the increase in particle numbers were due to a production of small particles.
+Particle flux at our site was characterized by rapid attenuation in the top layer of the OMZ followed by either low attenuation or a small increase in abundance, depending on the day of the study and hour of the day in the core of the OMZ, a region to which plankton of a range of sizes migrated during the day.
 
-Particle flux at our site was characterized by rapid attenuation in the top layer of the OMZ followed by either low attenuation or a small increase in abundance, depending on the day of the study, around 500m. This region coresponded with the presence of migratory plankton that spent the day in this region.
+These patterns suggest slower attenuation of particles of all sizes, rather than decreased dissaggregation of particles, or slower attenuation of just large particles is responsible for the lower flux attenuation in this region.
 
-A model of particle remineralization and shrinking was used to diagnose whether particle size patterns violated the assumption that particles only sink and remineralize, and are neither aggregated, disaggregated, or tranported by zooplnkton. Our model identified aggregation like processes between 250 and 500m of in the water column that occurred at all time-points.
+A model of particle remineralization and shrinking was used to diagnose whether particle size patterns violated the assumption that particles only sink and remineralize, and are neither aggregated, disaggregated, or tranported by zooplnkton. Our model identified dissaggregation like processes between 250 and 500m of in the water column that occurred at all time-points.
 
-Our data suggest a role of zooplantkon in transporting biomass in the form of fecal pellets, into the core of the OMZ, but also in disaggregating particles in this same region. We further observe that there is temporal varibility in flux transport, but that this variability is small, only accounting for ~X % of the variability in flux, and not accounting for variability in particle numbers or size distribution over the one week time period studied.
+Our data suggest a role of zooplantkon in transporting biomass in the form of fecal pellets, into the core of the OMZ, but also in disaggregating particles in this same region. We further observe that there is temporal varibility in flux transport.
 
 # Introduction
 
@@ -119,21 +121,19 @@ Our data suggest a role of zooplantkon in transporting biomass in the form of fe
 Unless specified otherwise, measurments were taken on board the R/V Sekuliaq from 07 January 2017 thorugh 13 January 2017 at 16.5°N	106.9°W, located in an oligotrophic region of the Eastern Tropicla North Pacific Oxygen Minimum Zone (Figure 1A). Data are compared against measurments taken at 16.5°N 152.0°W on 08 May. A same latitude region west of the OMZ, where oxygen is not limiting (Figure S1).
 
 ## Water property measurment
-We measured water properties of temperature, salinity, fluorescence, oxygen concentration and turbidity using the shipboard XXX CTD {get sensor information}. Data were processed using seabird software and analyzed and visualized in R.
+We measured water properties of temperature, salinity, fluorescence, oxygen concentration and turbidity using the shipboard XXX CTD {get sensor information}. Data were processed using seabird software and analyzed and visualized in *R*.
 
 ## Particle size measurments
 Particle size data were collected by Underwater Vision Profiler 5 (UVP) that was mounted below the CTD-rosette and deployed for all CTD casts shallower than 2500 m. A UVP is a combenation camera and light source that describes the abundance and size of particles from 100 microns to several centemeters in size [@picheralUnderwaterVisionProfiler2010]. Particles have been previously shown to be primarely "marine snow" but may also include a small number of zooplankton and visual artifacts. UVP data were processed using custom matlab scripts, uploaded to EcoTaxa, and analyzed in R.
 
 ## Flux measurments
-Particles were collected in incubating particle traps ({Someone in Ricks' lab -- what is a good reference for these?}). Traps were used to performincubation studies which will be reported elsewhere. As part of these studies, the traps also generated data about carbon flux, which is reportd here. Two types of traps were deployed.  The particles were collected in two kinds of traps. One set of traps, generally deployed in shallower water had a solid cone opening with a cone opening with area 0.46 m^2. The second set had larger conical net with opening of 1.23 m ^2 area made of 200 micron nylon mesh . In all cases particles collected in the net or cone fell into one of two chambers. The "plus-particles" chamber collected particles from the net and incubated them for an amount of time that ranged from X days to X days. The top-collector trap collected particles, and then returned immediately to the surface. We prferentially used data from the "top-collector"; however in many cases, data was only available forom the "plus-particles" trap, in which case we used that data.
+Particles were collected in incubating particle traps ({Someone in Ricks' lab -- what is a good reference for these?}). Traps were used to perform incubation studies which will be reported elsewhere. As part of these studies, the traps also generated data about carbon flux, which is reportd here. Two types of traps were deployed.  The particles were collected in two kinds of traps. One set of traps, generally deployed in shallower water had a solid cone opening with a cone opening with area 0.46 m^2. The second set had larger conical net with opening of 1.23 m ^2 area made of 200 micron nylon mesh . In all cases particles collected in the net or cone fell into one of two chambers. The "plus-particles" chamber collected particles from the net and incubated them for an amount of time that ranged from X days to X days. The top-collector trap collected particles, and then returned immediately to the surface. We prferentially used data from the "top-collector"; however in many cases, data was only available forom the "plus-particles" trap, in which case we used that data.
 
 ## Analysis
 All analyses were constrained to the mesopelegic, defined here as the region between the base of the photic zone and 1000m. 
 For many analyses particles were binned by depth with 20 m resolution between the surface and 100m, 25 m resolution between 100m and 200 m depths and 50m resolution between 200m and  1000m. To perform this binning, particle numbers, and volumes of water sampled of each observation in the depth region were summed prior to other analyses.
 
-Two normalized values of particle numbers were calulated. In the first, particle numbers were devided to volume sampled, to generate values in particles/m^3. IN 
-
-
+Two normalized values of particle numbers were calulated. In the first, particle numbers were devided to volume sampled, to generate values in particles/m^3. In the second, particles were devided by both volume sampled and the width of the size bin by which particles were classed to generate values in particles/m^3/mm.
 
 ### Particle size distribution
 
@@ -150,7 +150,7 @@ And where flux at a given depth is the sum of all bin specific values.
 $$Flux = \sum_j{flux_j}$$ 
 (Eqn 2.)
 
-We used r's built in optimization function to find the values of $C_f$ and $a$ that yielded closest fits of the UVP estemated flux to each particle trap.
+We used the optimize() function *R*'s "stats" package to find the values of $C_f$ and $a$ that yielded closest fits of the UVP estemated flux to each particle trap.
 
 Assuming a spherical particle drag profile, it is possible to also derrive the exponent of the particle size to biomass exponent $\alpha$  and size to sinking speed exponent $\gamma$ as described in the equations $Biomass_j \sim Size_j^\alpha$ and $Speed_j \sim Size_j^\gamma$ [@guidiRelationshipParticleSize2008], following the equations $a = /alpha + /gamma$ and $\gamma = \alpha -1$.
 
