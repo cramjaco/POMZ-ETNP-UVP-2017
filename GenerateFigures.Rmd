@@ -703,9 +703,9 @@ WBColorMap
 Average of everything
 
 ```{r}
-meanBese043 <- ToPlot %>% filter(lb <= 2, time == "2017-01-13 11:51:31")
+#meanBese043 <- ToPlot %>% filter(lb <= 2, time == "2017-01-13 11:51:31")
 
-meanBese043%>%
+meanBese%>%
    ggplot(aes(x = lb, y = depth, fill = log10(nnparticles), z = log10(nnparticles))) + geom_tile() + scale_fill_viridis_c() + scale_y_reverse() + scale_x_log10() + geom_contour(color = "black") + geom_hline(yintercept = 160, color = "darkgreen")
 ```
 Just 043
@@ -720,11 +720,11 @@ mbGam <- meanBese %>% group_by(depth)  %>% nest() %>%
 mbGam %>% ggplot(aes(x = psd, y = depth)) + geom_path() + scale_y_reverse() + geom_hline(yintercept = 160, color = "darkgreen") + geom_hline(yintercept =  850, color = "darkblue")
 ```
 
-```{r}
+
 mbGam <- meanBese043 %>% group_by(depth)  %>% nest() %>%
   mutate(mod = map(data, ~gam(log(nnparticles) ~ log(lb), family = gaussian(), data = .))) %>% 
   mutate(psd = map_dbl(mod, ~summary(.)$p.coeff[2]))
-```
+
 
 ```{r}
 pWBPSD <- mbGam %>% ggplot(aes(x = psd, y = depth)) + geom_path() + scale_y_reverse()  + geom_hline(yintercept = 160, color = "darkgreen") + geom_hline(yintercept =  850, color = "darkblue")
@@ -871,6 +871,16 @@ plot_grid(
 
 ggsave("figures/P16FluxRelate.svg")
 ggsave("figures/P16FluxRelate.png")
+```
+
+# Flux attenuation example
+
+```{r}
+loc_DFP <- bds %>% filter(profile == "stn_043", depth %in% c(275)) %>% pull(DFP)
+loc_use_DFP <- bds %>% filter(profile == "stn_043", depth %in% c(275)) %>% pull(use_this_DFP)
+for_single_disag <- bes %>% filter(profile == "stn_043", depth %in% c(225, 275)) %>% select(depth, lb, nnp_smooth) %>% mutate(depth = recode(depth, `225` = "Shallow", `275` = "Deep")) %>%
+  pivot_wider(names_from = depth, values_from = nnp_smooth)
+remin_smooth_
 ```
 
 

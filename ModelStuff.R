@@ -65,7 +65,7 @@ remin_shuffle <- function(abun_in, DFpct, DeltaZ = 10, Cm = m1mm, Cw = w1mm, lbv
   return(list(Cr = Cr, phi = phi, dnet = Delta_nj_net, din =  Delta_nj_in, dout = Delta_nj_out))
 }
 
-remin_shuffle_spec <- function(abun_in, DFpct, llb = lb_vec, mv = m_vec, wv = w_vec, ...){
+remin_shuffle_spec <- function(abun_in, DFpct, lbv = lb_vec, mv = m_vec, wv = w_vec, llb = little_lb, ...){
   core <- remin_shuffle(abun_in, DFpct, llb = llb, mv = mv, wv = wv, ...)
   abun_in + core$dnet
 }
