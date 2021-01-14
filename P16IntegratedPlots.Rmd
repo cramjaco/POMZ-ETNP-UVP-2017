@@ -1,0 +1,76 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+Just integrated plots for P16
+
+```{r}
+besE_p16 <- bes %>% filter(project == "P16")
+SameGam_p16 <- gam(TotalParticles ~s(log(lb), log(depth), by = factor(time)), offset = log(vol * binsize), family = nb(),
+    data = bes %>% filter(project == "P16"))
+
+# lb_new <- exp(seq(from = log(0.1), to = log(2.1), by = 0.05))
+# ub_new <- lead(lb_new)
+# binsize_new <- ub_new - lb_new
+# 
+# lbbs <- tibble(lb = lb_new, ub = ub_new, binsize = binsize_new)
+
+Expanded_P16 <- expand_grid(lb = exp(seq(from = log(0.1), to = log(2), by = 0.05)), depth = seq(from = 20, to = 2000, by = 20), time = as.factor(unique(besE_p16$time))) %>% left_join(lbbs, by = "lb")
+
+Pred_P16 <- exp(predict(SameGam_p16, Expanded_P16))
+ToPlot_P16 <- bind_cols(Expanded_P16, nnparticles = Pred_P16) %>% mutate(time = as.character(time)) %>% mutate(nparticles = nnparticles * binsize)
+```
+
+```{r}
+meanBese_P16 <- ToPlot_P16 %>% filter(lb <= 2) %>% group_by(lb, depth) %>% summarize(nparticles = mean(nparticles), nnparticles = mean(nnparticles))
+
+WBColorMap_P16 <- meanBese_P16%>%
+   ggplot(aes(x = lb, y = depth, fill = log10(nnparticles), z = log10(nnparticles))) + geom_tile() + scale_fill_viridis_c(name = "log10(number density \n (normalized))") + scale_y_reverse() + scale_x_log10() + geom_contour(color = "black") + geom_hline(yintercept = 200, color = "darkgreen") 
+WBColorMap_P16
+```
+
+```{r}
+mbGam_P16 <- meanBese_P16 %>% group_by(depth)  %>% nest() %>%
+  mutate(mod = map(data, ~gam(log(nnparticles) ~ log(lb), family = gaussian(), data = .))) %>% 
+  mutate(psd = map_dbl(mod, ~summary(.)$p.coeff[2]))
+```
+
+```{r}
+WBPSD_P16 <- mbGam_P16 %>% ggplot(aes(x = psd, y = depth)) + geom_path() + scale_y_reverse() + geom_hline(yintercept = 200, color = "darkgreen") 
+WBPSD_P16
+```
+
+```{r}
+PubDf_P16 <- ToPlot_P16 %>% mutate(ubiomass = nparticles * lb ^ ag_global) %>% filter(lb < 0.5) %>% group_by(time, depth) %>% summarize(ubiomass = sum(ubiomass)) %>% ungroup %>% group_by(depth)  %>% summarise(ubiomass = mean(ubiomass))
+photicBiomass <- PubDf_P16 %>% filter(depth <= 165, depth >= 155) %>% summarize(ubiomass = mean(ubiomass)) %>% pull(ubiomass)
+PubDf_P16 <- PubDf_P16 %>% mutate(nbiomass = ubiomass/photicBiomass)
+pWBS_P16 <- PubDf_P16 %>% ggplot(aes(x = nbiomass, y = depth)) + geom_path() + scale_y_reverse() + scale_x_continuous(limits = c(0,1.2)) + geom_hline(yintercept = 200, color = "darkgreen") + geom_vline(xintercept = 1, color = "gray50") + geom_vline(xintercept = 0, color = "gray50")  + labs( x = "Small particle mass (norm.)")
+pWBS_P16
+```
+
+```{r}
+LubDf_P16 <- ToPlot %>% mutate(ubiomass = nparticles * lb ^ ag_global) %>% filter(lb >= 0.5) %>% group_by(time, depth) %>% summarize(ubiomass = sum(ubiomass)) %>% ungroup %>% group_by(depth)  %>% summarise(ubiomass = mean(ubiomass))
+photicBiomass_P16 <- LubDf_P16 %>% filter(depth <= 165, depth >=155) %>% summarize(ubiomass = mean(ubiomass)) %>% pull(ubiomass)
+LubDf_P16 <- LubDf_P16 %>% mutate(nbiomass = ubiomass/photicBiomass_P16)
+pWBL_P16 <- LubDf_P16 %>% ggplot(aes(x = nbiomass, y = depth)) + geom_path() + scale_y_reverse() + scale_x_continuous(limits = c(0,1)) + geom_hline(yintercept = 200, color = "darkgreen") + labs( x = "Large particle mass (norm.)") + geom_vline(xintercept = 1, color = "gray50") + geom_vline(xintercept = 0, color = "gray50") 
+pWBL_P16
+```
+
+```{r, fig.width = 10, fig.height=3}
+WBFigSX <- plot_grid(WBPSD_P16, pWBS_P16,pWBL_P16, nrow = 1, labels = c("B", "C", "D"))
+WBFigSX
+```
+
+```{r}
+WBcombined_P16 <- plot_grid(WBColorMap_P16 + theme(plot.margin = unit(c(0,3,0, 3), "cm")), WBFigSX, ncol = 1, labels = c("A", ""))
+WBcombined_P16
+```
+
+```{r}
+ggsave("figures/WBModelValidation_Oxic.png")
+```
+
+```{r}
+WBcombined
+```
+WBcombined

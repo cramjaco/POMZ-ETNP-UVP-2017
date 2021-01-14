@@ -605,6 +605,7 @@ scale_shape_manual(values = c(25, 22))+
   scale_size_manual(values = 1, name = "") +
   ylab("Depth (m)") + xlab("Flux µmolC/m^2/day") +
   guides(fill = guide_legend(override.aes = list(shape = 21))) +
+  scale_fill_viridis_d() +
   theme_cowplot() + 
   theme(
         legend.position = c(0.5, 0.4),
@@ -612,15 +613,15 @@ scale_shape_manual(values = c(25, 22))+
         legend.margin = margin(-10, 5, 10, 5)
   ) +
   geom_rect(data = data.frame(project = "ETNP"), aes(xmin = 15, xmax = 32, ymin = 45, ymax = 195), colour = "red", fill = NA, inherit.aes = FALSE)
-# ggsave("figures/FittedFlux.png")
-# ggsave("figures/FittedFlux.svg")
+ ggsave("figures/FittedFlux.png")
+ ggsave("figures/FittedFlux.svg")
 ```
 
 ```{r}
-UVPFluxComb %>%
+UVPFluxPlot00 <- UVPFluxComb %>%
   ggplot(aes(y = depth))  + scale_y_reverse(limits = c(1000, 0)) +
   scale_x_continuous(limits = c(0, 200)) +
-  geom_point(aes(y = Depth, x = C_flux_umol, fill = SampleType, shape = TrapType),
+  geom_point(aes(y = Depth, x = C_flux_umol, fill = SampleType, shape = TrapType, ID = TrapID),
              colour = "black", stroke = 1, size = 5, data = fluxMS_distilled_toPlot) +
   geom_line(aes(x = Flux), size = 1, color = "black") +
   geom_point(aes(x = -1, y = -1, size = "UVP Estimate")) + # dummy point for the legend
@@ -634,11 +635,24 @@ scale_shape_manual(values = c(25, 22))+
         legend.position = c(0.5, 0.4),
         legend.box.background = element_rect(color = "black", size = 0.5),
         legend.margin = margin(-10, 5, 10, 5)
-  ) +
+  ) 
+UVPFluxPlot <- UVPFluxPlot00 +
   geom_rect(data = data.frame(project = "ETNP"), aes(xmin = 15, xmax = 32, ymin = 45, ymax = 195), colour = "red", fill = NA, inherit.aes = FALSE)
+
+UVPFluxPlot
+
 ggsave("figures/FittedFlux.png")
 ggsave("figures/FittedFlux.svg")
 ```
+
+```{r}
+plotly::ggplotly(UVPFluxPlot00)
+```
+Low traps 
+2-14 tc
+1-12 tc
+1-12 pp
+2-17 tc
 
 ## Example particle size distribution
 
@@ -881,12 +895,30 @@ source("ModelStuff.R")
 
 
 ```{r}
-loc_DFP <- bds %>% filter(profile == "stn_035", depth %in% c(275)) %>% pull(DFP)
-loc_use_DFP <- bds %>% filter(profile == "stn_035", depth %in% c(275)) %>% pull(use_this_DFP)
-for_single_disag <- bes %>% filter(profile == "stn_035", depth %in% c(225, 275)) %>% select(depth, lb, nnp_smooth) %>% mutate(depth = recode(depth, `225` = "Shallow", `275` = "Deep")) %>%
-  pivot_wider(names_from = depth, values_from = nnp_smooth)
-remin_smooth_shuffle(for_single_disag$Shallow,loc_use_DFP)
-remin_shuffle(for_single_disag$Shallow,loc_use_DFP)
+scan_for_example <- bds %>% filter(project == "ETNP", depth < 500, depth > 200) %>% select(profile, depth, DFP, use_this_DFP, ospsDZ)
+
+loc_station = "stn_036"
+loc_depth = 225
+loc_prev_depth = loc_depth - 50
+
+loc_DFP <- bds %>% filter(profile == loc_station, depth %in% c(275)) %>% pull(DFP)
+loc_use_DFP <- bds %>% filter(profile == loc_station, depth %in% c(275)) %>% pull(use_this_DFP)
+for_single_disag <- bes %>% filter(profile == loc_station, depth %in% c(225, 275)) %>% select(depth, lb, nnp_smooth) %>%
+  mutate(depth = recode(depth, `225` = "Shallow", `275` = "Deep")) %>%
+  pivot_wider(names_from = depth, values_from = nnp_smooth) 
+
+with_disag <- for_single_disag %>%
+  mutate(Predicted_Deep = remin_smooth_shuffle(Shallow, loc_use_DFP)) 
+#remin_smooth_shuffle(for_single_disag$Shallow,loc_use_DFP)
+
+for_plot_disag <- with_disag %>% pivot_longer(cols = -lb) %>% filter(lb <= 0.5) %>%
+  mutate(name = factor(name, levels = c("Shallow", "Deep", "Predicted_Deep"))) %>%
+  mutate(name = recode_factor(name, Shallow = "Shallow (250m)", Deep = "Deep (275m)", Predicted_Deep = "Predicted Deep (275m)"))
+
+for_plot_disag %>% ggplot(aes(x = lb, y = value, shape = name)) + geom_point() + scale_x_log10() + scale_y_log10() + scale_shape_manual(values = c(1, 6, 3)) + theme(legend.title = element_blank()) + labs(x = "Particle Size (mm)", y = "Normalized Particle Abundance (#/L/mm)")
+
+ggsave("figures/DisagExample.png")
+ggsave("figures/DisagExample.svg")
 ```
 
 
@@ -929,7 +961,7 @@ plot18k <- dataBinned_01 %>% filter(frequency == 18000) %>% ggplot(aes(x = timeM
   geom_segment(data = plotLetters, inherit.aes = FALSE, aes(x = timeMex - 9 * 60^2, xend = timeMex, y = depth_bin, yend = depth_bin), arrow = arrow(length = unit(0.03, "npc")))
 plot18k
 
-ggsave("figures/stationP2_EK60_18kOnly.png")
+#ggsave("figures/stationP2_EK60_18kOnly.png")
 ```
 
 ```{r}
@@ -945,5 +977,5 @@ dataBinned_01 %>% ggplot(aes(x = timeMex, y = depth_bin, fill = value)) + geom_t
   facet_wrap(~frequency, ncol = 1)
 
 #ggsave("figures/stationP2_EK60_go7.svg", width = 8, height = 20)
-ggsave("figures/stationP2_EK60_go7.png", width = 8, height = 20)
+#ggsave("figures/stationP2_EK60_go7.png", width = 8, height = 20)
 ```
