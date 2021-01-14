@@ -217,6 +217,7 @@ In contrast to the anoxic station, at the oxic station, flux always decreased wi
 
 ## Smoothed and averaged data
 Highly smoothed particle data suggested that particle size, averaged across all casts, followed a pattern in which the abundance of small particles increased in the OMZ surface (Figure 5A), which corresponded with characterized by steepening of the particle size distribution (Figure 5A), an increase in small particle biomass (Figure 5B), but not of large particle biomass (Figure 5C). Deeper in the OMZ the small particle number, PSD slope, and biomass of small particles declined.
+At the oxic site, particle size distributions generally steepended with depth, while both small and large particle estemated biomass followed a power law decrease with depth.
 
 ## Particle number dynamics differ from model expectations
 
@@ -274,7 +275,7 @@ The exponent of the particle size to flux relationship  that we saw at our site 
 If we used in the four traps that measured very little flux in the surface in our fitting algorithm, we instead got values for this size relationship exponent that approached zero. Because we have found that traps appear to under-measure flux when they fail, rather than over measure it, we have gone with the higher measurements. {People in Rick's lab -- any other thoughts about these low measurments?}
 
 ## Remineralization rates of all particles decrease in the OMZ, but disaggregation does not
-Particle size profiles, particle size distribution slopes, and estimated biovolume, averaged across all casts and smoothed, are all similar to the predictions made by Weber and Bianchi's [-@weberEfficientParticleTransfer2020] "Model 1". (Figure 4). This suggests that the low oxygen at this site decreases the particle remineralization rate of all particles, including small ones. It does not support the Weber-Bianchi Model 2 in which remineralization is suppressed in the OMZ, nor their model 3 in which only the very large particles' remineralization is slowed.
+Particle size profiles, particle size distribution slopes, and estimated biovolume, averaged across all casts and smoothed, are all similar to the predictions made by Weber and Bianchi's [-@weberEfficientParticleTransfer2020] "Model 1". (Figure 4). This suggests that the low oxygen at this site decreases the particle remineralization rate of all particles, including small ones. It does not support the Weber-Bianchi Model 2 in which remineralization is suppressed in the OMZ, nor their model 3 in which only the very large particles' remineralization is slowed. The data at the oxic site, generally conformed to Weber and Bianchi's "Model 0" [-@weberEfficientParticleTransfer2020], which was their prediciton for particle distributions at oxic sites. However, one difference was that the particle size distribution, while essentially constant from the base of the photic zone through 1000m, appeared to steepen between 1000 and 2000m, suggesting an increase in the abundance of small particles. This could indicate increased disaggregation in this region or horizontal transport of small particles through advection in this region.
 
 ## Zooplankton likely transport organic mater into the OMZ core.
 Predicted flux levels sometimes increase between 275 and 625 meters, and at all time attenuate very slowly in this region. The EK60 data suggest diel migration of organisms of all sizes to this same region. Taken together, this increase in flux concurrent diel migration, suggest transport of organic mater by zooplankton. That the flux varies between days suggests some day to day variability in this transport. That it is highest in the day, on average, suggests that the diel migrators may be contributing to this flux, but the fact that this diel variability is small compared to overall variability suggests that other processes may modulate this rate, and that nocturnal migrators may also play a role in carbon transport.
@@ -291,11 +292,22 @@ Furthermore, since flux varies over time, that variability could contribute to o
 
 The opposite pattern to that seen at shallower depths occurs below 500m, with apparent flattening of the particle size distribution. This could suggest aggregation occurs here. Given the sparsity of particles however, aggregation seems improbable, since particles are unlikely to collide when they are sparse [@devriesMechanisticParticleFlux2014]. One possibility is that the abundant small particles produced in the top 500m are the things that are aggregating. It is also possible that particles do only remineralize and sink, but one of our parameters, such as the fractal dimension of particle sinking or particle biomass that we use does not reflect reality.
 
+## Revisiting Hypotheses {This may be too redundant with other stuff}
+
+Our data provide the first combined look at the relationship between particle size, particle flux and migratory organisms. Our data support only the first of the Weber-Bianchi hypotheses [@weberEfficientParticleTransfer2020], that particles of all sizes remineralize more slowly in OMZs. It did not support Weber and Bianchis hypotheses that disaggregation is lower in the OMZ, nor that the largist particles degraded particularly slowly in OMZs. This non-support of the final hypotheses, that large particles do not degrade particularly slowly, is suprising because, models suggest that remineralization in the largest particles is driven by sulfate reduction, which is not as efficient as other processes [@weberEfficientParticleTransfer2020].
+
+While we hypothesized temporal within and between day variability in particle size, number and flux, we only observed statistically significant temporal variability in flux, and this variability was relatively small, compared to the total amount of flux. Flux was, in general, highest in the day-time, suggesting transport by diel migrators, but this variabiliy was not very strong. This suggests, that particle sinking speed may be slow enough that the diel migratory patterns of zooplankton occur on a shorter time-scale than that at which particles sink out of different water column layers. Careful analysis of particle sinking speed estemates would help to zero in on these time scales, but is beyond the scope of the current manuscript. 
+
+Our data supported our hypothsis particle size patterns cannot be explained by remineralization and sinking alone. Indeed the abundance of small particles above 500m, suggested either the presence of disaggreagation, or another process.
+
+
+
 ## Caveats
-[STUB]
+[STUB] None. Our results are infallable.
 
 # Conclusions
-Our data provide the first combined look at the relationship between particle size, particle flux and migratory organisms. We suggest that while particles appear to remineralize more slowly at this site, and that this is true of all sizes of particles not just large ones. Furthermore, it appears that diel migratory organisms both disaggregate particles and transport carbon throughout the top 500m of the water column. Day to day and within day variability in organic mater transport was evient, though overall patterns in particle size, flux and disaggregation appeared to be consistant over the course of the time-series.
+
+We suggest that while particles appear to remineralize more slowly at this site, and that this is true of all sizes of particles not just large ones. Furthermore, it appears that diel migratory organisms both disaggregate particles and transport carbon throughout the top 500m of the water column. Day to day and within day variability in organic mater transport was evient, though overall patterns in particle size, flux and disaggregation appeared to be consistant over the course of the time-series.
 
 
 ##
@@ -367,17 +379,20 @@ Figure S8. Depth binned particle number (volume normalized), particle size slope
 ![](../figures/P16FluxRelate.png)
 Figure S9. Flux profiles and flux attenuation at P2 Station 100. **(A)** Flux profile **(B)** Fifth-root transformed depth normalized rate of flux decrease. **(C)** Difference between observed and modeled results. Higher values suggest more disaggregation-like processes.
 
+![](../figures/WBModelValidation_Oxic.png)
+Figure S10. The same profiles as shown in Figure 5, but for the oxic site P16 Station 100. **(A)** GAM smoothed bin-size and volume particle numbers at each particle size class. **(B)** Particle size distributions. And estimated biomass of **(C)** Small and **(D)** Large particles. 
+
 
 ![](../figures/DisagExample.png)
 
-Figure S10. An example of differences between modeled and observed particle slope. Shown are profiles of particles between 100 $\mu m$ and 500 $\mu m$ than 1 mm. The particle size distribution at a shallow and deeper depth are shown. The model generates a prediction of the deep depth profile form the shallow depth profile and the flux attenuation between the two profiles. The model predicts more attenuation of the smallest particles than it actually observed. 
+Figure S11. An example of differences between modeled and observed particle slope. Shown are profiles of particles between 100 $\mu m$ and 500 $\mu m$ than 1 mm. The particle size distribution at a shallow and deeper depth are shown. The model generates a prediction of the deep depth profile form the shallow depth profile and the flux attenuation between the two profiles. The model predicts more attenuation of the smallest particles than it actually observed. 
 
 
 
 
 ![](../figures/OSMSGamPlot.png)
 
-Figure S11. GAM predicted effects of **A** Depth, **B** Day of the month in January 2017 Y axis indicates the value of the component smooth functions effect on the difference between observed and modeled flux. Thus higher values correspond with greater flux of small particles than predicted by the model.
+Figure S12. GAM predicted effects of **A** Depth, **B** Day of the month in January 2017 Y axis indicates the value of the component smooth functions effect on the difference between observed and modeled flux. Thus higher values correspond with greater flux of small particles than predicted by the model.
 
 
 # References
