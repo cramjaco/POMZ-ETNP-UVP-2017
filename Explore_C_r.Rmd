@@ -1,0 +1,88 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+First I want a highly interpolated smoothed data set.
+Same size bins as usual, but depths by meter, or 1/10 meter. I want the change in flux to be like < 1%.
+
+Then I get adjusted DF for every depth.
+Then I run remin_shuffle on each depth and extract Cr.
+
+
+Start with bes. I am assuming I have the usual data. I also have SameGam from GenerateFigures.Rmd, which I think is ready to go.
+```{r}
+fine_depths <- seq(from = 1, to = 1500, by = 5)
+
+lbbs_FD <- tibble(lb = lb_vec, binsize = binsize_vec)
+Expanded_FD <- expand_grid(time = as.factor(unique(besE$time)), lb = lb_vec, depth = BianchiBins[2:length(BianchiBins)]) %>%
+  left_join(lbbs_FD, by = "lb")
+
+pt0 <- proc.time()
+Pred_FD <- exp(predict(SameGam, Expanded_FD))
+pt1 <- proc.time()
+pt1 - pt0
+Thing_FD <- bind_cols(Expanded_FD, nnparticles = Pred_FD) %>% mutate(time = as.character(time)) %>% mutate(nparticles = nnparticles * binsize)
+```
+Too slow
+Hey. Here's an idea. Instead of slicing everything super thin, I could just calculate at the BES locations and like 1m below those locations.
+And then I look at jumps between each depth and the depth below
+
+```{r}
+space <- 0.01
+Expanded_FD_Above <- Expanded_FD %>%
+  mutate(depth = depth - space)
+Pred_FD_Above <- exp(predict(SameGam, Expanded_FD_Above))
+Thing_FD_Above <- bind_cols(Expanded_FD_Above, nnparticles = Pred_FD_Above) %>% mutate(time = as.character(time)) %>% mutate(nparticles = nnparticles * binsize)
+```
+
+```{r}
+Thing_FD_2 <- bind_cols(Thing_FD, depth_above = Thing_FD_Above$depth, nnparticles_above = Thing_FD_Above$nnparticles, nparticles_above = Thing_FD_Above$nparticles) %>%
+  mutate(flux = nparticles * C_f_global * lb ^ ag_global,
+         flux_above = nparticles_above * C_f_global * lb ^ ag_global)
+```
+
+```{r}
+Thing_FD_Nested <- Thing_FD_2 %>% group_by(time, depth) %>% 
+  nest() %>%
+  mutate(spec_only = map(data, ~pull(., nparticles)),
+         spec_prev = map(data, ~pull(., nparticles_above))
+  )
+```
+
+
+           DF = smooth_flux_fit - flux_prev,
+           #DFP = 1 - DF/flux_prev,  # I was using this for a while.
+           DFP = smooth_flux_fit/flux_prev,
+           depth_prev = lag(depth),
+           DZ = depth - depth_prev,
+
+```{r}
+Thing_FD_FSum <- Thing_FD_2 %>% group_by(time, depth, depth_above) %>% 
+  summarize(Flux = sum(flux), Flux_Above = sum(flux_above)) %>%
+  mutate(DF = Flux - Flux_Above,
+         DFP = Flux/Flux_Above,
+         DZ = depth - depth_above)
+
+Thing_FD_FSum
+```
+
+```{r}
+Thing_FD_3 <- left_join(Thing_FD_FSum, Thing_FD_Nested, by = c("time", "depth"))
+Thing_FD_3
+```
+
+```{r}
+Thing_FD_4 <- Thing_FD_3 %>%
+  mutate(use_DFP = map2_dbl(spec_prev, DFP, optFun, llb = little_lb))
+Thing_FD_4
+```
+
+```{r}
+Thing_FD_4 %>% ungroup() %>% summarize(DFPMin = min(DFP), UseDFPMin = min(use_DFP))
+```
+
+```{r}
+
+```
+
