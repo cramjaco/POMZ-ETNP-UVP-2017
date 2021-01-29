@@ -82,6 +82,7 @@ Thing_FD_4
 Thing_FD_4 %>% ungroup() %>% summarize(DFPMin = min(DFP), UseDFPMin = min(use_DFP))
 ```
 
+I've been misspecifying alpha and gamma in the remin model.
 ```{r}
 
 ```

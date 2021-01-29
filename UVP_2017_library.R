@@ -761,7 +761,7 @@ diagnose_disaggregation_one_profile <- function(x, DepthSummary = NULL){
   
   minDepth = min(preparedData$depth)
   
-  saveFirstDepth = preparedData %>% filter(depth == minDepth) %>% select(depth, spec_meta) %>% unnest(spec_meta)
+  saveFirstDepth = preparedData %>% filter(depth == minDepth) %>% select(depth, spec_meta) %>% unnest(spec_meta) 
   
   modelRun <- preparedData %>%
     .[-1,] %>%
@@ -770,7 +770,7 @@ diagnose_disaggregation_one_profile <- function(x, DepthSummary = NULL){
     mutate(spec_pred = map2(spec_prev, use_this_DFP, remin_smooth_shuffle, lbv = lb_vec, mv = m_vec, wv = w_vec, llb = llb_01))
   
   #modelRunFixLine1 <- bind_rows(preparedData[1,], modelRun)
-  
+
   modelConcise <- modelRun %>%
     mutate(spec_meta = map2(spec_meta, spec_prev, ~tibble(.x, np_prev = .y))) %>%
     mutate(spec_meta = map2(spec_meta, spec_pred, ~tibble(.x, np_pred = .y))) %>%

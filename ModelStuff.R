@@ -33,9 +33,9 @@ f_vec = C_f_global * lb_vec ^ alpha;
 
 
 ## Disagg functions
-
+# alpha was 0.52 and gamma was 0.26
 remin_shuffle <- function(abun_in, DFpct, DeltaZ = 10, Cm = m1mm, Cw = w1mm, lbv = lb_vec, mv = m_vec, wv = w_vec,
-                          alpha = 0.52, gamma = 0.26, llb = little_lb){
+                          alpha = alpha_global, gamma = gamma_global, llb = little_lb){
  rn = abun_in * lbv
  ran = abun_in * lbv ^ alpha
  srn = sum(rn)
@@ -99,12 +99,12 @@ remin_smooth_shuffle <- function(abun_in, DFpct, Ipct = 0.9999, lbv = lb_vec, mv
     Fpct = 1 - (iterFlux - DFpct)
     
     for (i in 1:iters){
-      abun_est = remin_shuffle_spec(abun_in = abun_est, DFpct = IMirror, llb = llb, mv = mv, wv = wv, ...)
+      abun_est = remin_shuffle_spec(abun_in = abun_est, DFpct = IMirror, lbv = lbv, llb = llb, mv = mv, wv = wv, ...)
     }
   }
   
   # Deal with remainder. In the case where the loss is less than ipct, or greater than 2-ipct (Imirror), just do this part
-  abun_est = remin_shuffle_spec(abun_in = abun_est, DFpct = Fpct, llb = llb, mv = mv, wv = wv, ...)
+  abun_est = remin_shuffle_spec(abun_in = abun_est, DFpct = Fpct, lbv = lbv, llb = llb, mv = mv, wv = wv, ...)
   
   abun_est
 }
