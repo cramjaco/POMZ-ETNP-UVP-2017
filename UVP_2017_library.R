@@ -766,8 +766,8 @@ diagnose_disaggregation_one_profile <- function(x, DepthSummary = NULL){
   modelRun <- preparedData %>%
     .[-1,] %>%
     # fix flux leak here
-    mutate(use_this_DFP = map2_dbl(spec_prev, DFP, optFun, lbv = lb_vec, mv = m_vec, wv = w_vec, llb = llb_01)) %>%
-    mutate(spec_pred = map2(spec_prev, use_this_DFP, remin_smooth_shuffle, lbv = lb_vec, mv = m_vec, wv = w_vec, llb = llb_01))
+    mutate(use_this_DFP = map2_dbl(spec_prev, DFP, optFun, lbv = lb_vec, mv = m_vec, wv = w_vec, llb = llb_01, alpha = alpha_global, gamma = gamma_global)) %>%
+    mutate(spec_pred = map2(spec_prev, use_this_DFP, remin_smooth_shuffle, lbv = lb_vec, mv = m_vec, wv = w_vec, llb = llb_01, alpha = alpha_global, gamma = gamma_global))
   
   #modelRunFixLine1 <- bind_rows(preparedData[1,], modelRun)
 
