@@ -84,6 +84,17 @@ Thing_FD_4 %>% ungroup() %>% summarize(DFPMin = min(DFP), UseDFPMin = min(use_DF
 
 I've been misspecifying alpha and gamma in the remin model.
 ```{r}
-
+#loc_rs <- function(abun_in, DFpct, DeltaZ){remin_shuffle()}
+Thing_FD_5 <- Thing_FD_4 %>%
+  mutate(Remin = pmap(list(spec_prev, use_DFP, DZ), remin_shuffle)) %>%
+  mutate(Cr = map_dbl(Remin, ~.$Cr))
+Thing_FD_5
 ```
 
+```{r}
+ggplot(Thing_FD_5, aes(y = depth, x = pracma::nthroot(Cr, 5), color = as.factor(time))) + geom_point() + scale_y_reverse(limits = c(1500, 0))
+```
+
+```{r}
+ggplot(Thing_FD_5, aes(y = depth, x = pracma::nthroot(DFP, 5), color = as.factor(time))) + geom_point() + scale_y_reverse(limits = c(1500, 0))
+```
