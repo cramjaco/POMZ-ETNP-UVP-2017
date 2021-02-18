@@ -1,0 +1,167 @@
+---
+title: "R Notebook"
+output: html_notebook
+
+I just run generate figures first here
+---
+A+B
+
+```{r}
+big_theme <- function(...){
+  theme(axis.text = element_text(size = 24),
+        axis.title = element_text(size = 18),
+        legend.position = "none",
+        ...)
+}
+```
+
+
+```{r}
+
+#theme_set(theme_bw)
+PlotPSDmany <- uds %>% 
+  filter(project == "ETNP") %>%
+  ggplot(aes(x = psd, y = depth, shape = factor(day(time)), fill = hour(time))) +
+ 
+  #geom_path(aes(x = psd_gam)) + 
+  #geom_ribbon(aes(x = psd_gam, xmin = psd_gam - 2 * psd_seg, xmax = psd_gam + 2 * psd_seg), alpha = 0.1, outline_type = "lower") +
+  geom_point(alpha = .6, size = 2, stroke = 1) +
+  scale_y_reverse(limits = c(1200, 0)) + scale_shape_manual(values = c(21:25)) +
+  scale_fill_gradientn(breaks = c(0, 6, 12, 18, 24), colors = c("black", "blue", "white", "orange", "black")) +
+  labs(y = "Depth (m)", x = "Particle Size Distribution Slope") + 
+  geom_hline(yintercept = 175, color = "darkgreen") +
+  geom_hline(yintercept = 850, color = "darkblue") +
+  theme(axis.title.y = element_blank()) +
+  big_theme()
+
+#theme_set(theme_cowplot)
+
+PlotParticlesmany <- uds %>% 
+  filter(project == "ETNP") %>%
+  ggplot(aes(x = tot_nparticles, y = depth, shape = factor(day(time)), fill = hour(time))) +
+ 
+  #geom_path(aes(x = psd_gam)) + 
+  #geom_ribbon(aes(x = psd_gam, xmin = psd_gam - 2 * psd_seg, xmax = psd_gam + 2 * psd_seg), alpha = 0.1, outline_type = "lower") +
+  geom_point(alpha = .6, size = 2, stroke = 1) +
+  scale_y_reverse(limits = c(1200, 0)) + scale_shape_manual(values = c(21:25)) +
+  scale_fill_gradientn(breaks = c(0, 6, 12, 18, 24), colors = c("black", "blue", "white", "orange", "black")) +
+  #scale_x_log10(breaks = c(seq(2, 10, by = 2), seq(20, 100, by = 20))) +
+  scale_x_log10(breaks = c(5, 10, 25, 50, 100), limits = c(NA, 100)) +
+  #theme(legend.position = "none") +
+
+  labs(y = "Depth (m)", x = "Particles / L") + 
+  geom_hline(yintercept = 175, color = "darkgreen") +
+  geom_hline(yintercept = 850, color = "darkblue") +
+  labs(fill = "Hour", shape = "Day") +
+  theme(axis.text = element_text(size = 24),
+        axis.title = element_text(size = 18),
+        legend.position = c(0.9, 0.47),
+        legend.background = element_rect(fill = "white"),
+        legend.spacing = unit(.1, "in"))
+  
+  # theme(axis.text = element_text(size = 24),
+  #       axis.title = element_text(size = 18),
+  #       legend.position = "none")
+PlotParticlesmany
+```
+
+```{r}
+PlotPSDmany
+PlotParticlesmany
+````
+
+C
+```{r fig.width=6, fig.height=4}
+scientific_10 <- function(x) {parse(text=gsub("e\\+*", " %*% 10^", scales::scientific_format()(x))) }
+scientific_10_b <- function(x) {parse(text=gsub("e\\+*", " %*% 10^", scales::scientific_format()(x))) }
+
+scientific_10_c <- function(x) {
+    xout <- gsub("1e", "10^{", format(x),fixed=TRUE)
+    xout <- gsub("{-0", "{-", xout,fixed=TRUE)
+    xout <- gsub("{+", "{", xout,fixed=TRUE)
+    xout <- gsub("{0", "{", xout,fixed=TRUE)
+    xout <- paste(xout,"}",sep="")
+    return(parse(text=xout))
+    
+}
+
+scale_x_log10nice <- function(name=NULL,omag=seq(-10,20),...) {
+    breaks10 <- 10^omag
+    scale_x_log10(breaks=breaks10,labels=scientific_10_c(breaks10),...)
+}
+
+
+#https://stackoverflow.com/questions/10762287/how-can-i-format-axis-labels-with-exponents-with-ggplot2-and-scales
+#jacob_magnitude <- function(x){expression(10^round(log10(x)))}
+
+cb10 <- c('#a6cee3','#1f78b4','#b2df8a','#33a02c','#fb9a99','#e31a1c','#fdbf6f','#ff7f00','#cab2d6','#6a3d9a')
+pltFlx <- bds %>% filter(project == "ETNP") %>% #filter(DFP > 1) %>% #filter(profile %in% c("stn_043", "p16n_100")) %>%
+  ggplot(aes(y = depth, x = Flux_Smooth, shape = factor(day(time)), fill = hour(time), group = factor(time)))  + geom_point(size = 2, stroke = 1)+
+  #geom_path() +
+  scale_y_reverse(limits = c(1000, 0))+
+  #scale_x_log10nice(limits = c(NA, 10^3))+
+  scale_x_log10(limits = c(NA, 500))+
+  #scale_x_log10() + 
+   scale_color_gradient2(low = "darkgreen", mid = "gray80", high = "purple", midpoint = 10) + scale_shape_manual(name = "Day of Month", values = rep(21:25, 2)) + 
+  scale_fill_gradientn(name = "Hour of Day", breaks = c(0, 6, 12, 18, 24), colors = c("black", "blue", "white", "orange", "black")) +
+  
+  labs(x = bquote("Smoothed Flux "(µmol~C/m^2/d)), y = "Depth (m)") +
+  #labs(x = expression(paste("Smoothed Flux\n", µmol, C/m^2/d)), y = "Depth (m)") +
+  #labs(x = "moo", y = "Depth (m)") +
+  #geom_rect(data = data.frame(project = "ETNP"), aes(xmin = 20, xmax = 180, ymin = 75, ymax = 500), colour = "red", fill = NA, inherit.aes = FALSE) +
+   geom_segment(aes(y = 160, yend = 160, x = 20, xend = 500), color = "darkgreen", stroke = 0.5)+
+   geom_segment(aes(y = 850, yend = 850, x = 20, xend = 500), color = "darkblue", stroke = 0.5) + #+ geom_hline(yintercept = 850, color = "darkblue")
+theme(axis.text.x = element_text(angle = 90, vjust = .3), legend.spacing = unit(.1, "cm"),
+      axis.text = element_text(size = 24),
+      axis.title = element_text(size = 18)) 
+
+
+pltFlxNoLegend <- pltFlx + theme(legend.position = "none")
+pltFlxLegend <- get_legend(pltFlx)
+
+pltFlxNoLegend
+#plotly::ggplotly(plt1)
+```
+
+D
+```{r}
+disagFig <- bds %>% filter(project == "ETNP") %>%
+  ggplot(aes(y = depth, x = pracma::nthroot(ospsDZ, 3), shape = factor(day(time)), fill = hour(time), group = factor(time))) + geom_point(size = 2) + scale_y_reverse(limits = c(1000, 0)) +
+  scale_x_continuous(limits = c(-1, 1)) +
+  geom_vline(xintercept = 0) +   scale_shape_manual(name = "Day of Month", values = rep(21:25, 2)) +
+  #labs(x = bquote("Observed - Modeled Small Particle Flux"~(μmol/m^3/day)), y = "Depth (m)") +
+  labs(x = paste("Observed - Modeled \n Small Particle Flux\n", expression((μmol/m^3/day))), y = "Depth (m)") +
+  scale_fill_gradientn(name = "Hour of Day", breaks = c(0, 6, 12, 18, 24), colors = c("black", "blue", "white", "orange", "black")) + geom_hline(yintercept = 175, color = "darkgreen") + geom_hline(yintercept = 850, color = "darkblue") +
+  big_theme() +
+  theme(axis.title.y = element_blank())
+disagFig
+#ggsave("..figures/FluxSizeShift.svg"
+```
+
+Combine
+
+
+
+```{r fig.height = 8, fig.width = 10}
+
+pgTop <- ggdraw(PlotParticlesmany 
+       ) +
+  draw_plot(pltFlxZoom, .4, .25, .55, .60) +
+  draw_plot_label(
+    c("","D"),
+    c(.05, 0.55),
+    c(1, 0.85),
+    size = 16
+  )
+
+pgCF <- plot_grid(PlotParticlesmany + ylim(c(1000, 0)),
+                  PlotPSDmany + ylim(c(1000, 0)) +theme(legend.position = "none"),
+                  pltFlxNoLegend + theme(plot.margin = unit(c(0, 0, .4, .2), units = "cm")),
+                    disagFig + theme(plot.margin = unit(c(0, 0, .2, 0), units = "cm")),
+                    ncol = 2, rel_heights = c(4, 4), labels = c("A", "B", "C", "D"), label_size = 16)
+pgCF
+
+ggsave("./figures/UVP_for_zoop_proposal.png", pgCF, width = 10, height = 8, units = "in")
+```
+
+1

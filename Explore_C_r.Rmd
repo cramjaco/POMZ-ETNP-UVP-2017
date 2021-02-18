@@ -13,16 +13,17 @@ Then I run remin_shuffle on each depth and extract Cr.
 Start with bes. I am assuming I have the usual data. I also have SameGam from GenerateFigures.Rmd, which I think is ready to go.
 ```{r}
 fine_depths <- seq(from = 1, to = 1500, by = 5)
+bds_depths <- unique(bds$depth)
 
 lbbs_FD <- tibble(lb = lb_vec, binsize = binsize_vec)
-Expanded_FD <- expand_grid(time = as.factor(unique(besE$time)), lb = lb_vec, depth = BianchiBins[2:length(BianchiBins)]) %>%
+Expanded_FD <- expand_grid(time = (unique(besE$time)), lb = lb_vec, depth = bds_depths) %>% # undid as.factor of time
   left_join(lbbs_FD, by = "lb")
 
 pt0 <- proc.time()
 Pred_FD <- exp(predict(SameGam, Expanded_FD))
 pt1 <- proc.time()
 pt1 - pt0
-Thing_FD <- bind_cols(Expanded_FD, nnparticles = Pred_FD) %>% mutate(time = as.character(time)) %>% mutate(nparticles = nnparticles * binsize)
+Thing_FD <- bind_cols(Expanded_FD, nnparticles = Pred_FD)  %>% mutate(nparticles = nnparticles * binsize) # %>% mutate(time = as.character(time))
 ```
 Too slow
 Hey. Here's an idea. Instead of slicing everything super thin, I could just calculate at the BES locations and like 1m below those locations.
@@ -33,7 +34,7 @@ space <- 0.01
 Expanded_FD_Above <- Expanded_FD %>%
   mutate(depth = depth - space)
 Pred_FD_Above <- exp(predict(SameGam, Expanded_FD_Above))
-Thing_FD_Above <- bind_cols(Expanded_FD_Above, nnparticles = Pred_FD_Above) %>% mutate(time = as.character(time)) %>% mutate(nparticles = nnparticles * binsize)
+Thing_FD_Above <- bind_cols(Expanded_FD_Above, nnparticles = Pred_FD_Above)  %>% mutate(nparticles = nnparticles * binsize) # %>% mutate(time = as.character(time))
 ```
 
 ```{r}
@@ -98,3 +99,19 @@ ggplot(Thing_FD_5, aes(y = depth, x = pracma::nthroot(Cr, 5), color = as.factor(
 ```{r}
 ggplot(Thing_FD_5, aes(y = depth, x = pracma::nthroot(DFP, 5), color = as.factor(time))) + geom_point() + scale_y_reverse(limits = c(1500, 0))
 ```
+
+```{r}
+Thing_FD_Slim <- Thing_FD_5 %>% ungroup() %>% select(time, depth, Cr) %>% mutate(time = as.POSIXct(time))
+bds_Slim <- bds %>% filter(project == "ETNP") %>% select(profile, time, depth)
+```
+
+
+```{r}
+bdsCr <- left_join(bds_Slim, Thing_FD_Slim , by = c("time", "depth"))
+```
+
+```{r}
+ggplot(bdsCr, aes(y = depth, x = pracma::nthroot(Cr, 3), color = as.factor(time))) + geom_point() + scale_y_reverse(limits = c(1500, 0)) + scale_x_continuous(limits = c(-0.2, 0.1)) +
+  geom_hline(aes(yintercept = PhoticBase), color = "darkgreen") + geom_hline(aes(yintercept = OMZBase), color = "darkblue")
+```
+

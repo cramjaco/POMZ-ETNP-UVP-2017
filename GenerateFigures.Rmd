@@ -72,6 +72,32 @@ summary(ProjGam)
 ```
 
 ```{r fig.width = 12}
+library(scales)
+#https://stackoverflow.com/questions/30179442/plotting-minor-breaks-on-a-log-scale-with-ggplot
+log_breaks = function(maj, radix=10) {
+  function(x) {
+    minx         = floor(min(logb(x,radix), na.rm=T)) - 1
+    maxx         = ceiling(max(logb(x,radix), na.rm=T)) + 1
+    n_major      = maxx - minx + 1
+    major_breaks = seq(minx, maxx, by=1)
+    if (maj) {
+      breaks = major_breaks
+    } else {
+      steps = logb(1:(radix-1),radix)
+      breaks = rep(steps, times=n_major) +
+               rep(major_breaks, each=radix-1)
+    }
+    radix^breaks
+  }
+}
+scale_x_log_eng = function(..., radix=10) {
+  scale_x_continuous(...,
+                     trans=log_trans(radix),
+                     breaks=log_breaks(TRUE, radix),
+                     minor_breaks=log_breaks(FALSE, radix))
+}
+
+#theme_set(theme_bw)
 PlotPSDmany <- uds %>% 
   filter(project == "ETNP") %>%
   ggplot(aes(x = psd, y = depth, shape = factor(day(time)), fill = hour(time))) +
@@ -81,9 +107,11 @@ PlotPSDmany <- uds %>%
   geom_point(alpha = .6, size = 2, stroke = 1) +
   scale_y_reverse(limits = c(1200, 0)) + scale_shape_manual(values = c(21:25)) +
   scale_fill_gradientn(breaks = c(0, 6, 12, 18, 24), colors = c("black", "blue", "white", "orange", "black")) +
-  labs(x = "Depth (m)", y = "Particle Size Distribution Slope") + 
+  labs(y = "Depth (m)", x = "Particle Size Distribution Slope") + 
   geom_hline(yintercept = 175, color = "darkgreen") +
   geom_hline(yintercept = 850, color = "darkblue") 
+
+#theme_set(theme_cowplot)
 
 PlotParticlesmany <- uds %>% 
   filter(project == "ETNP") %>%
@@ -94,8 +122,10 @@ PlotParticlesmany <- uds %>%
   geom_point(alpha = .6, size = 2, stroke = 1) +
   scale_y_reverse(limits = c(1200, 0)) + scale_shape_manual(values = c(21:25)) +
   scale_fill_gradientn(breaks = c(0, 6, 12, 18, 24), colors = c("black", "blue", "white", "orange", "black")) +
-  scale_x_log10() + theme(legend.position = "none") +
-  labs(x = "Depth (m)", y = "Particles / L") + 
+  scale_x_log10(breaks = c(10, 100, 1000), minor = c(5, 50, 500)) +
+  #theme(legend.position = "none") +
+  #scale_x_log_eng()+
+  labs(y = "Depth (m)", x = "Particles / L") + 
   geom_hline(yintercept = 175, color = "darkgreen") +
   geom_hline(yintercept = 850, color = "darkblue") 
 
@@ -331,6 +361,24 @@ Lets check the smooths. Or only go to 1000m.
 , legend.background = element_blank(), legend.box.background = element_rect()
 ```{r fig.width=6, fig.height=4}
 scientific_10 <- function(x) {parse(text=gsub("e\\+*", " %*% 10^", scales::scientific_format()(x))) }
+scientific_10_b <- function(x) {parse(text=gsub("e\\+*", " %*% 10^", scales::scientific_format()(x))) }
+
+scientific_10_c <- function(x) {
+    xout <- gsub("1e", "10^{", format(x),fixed=TRUE)
+    xout <- gsub("{-0", "{-", xout,fixed=TRUE)
+    xout <- gsub("{+", "{", xout,fixed=TRUE)
+    xout <- gsub("{0", "{", xout,fixed=TRUE)
+    xout <- paste(xout,"}",sep="")
+    return(parse(text=xout))
+    
+}
+
+scale_x_log10nice <- function(name=NULL,omag=seq(-10,20),...) {
+    breaks10 <- 10^omag
+    scale_x_log10(breaks=breaks10,labels=scientific_10_c(breaks10),...)
+}
+
+
 #https://stackoverflow.com/questions/10762287/how-can-i-format-axis-labels-with-exponents-with-ggplot2-and-scales
 #jacob_magnitude <- function(x){expression(10^round(log10(x)))}
 
@@ -339,13 +387,17 @@ pltFlx <- bds %>% filter(project == "ETNP") %>% #filter(DFP > 1) %>% #filter(pro
   ggplot(aes(y = depth, x = Flux_Smooth, shape = factor(day(time)), fill = hour(time), group = factor(time)))  + geom_point(size = 2, stroke = 1)+
   #geom_path() +
   scale_y_reverse(limits = c(1000, 0))+
-  scale_x_log10(label = scientific_10) +
+  scale_x_log10nice()+
+  #scale_x_log10() + 
    scale_color_gradient2(low = "darkgreen", mid = "gray80", high = "purple", midpoint = 10) + scale_shape_manual(name = "Day of Month", values = rep(21:25, 2)) + 
   scale_fill_gradientn(name = "Hour of Day", breaks = c(0, 6, 12, 18, 24), colors = c("black", "blue", "white", "orange", "black")) +
   
-labs(x = bquote(Smoothed~Flux~(µmol~C/m^2/d)), y = "Depth (m)") +
+  labs(x = bquote(Smoothed~Flux~(µmol~C/m^2/d)), y = "Depth (m)") +
+  #labs(x = "moo", y = "Depth (m)") +
   geom_rect(data = data.frame(project = "ETNP"), aes(xmin = 20, xmax = 180, ymin = 75, ymax = 500), colour = "red", fill = NA, inherit.aes = FALSE) +
-  theme(axis.text.x = element_text(angle = 90, vjust = .3), legend.spacing = unit(.1, "cm"))
+  theme(axis.text.x = element_text(angle = 90, vjust = .3), legend.spacing = unit(.1, "cm")) +
+   geom_segment(aes(y = 160, yend = 160, x = 20, xend = 500), color = "darkgreen", stroke = 0.5)+
+   geom_segment(aes(y = 850, yend = 850, x = 20, xend = 500), color = "darkblue", stroke = 0.5)#+ geom_hline(yintercept = 850, color = "darkblue")
 
 
 
@@ -367,7 +419,8 @@ pltFlxZoom <- bds %>% filter(project == "ETNP" & depth <= 500 & depth >= 75) %>%
    scale_color_gradient2(low = "darkgreen", mid = "gray80", high = "purple", midpoint = 10) + scale_shape_manual(values = rep(21:25, 2)) + 
   scale_fill_gradientn(breaks = c(0, 6, 12, 18, 24), colors = c("black", "blue", "white", "orange", "black")) +
   theme(axis.text.x = element_text(angle = 90)) +
-labs(x = "Smoothed Flux", y = "Depth") + theme(legend.position = "none")
+labs(x = "Smoothed Flux", y = "Depth") + theme(legend.position = "none")+
+geom_hline(yintercept = 160, color = "darkgreen")
 
 pltFlxZoom
 #plotly::ggplotly(plt1)
@@ -386,7 +439,8 @@ pltDelta3 <- bds %>% filter(project == "ETNP") %>% #filter(DFP > 1) %>% #filter(
    scale_color_gradient2(low = "darkgreen", mid = "gray80", high = "purple", midpoint = 10) + scale_shape_manual(name = "Day of Month", values = rep(21:25, 2)) + 
   scale_fill_gradientn(name = "Hour", breaks = c(0, 6, 12, 18, 24), colors = c("black", "blue", "white", "orange", "black")) +
   geom_vline(xintercept = 0) +
-  labs(x = bquote((DF/DZ)^{1/5}~(µmolC/m^3/d)^{1/5}), y = "Depth (m)") + theme(legend.pos = "none")
+  labs(x = bquote((DF/DZ)^{1/5}~(µmolC/m^3/d)^{1/5}), y = "Depth (m)") + theme(legend.pos = "none")+
+  geom_hline(yintercept = 160, color = "darkgreen") + geom_hline(yintercept = 850, color = "darkblue")
   #labs(x = "(DF/DZ) ^ 1/5 (µmol C/m^3/d) ^ 1/5")
 
 pltDelta3
@@ -513,16 +567,47 @@ ggplot(data = bds %>% filter(depth >= 175, depth <= 500), aes(y = DF/DZ, x = hou
 
 (u mol C / m^3 / day)
 ```{r fig.width = 6, fig.height = 4}
-bds %>% filter(project == "ETNP") %>%
+disagFig <- bds %>% filter(project == "ETNP") %>%
   ggplot(aes(y = depth, x = pracma::nthroot(ospsDZ, 3), shape = factor(day(time)), fill = hour(time), group = factor(time))) + geom_point(size = 2) + scale_y_reverse(limits = c(1000, 0)) +
   scale_x_continuous(limits = c(-1, 1)) +
-  geom_vline(xintercept = 0) +   scale_shape_manual(name = "Day of Month", values = rep(21:25, 2)) + labs(x = bquote("Observed - Modeled Small Particle Flux"~(μmol/m^3/day)), y = "Depth (m)") +
-  scale_fill_gradientn(name = "Hour of Day", breaks = c(0, 6, 12, 18, 24), colors = c("black", "blue", "white", "orange", "black")) + geom_hline(yintercept = 175, color = "darkgreen") + geom_hline(yintercept = 950, color = "darkblue")
-
+  geom_vline(xintercept = 0) +   scale_shape_manual(name = "Day of Month", values = rep(21:25, 2)) +
+  #labs(x = bquote("Observed - Modeled Small Particle Flux"~(μmol/m^3/day)), y = "Depth (m)") +
+  labs(x = paste("Observed - Modeled Small Particle Flux\n", expression((μmol/m^3/day)))) +
+  scale_fill_gradientn(name = "Hour of Day", breaks = c(0, 6, 12, 18, 24), colors = c("black", "blue", "white", "orange", "black")) + geom_hline(yintercept = 175, color = "darkgreen") + geom_hline(yintercept = 850, color = "darkblue")
+disagFig
 #ggsave("..figures/FluxSizeShift.svg"
 
  ggsave("figures/FluxSizeShift.png")
  ggsave("figures/FluxSizeShift.svg")
+```
+
+### Clara Fig
+For NSF Proposal
+plot_grid(
+  PlotParticlesmany,
+  PlotPSDmany,
+  rel_widths = c(2, 3)
+  )
+```{r fig.height = 8, fig.width = 10}
+
+pgTop <- ggdraw(pltFlxNoLegend 
+       ) +
+  draw_plot(pltFlxZoom, .4, .25, .55, .60) +
+  draw_plot_label(
+    c("","D"),
+    c(.05, 0.55),
+    c(1, 0.85),
+    size = 16
+  )
+
+pgCF <- plot_grid(PlotParticlesmany + ylim(c(1000, 0)),
+                  PlotPSDmany + ylim(c(1000, 0)) +theme(legend.position = "none"),
+                  pgTop + theme(plot.margin = unit(c(0, 0, 0, 0), units = "cm")),
+                    disagFig + theme(plot.margin = unit(c(0, 0, .2, 0), units = "cm")),
+                    ncol = 2, rel_heights = c(4, 4), labels = c("A", "B", "C", "E"), label_size = 16)
+pgCF
+
+ggsave("./figures/UVP_for_zoop_proposal.png", pgCF, width = 10, height = 8, units = "in")
 ```
 
 ```{r}
