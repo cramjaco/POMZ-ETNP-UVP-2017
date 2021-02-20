@@ -1,25 +1,29 @@
 ---
-title: "Particle size and abundance measurements suggest temporally variable biotic transport and disaggregation in the Eastern Tropical North Pacific Oxygen Minimum Zone"
+title: Particle size and abundance measurements suggest temporally variable biotic
+  transport and disaggregation in the Eastern Tropical North Pacific Oxygen Minimum
+  Zone
 author: "Jacob A. Cram"
+date: "07 January 2020"
 output:
+  word_document: default
   pdf_document:
     latex_engine: lualatex
   html_document: null
 bibliography: ../references.bib
-date: "07 January 2020"
 ---
 
 # Author list 
 (putative, order not set, please suggest others, will likely expand)
 Jacob Cram,
-Jessica Pretty,
-Megan Duffy,
-Rachael L,
 Clara Fuchsman,
+Megan Duffy,
+Jessica Pretty,
+Rachael L,
+Jaqui N,
+Shirley Leung,
 Klaus H,
 Thomas Weber,
-Shirley Leung,
-Jaqui N,
+Danielle Bianchi,
 Allan Duvol,
 Rick Keil,
 Andrew McDonnel
@@ -31,75 +35,27 @@ Models and observations suggest that that particle flux attenuation is lower acr
 
 # Introduction
 
-* A
-  + The biological pump, in which sinking particles transport carbon from the surface into the deep ocean, is a key part of the global carbon cycle (Turner 2015; Neuer 2014) [@neuerOceanBiologicalCarbon2014; @turnerZooplanktonFecalPellets2015].
-  + Flux into the deep ocean is a function of both export from the photic zone into the mesopelegic (export flux), and the fraction of that flux that crosses the mesopelegic (transfer efficiency) [@passowBiologicalPumpHigh2012; @siegelPredictionExportFate2016]. 
-  + Transfer efficiency, the flux between the base of the photic zone and the deep ocean (Francois 2002) [@francoisFactorsControllingFlux2002], is important in particular, because the depth to which carbon is transported may affect global atmospheric carbon levels (Kwon) [@kwonImpactRemineralizationDepth2009]
-  + Zooplankton can affect particle flux in the mesopelegic in several ways (Turner 2015; Steinberg and Landry 2017)[@steinbergZooplanktonOceanCarbon2017; @turnerZooplanktonFecalPellets2015; @jacksonModelDistributionParticle2001], and by extension the efficiency of the biological pump  [@cavanRoleZooplanktonDetermining2017; @archibaldModelingImpactZooplankton2019].
-    - (1) Zooplankton repackage particles into fecal pellets which have different properties from the original particles [@wilsonChangesFecalPellet2008].
-    - (2) Zooplankton consume particles in surface depths and release it at others, thereby actively transporting carbon, usually downward [@archibaldModelingImpactZooplankton2019; @bianchiIntensificationOpenoceanOxygen2013; @hannidesExportStoichiometryMigrantmediated2009; @steinbergZooplanktonVerticalMigration2000; @stukelNitrogenIsotopeFlows2018; @stukelRolesSuspensionFeedingFluxFeeding2019].
-    - (3) Zooplankton consume particles in the mesopelegic and respire some of their biomass  (Stukel et al. 2019).
-      + Though it was found that this rate of consumption was less than flux in the California Current [@stukelRolesSuspensionFeedingFluxFeeding2019].
-    - (4) Zooplankton  break large particles into smaller ones, likely by generating turbulance when they swim [@dillingFragmentationMarineSnow2000; @goldthwaitEffectsPhysicalFragmentation2005].
-      - Fragmentation of particles can lead to increased remineralization of particles because those smaller particle pieces sink more slowly and so have longer residence times, and so have longer to break down in the mesopelegic [@goldthwaitEffectsPhysicalFragmentation2005].
+The biological pump, in which sinking particles transport carbon from the surface into the deep ocean, is a key part of the global carbon cycle  [@neuerOceanBiologicalCarbon2014; @turnerZooplanktonFecalPellets2015]. Organic matter flux into the deep ocean is a function of both export from the photic zone into the mesopelegic (export flux), and the fraction of that flux that crosses the mesopelegic (transfer efficiency) [@passowBiologicalPumpHigh2012; @siegelPredictionExportFate2016]. The Transfer efficiency of the biological pump, the fraction of flux exported from the photic zone that reaches the base of the mesopelegic [@francoisFactorsControllingFlux2002], may affect global atmospheric carbon levels [@kwonImpactRemineralizationDepth2009]. Thus understanding the processes that shape organic matter degredation are important.
+  + Zooplankton play an important role in shaping carbon flux through the mesopelegic (Turner 2015; Steinberg and Landry 2017)[@steinbergZooplanktonOceanCarbon2017; @turnerZooplanktonFecalPellets2015; @jacksonModelDistributionParticle2001], and by extension the efficiency of the biological pump [@cavanRoleZooplanktonDetermining2017; @archibaldModelingImpactZooplankton2019]. They affect particle flux in four key ways: (1 - Repackaging) Zooplankton repackage particles into fecal pellets which have different properties from the original particles [@wilsonChangesFecalPellet2008]. (2- Respiration) Zooplankton consume particles in the mesopelegic and respire some of their biomass, though it was found that this rate of consumption was less than flux in the California Current [@stukelRolesSuspensionFeedingFluxFeeding2019]. (3 - Active Transport) Zooplankton consume particles in surface depths and release it at others, thereby actively transporting carbon, usually downward [@archibaldModelingImpactZooplankton2019; @bianchiIntensificationOpenoceanOxygen2013; @hannidesExportStoichiometryMigrantmediated2009; @steinbergZooplanktonVerticalMigration2000; @stukelNitrogenIsotopeFlows2018; @stukelRolesSuspensionFeedingFluxFeeding2019].  (4 - Disaggregation) Zooplankton  break large particles into smaller ones, likely by generating turbulance when they swim [@dillingFragmentationMarineSnow2000; @goldthwaitEffectsPhysicalFragmentation2005]. This fragmentation of particles can lead to increased remineralization of particles because those smaller particle pieces sink more slowly and so have longer residence times, and so have longer to break down in the mesopelegic [@goldthwaitEffectsPhysicalFragmentation2005].
       
-  + Oxygen levels, and in particular anoxic regions of the water column, appear to modulate particle flux through the mesopelegic
-    - Observations of particle flux in the Easternmost part of the Easten Tropical North Pacific [@vanmooyImpactSuboxiaSinking2002; @hartnettOrganicCarbonInput1998], and Arabian Sea [@keilMultiproxyApproachUnderstanding2016] have suggested lower flux attenuation in these OMZ systems.
-    - Models have shown that oxygen limitation in the OMZs is necessary to fit global patterns of particle transfer[@cramRoleParticleSize2018; @devriesExportFateOrganic2017].
-    - Oxygen minimum zones in the open ocean are expanding [@strammaExpandingOxygenMinimumZones2008], and this expansion is likely to effect ocean chemistry, the habitat of marine organisms, and the interactions between between organisms and chemistry [@gillyOceanographicBiologicalEffects2013]. Models and chemical data suggest that oxygen minimum zones may enhance carbon transport to the deep ocean, by inhibiting microbial degradation of sinking marine particles [@cramRoleParticleSize2018]. However, biological organic mater transport is modulated by zooplankton [@steinbergBacterialVsZooplankton2008; @steinbergZooplanktonOceanCarbon2017]  which feed on, produce and disaggregate particles, and whose interactions on particle flux in pelagic OMZs are only beginning to be explored [@kikoZooplanktonMediatedFluxesEastern2020].
+Oxygen levels, and in particular anoxic regions of the water column, appear to modulate particle flux through the mesopelegic.  Observations of particle flux in the Easternmost part of the Easten Tropical North Pacific [@vanmooyImpactSuboxiaSinking2002; @hartnettOrganicCarbonInput1998], and Arabian Sea [@keilMultiproxyApproachUnderstanding2016] have suggested lower flux attenuation in these OMZ systems. Models have shown that oxygen limitation in the OMZs is necessary to fit global patterns of particle transfer[@cramRoleParticleSize2018; @devriesExportFateOrganic2017]. Oxygen minimum zones in the open ocean are expanding [@strammaExpandingOxygenMinimumZones2008], and this expansion is likely to effect ocean chemistry, the habitat of marine organisms, and the interactions between between organisms and chemistry [@gillyOceanographicBiologicalEffects2013]. Models and chemical data suggest that oxygen minimum zones may enhance carbon transport to the deep ocean, by inhibiting microbial degradation of sinking marine particles [@cramRoleParticleSize2018]. However, biological organic mater transport is modulated by zooplankton [@steinbergBacterialVsZooplankton2008; @steinbergZooplanktonOceanCarbon2017]  which feed on, produce and disaggregate particles, and whose interactions on particle flux in pelagic OMZs are only beginning to be explored [@kikoZooplanktonMediatedFluxesEastern2020].
 
-   + Particle size resolved models of particle transfer through the mesopelegic oceans suggest that temperature, size and oxygen play a big role in modulating particle flux [@cramRoleParticleSize2018; @devriesExportFateOrganic2017].
-     - While regional differences in particle ballast plays a smaller role. [@cramRoleParticleSize2018].
-     -These models models assume that zooplankton play a small role, and therefore assume no transport through the mesopelegic, and no disaggregation.
-     -They therefore predict that small particles will attenuate with depth.
-     - However small particles have been shown to persist in deep waters (REF) and contribute substantialy to flux in the deep ocean (REF).
-     - Fortunately, these models particle size predictions generate a useful null hypothesis of expexted particle size distributions in the abscence of zooplankton effects.
+Particle size resolved models of particle transfer through the mesopelegic oceans suggest that particle size, ocean temperature temperature, and oxygen concentrations modulate particle flux [@cramRoleParticleSize2018; @devriesExportFateOrganic2017]. Meanwhile regional differences in particle ballasting play a smaller role. [@cramRoleParticleSize2018]. These models, however, assume that zooplankton play a small role, and therefore assume no transport through the mesopelegic, and no disaggregation. As a result of this assumption, the models predict that small particles will attenuate with depth. However small particles have been shown to persist in deep waters (REF) and contribute substantialy to flux in the deep ocean (REF). Conveniently, these models particle size predictions generate a useful null hypothesis of expexted particle size distributions in the abscence of zooplankton effects. Thus their predictions can in principle be compared to observed distributions of particles to explore the magnitude of zooplankton effects.
            
-   + Particle data provide valuable information about particle transport.
-     - When performed in concert with traps, they can be used to predict flux in places where traps aren't [@guidiRelationshipParticleSize2008].They can give resolved information about particle flux variability across space and time [@guidiRelationshipParticleSize2008; @kikoBiologicalPhysicalInfluences2017].
-     - They can tell us about the relationship between particle size and sinking speed [@guidiRelationshipParticleSize2008]. (Guidi)
+Underwater vision profilers, cameras that can count and size many particles over large water volumes (REF), provide valuable information about particle transport. When performed in concert with traps, they can be used to predict flux in places where traps aren't [@guidiRelationshipParticleSize2008].They can give resolved information about particle flux variability across space and time [@guidiRelationshipParticleSize2008; @kikoBiologicalPhysicalInfluences2017]. Thes relationships can furthermore provide us with information about relationship between particle size, and biomass, sinking speed, and contributions of the different particle sizes to flux. [@guidiRelationshipParticleSize2008]. (Guidi)
           
 
-   + A recent study combined particle size tracking, mockness tows, acoustic data, and trap measurements from nearby locations found in literature to explore zooplankton transport in a weak OMZ [@kikoZooplanktonMediatedFluxesEastern2020].
-     - They found a particle maximum in the mesopelegic and contended that it suggests transport by zooplankton, and mortality of migrating zooplankton.
-     - The authors suggested that in stronger and larger OMZs there might be less active transport into the mesopelegic than seen at their site, since migratory organisms would presumably not migrate as deeply into the water and would be less active in true OMZs.
+A recent study combined particle size tracking, mockness tows, acoustic data, and trap measurements from nearby locations found in literature to explore zooplankton transport in the Eastern Tropical North Atlantic a weak (hypoxic rather than fully anoxic, and X m thick) OMZ [@kikoZooplanktonMediatedFluxesEastern2020].The authors found a particle maximum in the mesopelegic and contended that it suggests transport by zooplankton, and mortality of migrating zooplankton. The authors suggested that in more anoxic and larger OMZs there might be less active transport into the mesopelegic than seen at their site, since migratory organisms would presumably not migrate as deeply into the water and would be less active in true OMZs.
      
-  + A recent modeling study posed three hypotheses, each with a prediction about particle size distributions [@weberEfficientParticleTransfer2020]
-     * Weber and Bianchi [-@weberEfficientParticleTransfer2020] proposed three reasons that this could occur 
-       (1) Slower attenuation of *all* particles: The rate of generalization of all particles could be slower in OMZs.
-       (2) Decreased disaggregation by zooplankton: 
-       (3) Slower attenuation of large particles: Large particles might harbor cores that are limited in both oxygen and nitrate and so microbial metabolism could be usually slow in these.
-        - The authors proposed that these processes would have signature effects on particle size distribution in the core of the ETNP. Slower attenuation of all particles, was predicted to result in an increase in the abundance of small particles, while the other two models, would result in a decrease in small particle abundance as small particles were either not replaced by breakdown of large particles (Model 2) or as those particles were broken down more quickly than larger particles (Model 3). However, they didn't have data to determine which model best fit reality.
+A recent modeling study posed three hypotheses, each with a prediction about particle size distributions [@weberEfficientParticleTransfer2020]. These were (**HWB1**) *All* particles in OMZs remineralize more slowly than in oxic water, regardless of their size. (**HWB2**) There is less disaggregation by zooplankton in OMZs than elsewhere. (**HWB3**) Large partices remineralize more slowly in OMZs, but smaller ones do not. This last hypothesis was suggested by another model that suggested that large particles are diffusion limited and that their cores could become both Nitrate + Nitrite limeted and Oxygen limited, and so less efficient sulfur oxydation dominates on particles [@bianchiGlobalNicheMarine2018]. The authors proposed that the processes undelying each hypothesis would have signature effects on particle size distribution in the core of the ETNP. Slower attenuation of all particles, was predicted to result in an increase in the abundance of small particles, while the other two models, would result in a decrease in small particle abundance as small particles were either not replaced by breakdown of large particles (Model 2) or as those particles were broken down more quickly than larger particles (Model 3). However, the authors were not able to support any hypothesis at the exclusion of the others because they did not have the necessary data about particle size. In this manuscript we present data that can test these three hypotheses.
 
-* B
-  * The particle size data to test each of the three the Weber-Bianchi [-@weberEfficientParticleTransfer2020] models, id not exist prior to this study for fully anoxic OMZs of the pelegic ocean, to our knowledge.
+Additionally, combined measurements of particle numbers, flux and migration of plankton, while avalable in the hypoxic ETNA [@kikoZooplanktonMediatedFluxesEastern2020] (Kiko), have not been made in a fully anoxic region. Indeed the ETNA study used trap data from earlier studies. Thus while UVP and traps have been sampled together [@guidiRelationshipParticleSize2008], combined trap and UVP measurments have not been taken together previously in an OMZ. Most OMZ are in the oligotrophic ocean, where productivity is low [@fuchsmanCyanobacteriaCyanophageContributions2019; @penningtonPrimaryProductionEastern2006]. Meanwhile most flux data has been measured in higher productivity regions of the ETNP [@vanmooyImpactSuboxiaSinking2002; @hartnettOrganicCarbonInput1998]. Furthermore the degree to which zooplankton swimming or other processes lead to disaggregation in OMZs and elsewhere in the ocean is unknown.
 
-  * Furthermore, combined measurements of particle numbers, flux and migration of plankton, while avalable in the hypoxic ETNA (Kiko), have not been made in a fully anoxic region.
-    - Indeed this study used trap data from earlier studies. UVP and traps have been sampled together [@guidiRelationshipParticleSize2008], but not before in an OMZ.
-  * While organic mater transport by zooplankton has been hypothesized to be limited in OMZs, this pattern hasn't been tested.
-  * The degree to which zooplankton swimming or other processes lead to disaggregation in OMZs and elsewhere in the ocean is unknown.
-  + Most OMZ are in the oligotrophic ocean, where productivity is low [@fuchsmanCyanobacteriaCyanophageContributions2019; @penningtonPrimaryProductionEastern2006]. Meanwhile most flux data has been measured in higher productivity regions of the ETNP [@vanmooyImpactSuboxiaSinking2002; @hartnettOrganicCarbonInput1998]. 
+To provide the data to test hypotheses and clear up unknowns about zooplankton particle interactions in oligotrophic OMZs, We collected particle size data at high temporal resolution over the course of a week in an anoxic site typical of the oligotrophic ETNP OMZ, well away from the high productivity zone in the coast. We integrate this size data with observed flux measurements, and acoustic data. We furthermore quantified, throughout the water column, how changes in size distribution deviate from changes that would be predicted by remineralization and sinking only models. Together, our analyses  provide more detailed information about the relationship between particle transport and zooplankton in the ETNP OMZ.
 
+We ask the following three questions: **A:** How do the particle size distribution at one location in the oligotrophic Eastern Tropical North Pacific evolve with respect to depth, and how does it vary over time? **B:** Do our data support any of the three Weber-Bianchi [-@weberEfficientParticleTransfer2020] models? **3** Do our data suggest regions of the oxygen minimum zone with disaggregation like processes, and if so, do these co-occur with regions suggested to harbor zooplankton.
 
-* T
-  * We targeted a site typical of the oligotrophic ETNP OMZ, well away from the high productivity zone in the coast.
-  * We collected particle size data at high temporal resolution over the course of a week
-  * We integrate this size data with observed flux measurements, and acoustic data.
-  * We describe the particle size distribution slope and how it changes with depth.
-  * We quantify, throughout the water column, how changes in size distribution deviate from changes that would be predicted by remineralization and sinking only models.
-  * Together, these analyses will provide more detailed information about the relationship between particle transport and zooplankton in the ETNP OMZ.
-
-
-## Scientific questions:
- * How do the particle size distribution at one location in the oligotrophic Eastern Tropical North Pacific evolve with respect to depth, and how does it vary over time?
- * Do our data support any of the three Weber-Bianchi [-@weberEfficientParticleTransfer2020] models?
- * Do our data suggest regions of the oxygen minimum zone with disaggregation like processes, and if so, do these co-occur with regions suggested to harbor zooplankton.
-
-## We hypothesized
- * (**H1**) Temporal day to day variability in particle number, particle size distribution slope and flux would be evident.
- * (**H2**) This variability would relate to the location of migratory zooplankton, with a combination of increased particle flux and disaggregation present where zooplankton occur.
- * (**H3**) Disaggregation and particle production by zooplankton might lead to particle size patterns that cannot be explained by remineralization and sinking alone.
- * We also will test each of the three Weber-Bianchi models, specifically that OMZs have (**HWB1**) slower attenuation of all particles, (**HWB2**) decreased disaggregation, or (**HWB3**) slower attenuation of just large particles, in the OMZ core.
+We hypothesized **H1:** Temporal day to day variability in particle number, particle size distribution slope and flux would be evident. **H2:** This variability would relate to the location of migratory zooplankton, with a combination of increased particle flux and disaggregation present where zooplankton occur. **H3:**) Disaggregation and particle production by zooplankton might lead to particle size patterns that cannot be explained by remineralization and sinking alone. We also will test each of the three Weber-Bianchi models, specifically that OMZs have (**HWB1**) slower attenuation of all particles, (**HWB2**) decreased disaggregation, or (**HWB3**) slower attenuation of just large particles, in the OMZ core.
 
  
 # Methods
@@ -170,10 +126,7 @@ In all profiles, particle abundances were highest at the surface, and highest am
 Total particle numbers were generally similar between different casts, regardless of which day or hour they were collected (Figure S5A). Particle numbers were highest in the surface and decreased rapidly, flattened out over the 250 m to 500m range, decreased again until the lower oxycline, and then increased below the oxycline (Figure S5A). 
 
 
-<!-- The slope of the particle size distribution is a negative number with more small particles than large ones with most observations varying between -4.5 and -3 (Figure S_), which is typical of other UVP estimates (Ref Guidi, Cram, Kiko).  -->
 The particle size distribution slope steepened (became more negative) between the surface and 500m, flattened (became less negative) between 500m and 1000m, and then steepened again after 1000m (Figure S5B). Steeper, more negative, slopes indicate a higher proportion of small particles relative to large particles, while flatter, less negative, slopes indicate a higher proportion of large particles relative to other places.
-
-<!-- These patterns differed from those seen at the oxic P16-station100, station 100 where particle size distribution was similar to ETNP station P2 through 400m, but where the PSD was then consistently steeper than at P2, and with a local minimum at ~850m and a gradual flattening of the PSD after that. -->
 
 ## Estimated particle flux sometimes increases with depth in the OMZ core
 Our optimization approach suggested that there was greatest agreement between estimates of trap observed particle flux, and UVP estimated particle flux when the particle size to flux relationship was governed by the ratio $$Flux = 133 * Size ^ {2.00}$$. This resulted in a UVP predicted flux profile that broadly fit the expected trap observed flux profiles, excluding the four traps that were held out from the analysis due to low abundance.  
@@ -184,29 +137,14 @@ General additive models that examined the rate of change of flux between 250 and
 
 ## ETNP particle dynamics differ from those seen at an oxic site
 
-### Oxic Region: Chemistry
 The oxic site, P16 Station 100, was characterized by a more gradually sloping picnocline, and an oxygen minimum at 500m of 19.7 $\mu$M, which is not anoxic (Figure S1B). The photic zone is characterized by a single fluorescence peak with a maximum at 110m and which disappeared at 200m (Figure S1C). Turbidity followed chlorophyll concentration and did not have a peak in the mesopelegic (Figure S1D), unlike the ETNP site. There was a salinity peak at 150m (Figure S1B).
 
-### Anoxic Vs. Oxic Region: Particle Number and Size
 Particle numbers were higher, between the base of the photic zone through 1000m at the ETNP site, than at the same-latitude, oxygenic P16 station 100 (Figure S7A). Particle size distributions were similar between the two sites above 500m, being characterized by overlapping confidence intervals by generated by a general additive model. From 500 to 1000m, particle size distributions were  steeper at the ETNP site,being characterized by a higher proportion of small particles (Figure S7B). 
-
-
-### Anoxic Vs.Oxic Region: Large vs small particles
 
 Small particles (100 $\mu$m - 500 $\mu$m) at the ETNP site were about two orders of magnitude more common than large particles (>= 500 $\mu$m) (Figure S8). Large particle numbers appeared to attenuate more quickly than small particles, and more generally follow a power law decrease, while small particles appeared to increase around 500 m. Flux was predicted to be predominantly from small, rather than large particles, at all depths except the very surface. The particle size distribution, calculated only on large particles, was more variable between depths than calculated for small particles. Data from the oxic P16 station 100 suggested more particles, steeper particle size distribution, and more flux than at this station than at the ETNP station. They also suggested that differences between large and small particles, with respect to number, flux and size distribution that were broadly similar to the ones seen at ETNP Station P2.
 
-### Anoxic vs Oxic Flux
-
 In contrast to the anoxic station, at the oxic station, flux always decreased with depth (Figure S9A+B).
 
-<!-- ## Possible particle transport by zooplankton {move to discussion} -->
-<!-- There was an apparent increase in particle flux between XXX and XXX m (Figure X), which corresponded to the region where migratory organisms spent most of the day (Figure X).  -->
-<!-- To estimate how this flux increased transfer efficiency, we compared the sequestration flux (flux through the depth bin centered at 975m) to an estimated sequestration flux if a power law, typical of the flux attenuation below 500m, was applied to the flux out of the photic zone (185.5m bin).  -->
-
-
-<!-- Extrapolating the power law relationship seen below 500m to the flux at the base of the photic zone suggests that if it was not for zooplankton transport the transfer efficiency would be 1/3 of what it is observed to be. -->
-
-<!-- {Compare to P2.} -->
 
 ## Smoothed and averaged data
 Highly smoothed particle data suggested that particle size, averaged across all casts, followed a pattern in which the abundance of small particles increased in the OMZ surface (Figure 5A), which corresponded with characterized by steepening of the particle size distribution (Figure 5A), an increase in small particle biomass (Figure 5B), but not of large particle biomass (Figure 5C). Deeper in the OMZ, the small particle number, PSD slope, and biomass of small particles declined.
@@ -230,28 +168,12 @@ Below 500 m, OSMS was negative. There were only two casts that reached below 500
 At P16 Station 100, OSMS was positive between the base of the photic zone and 350m and negative below 350m (Figure S9C).
 
 
-
-
-<!-- We used the difference between predicted flux of small particle and observed flux of small particles to quantify deviations from model expectations. Thus deviations from model are quantified  -->
-
-
-<!-- in observed and predicted flux by small particles as a single variable to quantify deviation from model expectations.  -->
-
-
-<!-- We further found that this difference from exceptions varied between depths.  -->
-
-<!-- By comparing the particle size distributions at each depth to the particle size distribution to the distribution that remineralization and sinking model would predict from the flux profile one depth shallower in the water column and observed flux attenuation, we were able to see how observed flux profiles differed from predicted flux profile changes (Figure S_ {generate this for a key depth with both attenuation and disaggregation}). We called the difference between observed and predicted flux of small particles, which is identical, but with opposite sign to the difference between the observed and predicted flux of large particles "Disaggregation Like Flux Shift", because as we will argue in the discussion, disaggregation as well as other processes, would lead to higher values of this Flux-Shift parameter, while aggregation would lead to lower values of the Flux-Shift parameter. We constrain our analysis here to the below photic zone dynamics {for reasons}. There appeared to be highest flux shift between the photic zone and 500m, and negative flux shift below 500m (Figure X). {Say something about P16 once I have identified the location of the photic zone therein.} -->
-
-<!-- be predicted from the particle size distribution one depth bin shallower in the water column, and the observed flux attenuation, we were able to examine how particle number attenuation differed from what would be expected if particles sank and remineralized following PRiSM model like dynamics. We observed that there were more small particles than would be predicted from remineralization dynamics only. By comparing the observed flux of particles < 53 microns to the reminineralization-predicted flux of small particles, we observed that above 500m, there was excess observed small particle flux above 500m (Figure X).  -->
-
 # Discussion
 
 ## Diel migrators spend time in the OMZ core
 Organisms of all sizes appear to migrate into the core of the OMZ at our site. Most migrators appear to leave the surface at dusk, spend the day in the top 500m of the OMZ in the day and return to the surface at dusk (Figure 2A), while others show the opposite pattern, leaving the surface at dusk and returning at dawn (Figure 2B). Diel migration is prevalent throughout the oceans [@haysReviewAdaptiveSignificance2003; @cisewskiSeasonalVariationDiel2010; @heywoodDielVerticalMigration1996; @jiangTemporalVariabilityZooplankton2007; @rabindranathSeasonalDielVertical2011; @yangDielVerticalMigration2019; @sainmontInterIntraspecificDiurnal2014], including other OMZ sites [@antezanaSpeciesspecificPatternsDiel2009; @kikoZooplanktonMediatedFluxesEastern2020; [@riquelme-buguenoDielVerticalMigration2020], including highly anoxic sites with secondary, anoxic deep chlorophyl maxima like this one [@hidalgoOntogeneticVerticalDistribution2005], and much of the ETNP OMZ [@herreraVerticalVariabilityEuphausia2019]. Sampling efforts elsewhere in the ETNP suggested that any of of these diel migrators are euphausids and fish [@maasFinescaleVerticalDistribution2014; @wishnerZooplanktonEasternTropical2013], and that diel migrators are primarely 2-5 mm in size [@wishnerZooplanktonEasternTropical2013]. Krill have been shown to have the opposite pattern in the Humboldt current OMZ, migrating to the surface at night time [@riquelme-buguenoDielVerticalMigration2020], as seen for some organisms at our site (Figure 1B). The presence of organisms that appear and disapear just above the base of the photic zone, in the region of the deeper anoxic fluorescence peak region, but abscence of a tell-tale signature of mass migration before or after they appear (Figure 1C) may suggest that these organisms migrate at different times of the day to this deep region, rather than all at once. Another possiblility is that they are transiting through our station at this depth in mid day, but do not migrate to depth at this location, but rather at another location.
 
 The organisms that appear between 500m and 1000 m (Figure 2E) have acoustic signatures that resemble jellyfish [@kaartvedtDielVerticalMigration2007]. That they appear in horizontal bands that do not appear to trend upwards over time suggests that they are traveling through our site at progressively shallower depths over the course of the day, but that individual swarms are not themselves moving upward at this station. This suggests that any vertical migration carried out by these organisms happens elsewhere, or occurs more slowly than the advection seen at this site. That they appear at different depths at different times of the day suggest that these organsims have some sort of vertical migration pattern. Future work may consider more highly resolved spatial and temporal monitoring of this phenominan. Indeed molecular surveys have found evidence of both Cnidarians and Ctenophores both within and below the the ETSP OMZ near Chile (Parris et al 2014).
-
-<!-- At the size range seen by the 18000 kHz band, Humboldt and market squid are known to be tolerant to anoxia and to migrate into the OMZ to hunt. These small organisms likely have the greatest effect on particle transport (ref) and disaggregation (ref). Diel migration patterns are common in the ocean (ref) and zooplankton transport of particles have been indicated in other environments (ref).  -->
 
 ## Flux is lower at this site than previous measurements in the ETNP 
 {Unless Megan Duffy is going to have already said this somewhere}.
@@ -313,9 +235,6 @@ Similarly, a clear next step is to apply our disaggregation model to other ocean
 # Conclusions
 
 We suggest that while particles appear to remineralize more slowly at this site, and that this is true of all sizes of particles not just large ones. Furthermore, it appears that diel migratory organisms both disaggregate particles and transport carbon throughout the top 500m of the water column. Day to day and within day variability in organic mater transport was evient, though overall patterns in particle size, flux and disaggregation appeared to be consistant over the course of the time-series.
-
-
-##
 
 
 # Figures
@@ -399,14 +318,7 @@ Figure S11. An example of differences between modeled and observed particle slop
 
 Figure S12. GAM predicted effects of **A** Depth, **B** Day of the month in January 2017 Y axis indicates the value of the component smooth functions effect on the difference between observed and modeled flux. Thus higher values correspond with greater flux of small particles than predicted by the model.
 
-## Talk about
 
-Different community vs oxic things.
-
-Wishner -- there is a peak of biomass at lower OMZ -- lower oxycline
-
-Directions -- 
-Progression -- models and can actually test hypotheses for proposal
 
 # References
 
