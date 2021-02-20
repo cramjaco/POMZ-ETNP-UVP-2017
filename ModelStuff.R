@@ -1,5 +1,7 @@
 ## Global Settings
 
+source("UVP_2017_library.R")
+
 lb_vec <- c(0.102, 0.128, 0.161, 0.203, 0.256, 0.323, 0.406, 0.512, 0.645, 
             0.813, 1.02, 1.29, 1.63, 2.05, 2.58, 3.25, 4.1, 5.16, 6.5, 8.19, 
             10.3, 13, 16.4, 20.6, 26)
@@ -33,7 +35,39 @@ f_vec = C_f_global * lb_vec ^ alpha;
 
 
 ## Disagg functions
-# alpha was 0.52 and gamma was 0.26
+
+#' Apply remineralization dynamics to a particle spectrum, given a flux attenuation
+#'remin_shuffle is the core function that runs particle remineralization. It takes an abundance profile,
+#'and a percentage change in flux, and some other parameters,
+#'and returns a the changes in the number of particles in each size bin accross the size profile
+#'and some additonal outputs
+#' @param abun_in An abundance profile. This is a one dimensional vector,
+#'  with each value corresponding to particle numbers one smaller.
+#' @param DFpct The percentage change in flux. 
+#' Value is a fraction of one so a value of 0.9 would correspond to 90% of flux retaioned
+#' One gets negative values if this is too large. Recommend setting to
+#' < 99% and using remin_smooth_shuffle to handle larger values.
+#' @param DeltaZ the depth between this depth and the one before it. 
+#' DeltaZ affects `Cr` but cancells itself out in such a way that the main delta_nj values are not affected.
+#' @param Cm A mass constant, defaults to 3.3 * 10^-6; #%g % Alldgedge 1998 % mass of 1mm particle
+#' @param CW A sinking speed constant defaults to 2 #% m/day # Alldredge and Gotschalk, methinks % sinking speed of 1mm particle
+#' @param lbv a vector of lower bounds of particle sizes for each size bin
+#' should have same length as abun_in
+#' @param mv a vector of the masses of the particles in each bin
+#' @param wv a vector of the sinking speeds of the particles in each bin
+#' @param alpha the particle mass fractal dimension
+#' @param gamma the particle sinking speed fractal dimension
+#' @param llb the size that particles become when they are no longer considered by the model
+#' @return A list with different parameter outputs
+#' \itimize{
+#' list(
+#' Cr - Effective partical remineralization rate (1/day)
+#' \item phi - a placeholder vector, used to calculate changes in particle numbers
+#' \item Delta_nj_net - the net change in particle numbers in each size bin (Delta_nj_in - Delta_nj_out)
+#' \item Delta_nj_in - the numbers of particles lost from each size bin due to remineralization
+#' \item Delta_nj_out - the numbers of particles added to each size bin due to remineralization
+#' )
+#' }
 remin_shuffle <- function(abun_in, DFpct, DeltaZ = 10, Cm = m1mm, Cw = w1mm, lbv = lb_vec, mv = m_vec, wv = w_vec,
                           alpha = alpha_global, gamma = gamma_global, llb = little_lb){
  rn = abun_in * lbv
@@ -65,11 +99,20 @@ remin_shuffle <- function(abun_in, DFpct, DeltaZ = 10, Cm = m1mm, Cw = w1mm, lbv
   return(list(Cr = Cr, phi = phi, dnet = Delta_nj_net, din =  Delta_nj_in, dout = Delta_nj_out))
 }
 
+#' runs remin shuffle and uses it to provide an expected number of particles in each bin, rather than
+#' changes in particle numbers in each bin and other parameters
+#' inherits all input variables from remin_shuffle
 remin_shuffle_spec <- function(abun_in, DFpct, lbv = lb_vec, mv = m_vec, wv = w_vec, llb = little_lb, ...){
   core <- remin_shuffle(abun_in, DFpct, lbv = lbv, mv = mv, wv = wv, llb = llb, ...)
   abun_in + core$dnet
 }
 
+#' Iterate over remin_shuffle so that changes behave in a compound way,
+#' rather than extrapolating changes from the particle size distribution as it was
+#' prevents negative abunadance values
+#' All values inherit from remin_shuffle except
+#' @param Ipct the flux loss from each step of the function
+#' @return abun_est vector of particle abundances in each size class
 remin_smooth_shuffle <- function(abun_in, DFpct, Ipct = 0.9999, lbv = lb_vec, mv = m_vec, wv = w_vec, llb = little_lb, ...){
   # DFpct: Fractional mass retained between depths
   # Ipct: Fractional mass retained between iterations
@@ -109,6 +152,13 @@ remin_smooth_shuffle <- function(abun_in, DFpct, Ipct = 0.9999, lbv = lb_vec, mv
   abun_est
 }
 
+
+#' Calculate the rmse of the difference between the flux loss from remin_smooth_shuffle and the
+#'  intended flux loss
+#'  Inherits all parametrs from remin_smooth shuffle plus
+#'  @param DFpct_toRemin Percentage of flux retained, sent to remin_smooth shuffle,
+#'   varied by optimization functions
+#'   @param DFpct_target The amount of flux actually lost
 shuffle_tune <- function(DFpct_toRemin, abun_in,  DFpct_target, llb = lb_vec, mv = m_vec, wv = w_vec,...){
   abun_out <- remin_smooth_shuffle(abun_in = abun_in, DFpct = DFpct_toRemin, llb = llb, mv = mv, wv = wv, ...)
   flux_in <- sum(abun_in * C_f_global * llb ^ ag_global)
@@ -118,6 +168,9 @@ shuffle_tune <- function(DFpct_toRemin, abun_in,  DFpct_target, llb = lb_vec, mv
   rmse
 }
 
+#' Determine the DFP value that actually provides the preferred flux loss. 
+#' @return The DFP value which if passed to remin_smooth_shuffle, will
+#'  actually warrant the DFpct value passed to this function
 optFun <- function(abun_in, DFpct, llb = lb_vec, mv = m_vec, wv = w_vec, ...){
   opt <- optimize(shuffle_tune, c(0, 2), abun_in = abun_in, DFpct_target = DFpct, llb = llb, mv = mv, wv = wv, ...)
   opt$minimum
