@@ -159,10 +159,10 @@ remin_smooth_shuffle <- function(abun_in, DFpct, Ipct = 0.9999, lbv = lb_vec, mv
 #'  @param DFpct_toRemin Percentage of flux retained, sent to remin_smooth shuffle,
 #'   varied by optimization functions
 #'   @param DFpct_target The amount of flux actually lost
-shuffle_tune <- function(DFpct_toRemin, abun_in,  DFpct_target, llb = little_lb, mv = m_vec, wv = w_vec,...){
+shuffle_tune <- function(DFpct_toRemin, abun_in,  DFpct_target, llb = little_lb, mv = m_vec, wv = w_vec, lbv = lb_vec,...){
   abun_out <- remin_smooth_shuffle(abun_in = abun_in, DFpct = DFpct_toRemin, llb = llb, mv = mv, wv = wv, ...)
-  flux_in <- sum(abun_in * C_f_global * llb ^ ag_global)
-  flux_out <- sum(abun_out * C_f_global * llb ^ ag_global)
+  flux_in <- sum(abun_in * C_f_global * lbv ^ ag_global)
+  flux_out <- sum(abun_out * C_f_global * lbv ^ ag_global)
   DFPct_actually_happened <- flux_out/flux_in
   rmse <- (DFPct_actually_happened - DFpct_target)^2
   rmse
