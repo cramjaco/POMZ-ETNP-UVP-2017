@@ -72,7 +72,7 @@ I should make the following code blocks into one function...
 ```{r}
 S43Smooth <- S43dataEx %>%
   select(profile:vol, depth, n_nparticles = resp_fit) %>%
-  mutate(nparticles = n_nparticles * binsize, TotalParticles = nparticles * vol)
+  mutate(nparticles = n_nparticles * binsize, TotalParticles = nparticles * vol, project = "ETNP")
 
 S43Twin <- S43Smooth %>% make_twin_df_list() %>%
   calc_particle_parameters()

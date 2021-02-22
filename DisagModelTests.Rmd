@@ -1,0 +1,158 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+A few tests of the disaggregation model.
+
+Example parameters:
+
+```{r}
+source("ModelStuff.R")
+```
+
+Example particle size distribution
+A power law distribution
+```{r}
+Cm = 1000
+beta = -3.5
+
+test_nnp_vec <- Cm * lb_vec^ beta
+
+test_np_vec <- test_nnp_vec * binsize_vec
+
+test_df <- tibble(lb = lb_vec, nnp = test_nnp_vec, np = test_np_vec)
+test_df
+```
+
+```{r}
+ggplot(aes(x = lb_vec, y = test_np_vec), data = test_df) + geom_point() + scale_x_log10() + scale_y_log10()
+```
+
+```{r}
+remin_shuffle(abun_in = test_df$np, DFpct = 0.8)
+```
+
+```{r}
+test_standard <- remin_shuffle_spec(abun_in = test_df$np, DFpct = 0.8)
+test_standard
+test_df$std8 = test_standard
+```
+
+example where some values go negative
+```{r}
+test_standard2 <- remin_shuffle_spec(abun_in = test_df$np, DFpct = 0.7)
+test_standard2
+test_df$std7 = test_standard2
+```
+
+```{r}
+ggplot(aes(x = lb_vec, y = test_standard), data = test_df) +geom_point(shape = 1) + scale_x_log10() + #scale_y_log10() +
+  geom_point(shape = 2, aes(y = np)) + 
+  geom_point(shape = 5, aes(y = std7))
+```
+
+
+```{r}
+test_df %>% pivot_longer(c(np, nnp, std8, std7), values_to = "nparticles") %>% filter(name != "nnp") %>%
+  ggplot(aes(x = lb, y = nparticles, color = name, shape = name)) + geom_point(size = 2) + geom_path() + scale_x_log10()
+```
+
+Now with iterative approach for smoothing. This deals with the negative values, and makes the drop of of smallest particles least bad
+
+```{r}
+test_smootshuf_8 <- remin_smooth_shuffle(abun_in = test_df$np, DFpct = 0.8)
+test_smootshuf_7 <- remin_smooth_shuffle(abun_in = test_df$np, DFpct = 0.7)
+test_df$ss8 <- test_smootshuf_8 
+test_df$ss7 <- test_smootshuf_7
+```
+
+```{r}
+test_df %>% pivot_longer(-lb, values_to = "nparticles") %>% filter(name %in% c("np", "ss8", "ss7")) %>%
+  ggplot(aes(x = lb, y = nparticles, color = name, shape = name)) + geom_point(size = 2) + geom_path() + scale_x_log10()
+```
+
+So less extreme dropping off of the small particles because we aren't over extrapolating.
+
+# Flux issue
+
+Ok, so the problem is that if we calcualte flux before and after, we get different values.
+
+Observe:
+
+Starting flux
+```{r}
+initial_flux = test_df$np * (C_f * lb_vec ^ ag_global)
+initial_Flux <- sum(initial_flux)
+```
+
+Flx after we've attenuated "80%" of flux
+
+```{r}
+attenuated8_flux = test_df$ss8 * (C_f * lb_vec ^ ag_global)
+attenuated8_Flux <- sum(attenuated8_flux)
+
+attenuated8_Flux/initial_Flux
+```
+
+As you can see we come up a bit short.
+
+## llb
+
+This problem seems related to the value that I select for "llb"
+
+```{r}
+test_smootshuf_llb1 <- remin_smooth_shuffle(abun_in = test_df$np, DFpct = 0.8, llb = lb_vec[1] - 0.001)
+test_smootshuf_llb0 <- remin_smooth_shuffle(abun_in = test_df$np, DFpct = 0.8, llb = 0)
+test_df$llb1 = test_smootshuf_llb1
+test_df$llb0 = test_smootshuf_llb0
+```
+
+```{r}
+attenuatedLLB1_flux = test_df$llb1 * (C_f * lb_vec ^ ag_global)
+attenuatedLLB1_Flux <- sum(attenuatedLLB1_flux)
+
+attenuatedLLB0_flux = test_df$llb0 * (C_f * lb_vec ^ ag_global)
+attenuatedLLB0_Flux <- sum(attenuatedLLB0_flux)
+
+attenuatedLLB1_Flux/initial_Flux
+attenuatedLLB0_Flux/initial_Flux
+```
+
+Things actually look a little better flux wise if I make the smallest size of particles all go all the way to zero. And worse, if I disappear them if they get just a tiny bit smaller than LB1.
+
+
+```{r}
+test_df %>% pivot_longer(-lb, values_to = "nparticles") %>% filter(name %in% c("np", "ss8", "llb0")) %>%
+  ggplot(aes(x = lb, y = nparticles, color = name, shape = name)) + geom_point(size = 2) + geom_path() + scale_x_log10()
+```
+
+But then we get a pile-up of really small particles, since they hardly remineralize at all.
+
+My solution so far has been essentially tuning the remineralization constant. I do this by actually feeding the funciton the flux that it needs to actually return the correct flux.
+
+I use an optimizatio function to tell me what value of flux attenuation that I ask the model for will get me the value I actually wnat
+
+```{r}
+shuffle_tune(0.8, test_df$np, 0.8)
+```
+
+
+```{r}
+patchFlux <- optFun(test_df$np, DFpct = 0.8)
+patchFlux
+```
+
+
+```{r}
+test_patch <- remin_smooth_shuffle(abun_in = test_df$np, DFpct = patchFlux)
+test_df$patch <- test_patch
+```
+
+```{r}
+attenuated_patch_flux = test_df$patch * (C_f * lb_vec ^ ag_global)
+attenuated_patch_Flux <- sum(attenuated_patch_flux)
+attenuated_patch_Flux/initial_Flux
+```
+
+And this is still wrong. WTF?

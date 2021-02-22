@@ -159,7 +159,7 @@ remin_smooth_shuffle <- function(abun_in, DFpct, Ipct = 0.9999, lbv = lb_vec, mv
 #'  @param DFpct_toRemin Percentage of flux retained, sent to remin_smooth shuffle,
 #'   varied by optimization functions
 #'   @param DFpct_target The amount of flux actually lost
-shuffle_tune <- function(DFpct_toRemin, abun_in,  DFpct_target, llb = lb_vec, mv = m_vec, wv = w_vec,...){
+shuffle_tune <- function(DFpct_toRemin, abun_in,  DFpct_target, llb = little_lb, mv = m_vec, wv = w_vec,...){
   abun_out <- remin_smooth_shuffle(abun_in = abun_in, DFpct = DFpct_toRemin, llb = llb, mv = mv, wv = wv, ...)
   flux_in <- sum(abun_in * C_f_global * llb ^ ag_global)
   flux_out <- sum(abun_out * C_f_global * llb ^ ag_global)
@@ -171,7 +171,7 @@ shuffle_tune <- function(DFpct_toRemin, abun_in,  DFpct_target, llb = lb_vec, mv
 #' Determine the DFP value that actually provides the preferred flux loss. 
 #' @return The DFP value which if passed to remin_smooth_shuffle, will
 #'  actually warrant the DFpct value passed to this function
-optFun <- function(abun_in, DFpct, llb = lb_vec, mv = m_vec, wv = w_vec, ...){
+optFun <- function(abun_in, DFpct, lbv = lb_vec, llb = little_lb, mv = m_vec, wv = w_vec, ...){
   opt <- optimize(shuffle_tune, c(0, 2), abun_in = abun_in, DFpct_target = DFpct, llb = llb, mv = mv, wv = wv, ...)
   opt$minimum
 }
