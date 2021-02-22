@@ -2,10 +2,12 @@
 title: "R Notebook"
 output: html_notebook
 ---
+Dear Tom,
 
-A few tests of the disaggregation model.
+Here are some tests/demonstrations of the particle remineralization model and how it works. I'm just applying it to some example spectra to show what happens when particles remineralize, and not calculating differences form the model itself.
 
-Example parameters:
+
+Load in the functions and parameters:
 
 ```{r}
 source("ModelStuff.R")
@@ -29,36 +31,35 @@ test_df
 ggplot(aes(x = lb_vec, y = test_np_vec), data = test_df) + geom_point() + scale_x_log10() + scale_y_log10()
 ```
 
+`remin_shuffle()` is my main function, which does the remineralization math
 ```{r}
 remin_shuffle(abun_in = test_df$np, DFpct = 0.8)
 ```
 
+`remin_shuffle_spec()` Takes the `$dnet` parameter form `remin_shuffle` and adds that to the existing particle size distribution to get a new size distribution
 ```{r}
 test_standard <- remin_shuffle_spec(abun_in = test_df$np, DFpct = 0.8)
 test_standard
 test_df$std8 = test_standard
 ```
 
-example where some values go negative
+However, in some cases, especially if we do a lot of remeralization, we can get some negative values in our smallest bin.
 ```{r}
 test_standard2 <- remin_shuffle_spec(abun_in = test_df$np, DFpct = 0.7)
 test_standard2
 test_df$std7 = test_standard2
 ```
 
-```{r}
-ggplot(aes(x = lb_vec, y = test_standard), data = test_df) +geom_point(shape = 1) + scale_x_log10() + #scale_y_log10() +
-  geom_point(shape = 2, aes(y = np)) + 
-  geom_point(shape = 5, aes(y = std7))
-```
-
+Behold:
+np is our origninal spectrum, std8 attenuates down to 80% of the flux in np, std7 down to 70%. Note that we have negative particles in the first bin for std7
 
 ```{r}
 test_df %>% pivot_longer(c(np, nnp, std8, std7), values_to = "nparticles") %>% filter(name != "nnp") %>%
   ggplot(aes(x = lb, y = nparticles, color = name, shape = name)) + geom_point(size = 2) + geom_path() + scale_x_log10()
 ```
 
-Now with iterative approach for smoothing. This deals with the negative values, and makes the drop of of smallest particles least bad
+We can solve this negative number problem with an iterative approach. remin_smooth_shuffle only attenuates 0.0001 (0.01%) of flux at a time and then does that untill the desired attenuation has happened. This also fixes other extrapolation problems.
+
 
 ```{r}
 test_smootshuf_8 <- remin_smooth_shuffle(abun_in = test_df$np, DFpct = 0.8)
@@ -67,6 +68,7 @@ test_df$ss8 <- test_smootshuf_8
 test_df$ss7 <- test_smootshuf_7
 ```
 
+Behold: As above, but with the iterative approach
 ```{r}
 test_df %>% pivot_longer(-lb, values_to = "nparticles") %>% filter(name %in% c("np", "ss8", "ss7")) %>%
   ggplot(aes(x = lb, y = nparticles, color = name, shape = name)) + geom_point(size = 2) + geom_path() + scale_x_log10()
@@ -76,10 +78,9 @@ So less extreme dropping off of the small particles because we aren't over extra
 
 # Flux issue
 
-Ok, so the problem is that if we calcualte flux before and after, we get different values.
+Ok, so my main problem it this point, is that my function doesn't actually attenuate the desired amount of flux. 
 
 Observe:
-
 Starting flux
 ```{r}
 initial_flux = test_df$np * (C_f * lb_vec ^ ag_global)
@@ -95,12 +96,12 @@ attenuated8_Flux <- sum(attenuated8_flux)
 attenuated8_Flux/initial_Flux
 ```
 
-As you can see we come up a bit short.
+As you can see we come up a bit short on flux (eg we attenuated too much
 
 ## llb
 
-This problem seems related to the value that I select for "llb"
-
+This problem seems related to the value that I select for "llb". llb is the size that particles form the smallest bin "become" once I don't see them any more.
+Lets try one case where those particles are just a hair smaller than our smallest bin (llb1) and one where they are zero (llb0).
 ```{r}
 test_smootshuf_llb1 <- remin_smooth_shuffle(abun_in = test_df$np, DFpct = 0.8, llb = lb_vec[1] - 0.001)
 test_smootshuf_llb0 <- remin_smooth_shuffle(abun_in = test_df$np, DFpct = 0.8, llb = 0)
@@ -108,6 +109,7 @@ test_df$llb1 = test_smootshuf_llb1
 test_df$llb0 = test_smootshuf_llb0
 ```
 
+Calculate flux lossi in these case.
 ```{r}
 attenuatedLLB1_flux = test_df$llb1 * (C_f * lb_vec ^ ag_global)
 attenuatedLLB1_Flux <- sum(attenuatedLLB1_flux)
@@ -119,36 +121,41 @@ attenuatedLLB1_Flux/initial_Flux
 attenuatedLLB0_Flux/initial_Flux
 ```
 
-Things actually look a little better flux wise if I make the smallest size of particles all go all the way to zero. And worse, if I disappear them if they get just a tiny bit smaller than LB1.
+Things actually look a little better flux wise if I make the smallest size of particles all go all the way to zero. They look worse if I disappear them if they get just a tiny bit smaller than LB1.
 
+Here's what the size distributions look like in this case.
 
 ```{r}
 test_df %>% pivot_longer(-lb, values_to = "nparticles") %>% filter(name %in% c("np", "ss8", "llb0")) %>%
   ggplot(aes(x = lb, y = nparticles, color = name, shape = name)) + geom_point(size = 2) + geom_path() + scale_x_log10()
 ```
 
-But then we get a pile-up of really small particles, since they hardly remineralize at all.
+As you can see, while flux is ok in the "lb0" situation we get a pile-up of really small particles, since they hardly remineralize at all.
 
-My solution so far has been essentially tuning the remineralization constant. I do this by actually feeding the funciton the flux that it needs to actually return the correct flux.
+My solution so far has been to tune tuning the remineralization constant. I do this in the context of the code expecting flux attenuation, rather than Cr as an input by feeding the funciton the flux that it needs to actually return the correct flux.
 
 I use an optimization function to tell me what value of flux attenuation that I ask the model for will get me the value I actually wnat
 
+Shuffle tune calculates the rmse. Eg how bad of a job the function does at approximating the flux I want.
+So in the below function I'm telling the function to remineralize till 80% of the flux is left, and seeing how bad of a job it does.
 ```{r}
-shuffle_tune(0.8, test_df$np, 0.8)
+shuffle_tune(DFpct_toRemin = 0.8, abun_in = test_df$np, DFpct_target =  0.8)
 ```
 
-
+`optFun` Uses shuffle tune and tunes the DFpct_toRemin number untill it actually appoaches the target flux (specified as DFpct) and returns that value (flux we should tell the program to keep).
 ```{r}
 patchFlux <- optFun(test_df$np, DFpct = 0.8)
 patchFlux
 ```
 
+So here, to get 80% we tell the function to give us 83% flux remaining.
 
 ```{r}
 test_patch <- remin_smooth_shuffle(abun_in = test_df$np, DFpct = patchFlux)
 test_df$patch <- test_patch
 ```
 
+And as ew can see, it hits the desired 80%, within 5 sig figs.
 ```{r}
 attenuated_patch_flux = test_df$patch * (C_f * lb_vec ^ ag_global)
 attenuated_patch_Flux <- sum(attenuated_patch_flux)
@@ -156,4 +163,65 @@ attenuated_patch_Flux/initial_Flux
 ```
 
 So now we have the expcted flux attenuation.
+
+And we can get a resonable shape out, with the right amount of attenuation.
+```{r}
+test_df %>% pivot_longer(-lb, values_to = "nparticles") %>% filter(name %in% c("np", "ss8", "patch")) %>%
+  ggplot(aes(x = lb, y = nparticles, color = name, shape = name)) + geom_point(size = 2) + geom_path() + scale_x_log10()
+```
+
+So I think I'm updating Cr to give me the right flux assuming that `omega` the flux out of the bottom bin is what it would be if the particles actually had to really disapear. I'm looking for a solution to my math so that I can skip the optimization step.
+
+If that turns out to be a hard problem, I'll just say that I'm tuning Cr to get the correct flux loss, and keep the rest of the math as it is.
+
+```{r}
+test_df %>% pivot_longer(-lb, values_to = "nparticles") %>% filter(name %in% c("np", "ss8", "patch")) %>%
+  ggplot(aes(x = lb, y = nparticles, color = name, shape = name)) + geom_point(size = 2) + geom_path() + scale_x_log10() + scale_y_log10()
+```
+
+As above, but log transformed y axis.
+
+# Non linear PSD
+Realistically the PSDs aren't all linear. They tend to have some bends.
+
+## Some Data
+
+```{r}
+test_s <- structure(list(lb = c(0.102, 0.128, 0.161, 0.203, 0.256, 0.323, 
+0.406, 0.512, 0.645, 0.813, 1.02, 1.29, 1.63, 2.05, 2.58, 3.25, 
+4.1, 5.16, 6.5, 8.19, 10.3, 13, 16.4, 20.6, 26), np = c(4.50604661107017, 
+2.46146714148256, 1.30189817652119, 0.671399050178077, 0.353934894973748, 
+0.191119765760075, 0.113705244326189, 0.068094706364101, 0.040837084137518, 
+0.0223473849065254, 0.0117984833605112, 0.00510827146325076, 
+0.0019573779053016, 0.000753119853166416, 0.000301576366484833, 
+0.00013548407717094, 6.94340468443502e-05, 4.18087859791443e-05, 
+2.69665496271688e-05, 1.69196049314323e-05, 9.91959523502151e-06, 
+4.91495708935307e-06, 2.12363942637543e-06, 9.31859226733937e-07, 
+3.62031271489909e-07)), row.names = c(NA, -25L), class = c("tbl_df", 
+"tbl", "data.frame"))
+
+test_s
+```
+
+```{r}
+test_s %>% ggplot(aes(x = lb, y = np)) + geom_point(size = 2) + geom_line() + scale_x_log10() + scale_y_log10()
+```
+
+Let remineralize 80% of this
+
+```{r}
+patchFluxS <- optFun(test_s$np, DFpct = 0.8)
+patchFluxS
+```
+
+```{r}
+attenuated_spline <- remin_smooth_shuffle(abun_in = test_s$np, DFpct = patchFluxS)
+test_s$paten8 <- attenuated_spline
+```
+
+```{r}
+test_s %>% pivot_longer(-lb, values_to = "nparticles") %>% filter(name %in% c("np", "paten8")) %>%
+  ggplot(aes(x = lb, y = nparticles, color = name, shape = name)) + geom_point(size = 2) + geom_path() + scale_x_log10() + scale_y_log10()
+```
+
 
