@@ -271,7 +271,8 @@ ggsave("figures/BigVsSmall.png")
 ```
 
 Flux small and flux tot track so closely because ag > psd. since the size distribution of the flux sould be PSD + ag (psd is negative in this case). Yo ucan see the variance at the one depth where psd is flatest at the very top.
-
+time 2017-01-13 17:51:31
+202.4 L
 ```{r}
 eg_dataline <- bds %>% 
   filter(profile == "stn_043", depth == 162.5)
