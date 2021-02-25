@@ -61,13 +61,13 @@ WBFigSX <- plot_grid(WBPSD_P16, pWBS_P16,pWBL_P16, nrow = 1, labels = c("B", "C"
 WBFigSX
 ```
 
-```{r}
+```{r fig.height = 6, fig.width = 8}
 WBcombined_P16 <- plot_grid(WBColorMap_P16 + theme(plot.margin = unit(c(0,3,0, 3), "cm")), WBFigSX, ncol = 1, labels = c("A", ""))
 WBcombined_P16
 ```
 
 ```{r}
-ggsave("figures/WBModelValidation_Oxic.png")
+ggsave("figures/WBModelValidation_Oxic.png", width = 8, height = 6)
 ```
 
 ```{r}
