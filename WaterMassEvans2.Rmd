@@ -1,0 +1,109 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+From Evans et al. 2020. Appendex 2
+
+```{r}
+library(tidyverse)
+library(R.matlab)
+```
+
+```{r}
+wmCols <- c("gray80", "darkorange", "darkgreen", "yellow", "white", "darkblue", "black")
+```
+
+Data from natalya evans 02 April 2020
+```{r}
+evansA2_00 <- readMat("data/SKQ_26_27.mat")
+```
+
+Pull data out of the matlab meta-object and turn into a tibble with the data I nead
+```{r}
+WaterMasses = t(evansA2_00$A)
+colnames(WaterMasses) = c("13CW", "NEPIW", "AAIW")
+WaterMasses <- as_tibble(WaterMasses)
+Pressure <- t(evansA2_00$press)
+colnames(Pressure) <- "press"
+Pressure <- as_tibble(Pressure)
+
+# convert one element matlab object to a one column tibble
+mat_to_tib <- function(mob, mobname = "thing"){
+  Thing = t(mob)
+  colnames(Thing) = mobname
+  Thing = as_tibble(Thing)
+}
+
+Lat = mat_to_tib(evansA2_00$lat, "lat")
+Lon = mat_to_tib(evansA2_00$lon, "long")
+
+WaterMasses = bind_cols(Lat, Lon, Pressure, WaterMasses)
+```
+
+
+```{r}
+evans_LL <- WaterMasses %>%
+  select(long, lat) %>% distinct()
+evans_LL %>%
+  ggplot(aes(x = long, y = lat)) + geom_point()
+```
+
+```{r}
+library("rnaturalearth")
+library("rnaturalearthdata")
+library("sf")
+```
+
+```{r}
+oceanData <- ne_download(scale = 10, type = "coastline", category = "physical", returnclass = "sf")
+```
+
+```{r}
+mexMap <- ggplot(data = oceanData) +
+  geom_sf(color = "black", fill = "grey90") +
+  coord_sf(xlim = c(-120, -100), ylim = c(13.5, 18)) +
+  geom_point(data = evans_LL, aes(x = long, y = lat))
+mexMap
+```
+
+Unless specified otherwise, measurements were taken on board the R/V Sikuliaq from 07 January 2017 through 13 January 2017 at 16.5°N 106.9°W
+
+I'll pull from the 14N, 107 W station.
+
+```{r}
+evans_Target <- WaterMasses %>%
+  filter(long > -107.1, long < -106.8, lat < 16.6, lat > 16.4)
+```
+
+```{r}
+wmNames = c("13CW", "NEPIW", "AAIW")
+evans_Target_01 <- evans_Target %>% 
+  #filter(pdens < 27) %>%
+  select(press, `13CW`, NEPIW, AAIW) %>% 
+  pivot_longer(cols = -press, names_to = "watermass") %>%
+  mutate(watermass = factor(watermass, levels = wmNames, ordered = TRUE))
+```
+
+```{r}
+evans107Plot <- evans_Target_01 %>%
+  arrange(press) %>%
+  #filter(watermass != "UCDW") %>%
+  #filter(value > 0) %>%
+  mutate(value = if_else(value > 1, 1, value)) %>%
+  ggplot(aes(x = value, y = press, fill = watermass, shape = watermass, group = watermass)) +
+  geom_point(size = 3) +
+  #geom_path(color = "black") +
+  scale_y_reverse(limits = c(500, 100), breaks = seq(from = 0, to = 1000, by = 100)) +
+  #scale_y_reverse() +
+  scale_x_continuous(limits = c(0, 1)) +
+  scale_fill_manual(values = c(`13CW` = "Yellow", NEPIW = "Blue", AAIW = "Black")) + scale_shape_manual(values = c(21:25, 21:25)) +
+  geom_hline(yintercept = 160, color = "darkgreen") +
+  theme_bw()
+evans107Plot
+```
+
+```{r}
+ggsave("figures/evans16p5N107W.png", evans107Plot, width = 5, height = 3, dpi = 100)
+```
+
