@@ -10,12 +10,7 @@ library(readxl)
 ```
 
 ```{r}
-cb10 <- c('#a6cee3','#1f78b4','#b2df8a','#33a02c','#fb9a99','#e31a1c','#fdbf6f','#ff7f00','#cab2d6','#6a3d9a')
-```
-
-
-```{r}
-watermass00 <- read_excel("data/StP2_2017_out.xlsx")
+watermass00 <- read_excel("data/StP2_2017_out_v2b.xlsx", sheet = "Normalized to align")
 ```
 
 ```{r}
@@ -25,27 +20,28 @@ wmNames <- watermass00 %>% select(TSW:UCDW) %>% colnames
 
 ```{r}
 watermass01 <- watermass00 %>% 
-  filter(consv_T < 27) %>%
-  select(press:UCDW) %>% 
-  pivot_longer(cols = -press, names_to = "watermass") %>%
+  #filter(pdens < 27) %>%
+  select(pressure:UCDW) %>% 
+  pivot_longer(cols = -pressure, names_to = "watermass") %>%
   mutate(watermass = factor(watermass, levels = wmNames, ordered = TRUE))
 ```
 
 ```{r}
 wmCols <- c("gray80", "darkorange", "darkgreen", "yellow", "white", "darkblue", "black")
 watermass01 %>% 
-  arrange(press) %>%
+  arrange(pressure) %>%
   #filter(watermass != "UCDW") %>%
   filter(value > 0) %>%
   mutate(value = if_else(value > 1, 1, value)) %>%
-  ggplot(aes(x = value, y = press, fill = watermass, shape = watermass, group = watermass)) +
+  ggplot(aes(x = value, y = pressure, fill = watermass, shape = watermass, group = watermass)) +
   geom_point(size = 3) +
   #geom_path(color = "black") +
-  scale_y_reverse(limits = c(1250, 5)) +
+  scale_y_reverse(limits = c(1000, 5), breaks = seq(from = 0, to = 1000, by = 100)) +
   #scale_y_reverse() +
   scale_x_continuous(limits = c(0, 1)) +
   scale_fill_manual(values = wmCols) + scale_shape_manual(values = c(21:25, 21:25)) +
-  cowplot::theme_cowplot()
+  theme_bw()
+  #cowplot::theme_cowplot()
 ```
 
 ```{r}
@@ -55,11 +51,11 @@ ggsave("figures/watermass.png", width = 5, height = 3, dpi = 100)
 ```{r}
 wmCols <- c("gray80", "darkorange", "darkgreen", "yellow", "white", "darkblue", "black")
 watermass01 %>% 
-  arrange(press) %>%
+  arrange(pressure) %>%
   #filter(watermass != "UCDW") %>%
   filter(value > 0) %>%
   #mutate(value = if_else(value > 1, 1, value)) %>%
-  ggplot(aes(x = value, y = press, fill = watermass, shape = watermass, group = watermass)) +
+  ggplot(aes(x = value, y = pressure, fill = watermass, shape = watermass, group = watermass)) +
   geom_point(size = 3) +
   #geom_path(color = "black") +
   #scale_y_reverse(limits = c(1250, 5)) +
