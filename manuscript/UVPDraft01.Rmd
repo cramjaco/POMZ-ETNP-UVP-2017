@@ -321,10 +321,7 @@ Figure S10. The same profiles as shown in Figure 5, but for the oxic site P16 St
 
 ![](../figures/DisagExample.png)
 
-Figure S11. An example of differences between modeled and observed particle slope. Shown are profiles of particles between 100 $\mu m$ and 500 $\mu m$ than 1 mm. The particle size distribution at a shallow and deeper depth are shown. The model generates a prediction of the deep depth profile form the shallow depth profile and the flux attenuation between the two profiles. The model predicts more attenuation of the smallest particles than it actually observed. 
-
-
-
+Figure S11. An example of differences between modeled and observed particle slope. The particle size distribution at a shallow and deeper depth are shown. The model generates a prediction of the deep depth profile form the shallow depth profile and the flux attenuation between the two profiles. The model predicts more attenuation of the smallest particles than it actually observed. In practice the model compares depths that are closer together than the two shown here. Two depths that are far apart are shown so that the flux attenuation is large enough to be seen by eye and to provide a conceptual example of the models' function.
 
 ![](../figures/OSMSGamPlot.png)
 

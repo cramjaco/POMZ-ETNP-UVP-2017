@@ -994,23 +994,28 @@ source("ModelStuff.R")
 ```{r}
 scan_for_example <- bds %>% filter(project == "ETNP", depth < 500, depth > 200) %>% select(profile, depth, DFP, use_this_DFP, ospsDZ)
 
-loc_station = "stn_036"
+#loc_station = "stn_036"
+loc_station = "stn_043"
 loc_depth = 225
-loc_prev_depth = loc_depth - 50
+loc_prev_depth = 112.5
 
-loc_DFP <- bds %>% filter(profile == loc_station, depth %in% c(275)) %>% pull(DFP)
-loc_use_DFP <- bds %>% filter(profile == loc_station, depth %in% c(275)) %>% pull(use_this_DFP)
-for_single_disag <- bes %>% filter(profile == loc_station, depth %in% c(225, 275)) %>% select(depth, lb, nnp_smooth) %>%
-  mutate(depth = recode(depth, `225` = "Shallow", `275` = "Deep")) %>%
+allDFPs <- bds %>% filter(profile == loc_station, depth >= loc_prev_depth, depth <= loc_depth) %>% summarize(DFP = prod(DFP), use_this_DFP = prod(use_this_DFP))
+
+loc_DFP <-  allDFPs %>% pull(DFP)
+loc_use_DFP <- allDFPs %>% pull(use_this_DFP)
+
+
+for_single_disag <- bes %>% filter(profile == loc_station, depth %in% c(loc_prev_depth, loc_depth)) %>% select(depth, lb, nnp_smooth) %>%
+  mutate(depth = recode(depth, `112.5` = "Shallow", `225` = "Deep")) %>% # I have no idea how to not hard code this bit
   pivot_wider(names_from = depth, values_from = nnp_smooth) 
 
 with_disag <- for_single_disag %>%
   mutate(Predicted_Deep = remin_smooth_shuffle(Shallow, loc_use_DFP)) 
 #remin_smooth_shuffle(for_single_disag$Shallow,loc_use_DFP)
 
-for_plot_disag <- with_disag %>% pivot_longer(cols = -lb) %>% filter(lb <= 0.5) %>%
+for_plot_disag <- with_disag %>% pivot_longer(cols = -lb) %>% #filter(lb <= 5) %>%
   mutate(name = factor(name, levels = c("Shallow", "Deep", "Predicted_Deep"))) %>%
-  mutate(name = recode_factor(name, Shallow = "Shallow (250m)", Deep = "Deep (275m)", Predicted_Deep = "Predicted Deep (275m)"))
+  mutate(name = recode_factor(name, Shallow = "Shallow (112.5m)", Deep = "Deep (225m)", Predicted_Deep = "Predicted Deep (225m)"))
 
 for_plot_disag %>% ggplot(aes(x = lb, y = value, shape = name)) + geom_point() + scale_x_log10() + scale_y_log10() + scale_shape_manual(values = c(1, 6, 3)) + theme(legend.title = element_blank()) + labs(x = "Particle Size (mm)", y = "Normalized Particle Abundance (#/L/mm)")
 

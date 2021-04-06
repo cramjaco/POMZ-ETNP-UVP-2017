@@ -1,0 +1,31 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+Revisiting smoothing function, as the largest values look suspiciously large sometimes.
+
+```{r}
+source("UVP_2017_library.R")
+source("ModelStuff.R")
+```
+
+
+```{r}
+bes <- read_csv("dataOut/binned_EachSize.csv")
+bds <- read_csv("dataOut/binned_DepthSummary.csv")
+binnedCombined <- list(ES = bes, DS = bds)
+```
+
+
+
+```{r}
+pt0 = proc.time()
+mod1 <- gam(TotalParticles ~s(log(lb), log(depth), by = factor(profile)), offset = log(vol * binsize), family = nb(), data = bes)
+pt1 = proc.time()
+pt1 - pt0
+```
+
+```{r}
+plot(mod1)
+```
+
