@@ -50,7 +50,7 @@ Jacob A. Cram http://orcid.org/0000-0001-9546-1130,
 <<<<<<< HEAD
 Clara A. Fuchsman 0000-0002-9151-4984,
 
-Megan E. Duffy,
+Megan Duffy,
 
 Jessica L. Pretty 0000-0001-6542-8540 ???,
 
@@ -373,11 +373,6 @@ Similarly, a clear next step is to apply our disaggregation model to other ocean
 
 Particles of all sizes appear to remineralize more slowly at this ODZ site than in oxic sites. Furthermore, it appears that diel migratory organisms both disaggregate particles and transport carbon throughout the top 500m of the water column. Day to day and within day variability in organic matter transport was evident, though overall patterns in particle size, flux and disaggregation appeared to be consistant over the course of the time-series.
 
-# Acknowledgements
-
-The authors thank the captain and crew of the RV Sequliaq for making field collection possible. The authors also thank Gabrelle Rocap, Curtis Deutch for asstance in the field and valuable insight.
-Funding for this project was provided by NSF Grant Number DEB-1542240, as well as startup funds to JAC provided by University of Maryland Center for Environmental Science.
-
 
 # Figures
 
@@ -473,17 +468,14 @@ Figure S12. GAM predicted effects of **A** Depth, **B** Day of the month in Janu
 # Cover Letter
 
 Dear Editor,
-
-We present for your consideration, our manuscript entitled Particle size and abundance measurements suggest temporally variable biotic transport and disaggregation in the Eastern Tropical North Pacific Oxygen Minimum Zone. This manuscript presents a time-series of measurements of particle size and abundance in the Eatern Tropical North Pacific Oxygen Deficient zone. Our particle size measurements are complemented by the first set of trap based measurements of carbon flux taken in the oligotrophic section of the ETNP-OMZ and acoustic measurements of zooplankton abundances.
-
-Oxygen deficient zones have the capacity to regulate the global carbon cycle, because carbon flux attenuates more slowly in the mesopelagic when those waters are anoxic. However there is some uncertainty about why carbon flux attenuation is so low in this region. Our measurements support the predictions of models that suggest that all particles are consumed more slowly by bacteria in OMZs. In contrast, they do not conform to the predictions models that suggest that zooplankton activity is supressed in OMZs, or that only large particles break down slowly. Furthermore, by comparing our observations to the predictions of another model, we provide a depth resolved estimate of the rate at which zooplankton disaggregate large particles into smaller ones. It appears that this apparent disaggregation is highest where acoustic data suggest abundant zooplankton. By examining day to day variability, we also show that the patterns that we observe are representative of conditions in the core.
+      We present for your consideration, our manuscript entitled Particle size and abundance measurements suggest temporally variable biotic transport and disaggregation in the Eastern Tropical North Pacific Oxygen Minimum Zone. This manuscript presents a time-series of measurments of particle size and abundance in the Eatern Tropical North Pacific Oxygen Deficient zone. Our particle size measurments are complemented by the first set of by trap based measurments of carbon flux taken in the oligotrophic section of the ETNP-OMZ and acoustic measurments of zooplankton abundances.
+   
+Oxygen defficient zones have the capacity to regulate the global carbon cycle, because carbon flux attenuates more slowly in the mesopelegic when those waters are anoxic. However there is some uncertaintly about why carbon flux attenuation is so low in this region. Our measurments support the to predictions of models that suggest that all particles are consumed more slowly by bacteria in OMZs. In contrast, they do not conform to he predictions models that suggest that zooplankton activity is supressed in OMZs, or that only large particles break down slowly. Furthermore, by comparing our observations to the predictions of another model, we provide a depth resolved estemate of the rate at which zooplankton disaggregate large particles into smaller ones. It appears that this a apparent disaggregation is highest where acoustic data suggest abundant zooplankton. By examining day to day variability, we also show that the patterns that we observe are representiative of conditions in the core.
 
 We think this manuscript will be of interest to readers of GBC because it settles some important questions about how oxygen minimum zones regulate the carbon cycle. In particular it presents evidence that microbial breakdown of particles is slow in this region, even though there are abundant electron acceptors in the form of nitrate and nitrite, and that zooplankton still play an important role in particle transport and breakdown, even though there is not oxygen for them to breathe in this region.
 
 Sincerely,
-
 Jacob Cram
-
 
 # Suggested Reviewers
 
