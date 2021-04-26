@@ -70,20 +70,28 @@ f_vec = C_f_global * lb_vec ^ alpha;
 #' }
 remin_shuffle <- function(abun_in, DFpct, DeltaZ = 10, Cm = m1mm, Cw = w1mm, lbv = lb_vec, mv = m_vec, wv = w_vec,
                           alpha = alpha_global, gamma = gamma_global, llb = little_lb){
+ ail = length(abun_in)
  rn = abun_in * lbv
  ran = abun_in * lbv ^ alpha
  srn = sum(rn)
  sran = sum(ran)
  
- omega = lbv[1] ^ (2 * alpha)  * abun_in[1]/(lbv[1] ^ alpha - llb ^ alpha)
- #omega = lbv[1] ^ (2 * alpha)  * abun_in[1]/(llb ^ alpha - lbv[1] ^ alpha) # possible correction
+ # For C_r only, didn't help
+ ran2 = ran[2:ail]
+ sran2 = sum(ran2)
+ 
+ omega = lbv[1] ^ (2 * alpha)  * abun_in[1]/(lbv[1] ^ alpha - llb ^ alpha) # flipped the denominater so its positive
+
+ #omega = lbv[1] ^ (2 * alpha)  * abun_in[1]/(llb ^ alpha - lbv[1] ^ alpha) ## Omega should calculate like this but the flux attenuation is closer to expected if I use the equation above
  
  nmw = abun_in * mv * wv
  F1 = sum(nmw)
  DeltaF = (F1 * DFpct) - F1 # should be negative
  
  #Cr = DeltaF/ (Cm*(1+gamma/alpha) * DeltaZ * (sran + omega));
- Cr = DeltaF/ (Cm*  DeltaZ * ((1+gamma/alpha) * sran + omega)); # Possible correction
+ Cr = DeltaF/ (Cm*  DeltaZ * ((1+gamma/alpha) * sran + omega)); # Possible correction (latest)
+ Cr = DeltaF/ (Cm*  DeltaZ * (1+gamma/alpha) * (sran + omega)); #J burchfield modification
+ #Cr = DeltaF/ (Cm*  DeltaZ * ((1+gamma/alpha) * sran2 + omega)); # Avoid double dip (worse fit)
  #Cr = DeltaF/ (Cm*(1+gamma/alpha) * DeltaZ * (sran)); # Test
  CrCw = Cr/Cw
  
@@ -160,18 +168,18 @@ remin_smooth_shuffle <- function(abun_in, DFpct, Ipct = 0.9999, lbv = lb_vec, mv
 #'   varied by optimization functions
 #'   @param DFpct_target The amount of flux actually lost
 shuffle_tune <- function(DFpct_toRemin, abun_in,  DFpct_target, llb = little_lb, mv = m_vec, wv = w_vec, lbv = lb_vec,...){
-  abun_out <- remin_smooth_shuffle(abun_in = abun_in, DFpct = DFpct_toRemin, llb = llb, mv = mv, wv = wv, ...)
+  abun_out <- remin_smooth_shuffle(abun_in = abun_in, DFpct = DFpct_toRemin, llb = llb, mv = mv, wv = wv, lbv = lbv, ...)
   flux_in <- sum(abun_in * C_f_global * lbv ^ ag_global)
   flux_out <- sum(abun_out * C_f_global * lbv ^ ag_global)
   DFPct_actually_happened <- flux_out/flux_in
   rmse <- (DFPct_actually_happened - DFpct_target)^2
-  rmse
+  rmse * 100
 }
 
 #' Determine the DFP value that actually provides the preferred flux loss. 
 #' @return The DFP value which if passed to remin_smooth_shuffle, will
 #'  actually warrant the DFpct value passed to this function
 optFun <- function(abun_in, DFpct, lbv = lb_vec, llb = little_lb, mv = m_vec, wv = w_vec, ...){
-  opt <- optimize(shuffle_tune, c(0, 2), abun_in = abun_in, DFpct_target = DFpct, llb = llb, mv = mv, wv = wv, ...)
+  opt <- optimize(shuffle_tune, c(0, 2), abun_in = abun_in, DFpct_target = DFpct, llb = llb, mv = mv, wv = wv, lbv = lbv, ...)
   opt$minimum
 }
