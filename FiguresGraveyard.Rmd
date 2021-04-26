@@ -1,0 +1,252 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+Figures that I ended up not using in the manuscript.
+And analysis that I'm not using.
+
+# Comparing the P2 site to the oxic P16S100
+```{r}
+PlotNParticles <- uds %>% 
+  ggplot(aes(x = tot_nparticles, y = depth, col = profile)) +
+ facet_wrap(~project) +
+ geom_point(alpha = 0.3, shape = 1) +
+scale_y_reverse() + scale_x_log10()
+
+PlotNParticles
+```
+
+```{r}
+bdsAddTime <- bds %>%
+  mutate(Hour = hour(time), Day = day(time))
+
+FSG1 <- gam(tot_nparticles~ s(depth, k = 3) + s(Day, k = 3) + s(Hour, k = 4, bs = "cc"), knots = list(Hour = c(0, 24)), data = bdsAddTime %>% filter(depth >= 175 & depth <=500 & project == "ETNP"))
+
+FSG2 <- gam(tot_nparticles ~ s(depth, k = 3) + s(Day, k = 3), data = bdsAddTime %>% filter(depth >= 175 & depth <=500 & project == "ETNP"))
+
+FSG3 <- gam(tot_nparticles ~ s(depth, k = 3), data = bdsAddTime %>% filter(depth >= 175 & depth <=500 & project == "ETNP"))
+
+#FSG4 <- gam(tot_nparticles~ s(depth, k = 3)  + s(Hour, k = 4, bs = "cc"), knots = list(Hour = c(0, 24)), data = bdsAddTime %>% filter(depth >= 175 & depth <=500 & project == "ETNP"))
+
+summary(FSG1)
+#summary(FSG2)
+#summary(FSG3)
+#summary(FSG4)
+
+summary(FSG1)$r.sq - summary(FSG2)$r.sq
+summary(FSG2)$r.sq - summary(FSG3)$r.sq
+summary(FSG3)$r.sq
+```
+
+But there is between projects:
+```{r}
+ProjGam <- gam(tot_nparticles~ s(depth, k = 3) + factor(project), knots = list(Hour = c(0, 24)), data = bdsAddTime %>% filter(depth >= 175 & depth <=500))
+
+summary(ProjGam)
+```
+
+But there is between projects:
+```{r}
+ProjGam <- gam(psd~ s(depth, k = 3) + factor(project), knots = list(Hour = c(0, 24)), data = bdsAddTime %>% filter(depth >= 175 & depth <=500))
+
+summary(ProjGam)
+```
+
+I wonder if I can show that the profiles aren't statistically significanlty different. Or that they are for that matter...
+I think in that case, I run a gam with and without a parameter for profile...
+And then quantify the effect size of that parameter
+
+Or follow this Gavin Simpson Post
+https://fromthebottomoftheheap.net/2017/10/10/difference-splines-i/
+
+or 
+anova.gam {mgcv}
+
+Calculate gams for each profile, and then run anova.gam to see if they are different...
+
+# Smooth flux and um disaggregation.
+
+```{r}
+bds %>% 
+  ggplot(aes(y = depth, x = Flux_Smooth, col = factor(time))) + facet_wrap(~project) + geom_point() + scale_y_reverse(limits = c(1000, 0)) + scale_x_log10()
+```
+
+
+
+
+```{r}
+bdsAddTime <- bds %>%
+  mutate(Hour = hour(time), Day = day(time))
+
+FSG1 <- gam(Flux_Smooth~ s(depth, k = 3) + s(Day, k = 3) + s(Hour, k = 4, bs = "cc"), knots = list(Hour = c(0, 24)), data = bdsAddTime %>% filter(depth >= PhoticBase & depth <=500 & project == "ETNP"))
+
+FSG2 <- gam(Flux_Smooth ~ s(depth, k = 3) + s(Day, k = 3), data = bdsAddTime %>% filter(depth >= PhoticBase & depth <=500 & project == "ETNP"))
+
+FSG3 <- gam(Flux_Smooth ~ s(depth, k = 3), data = bdsAddTime %>% filter(depth >= PhoticBase & depth <=500 & project == "ETNP"))
+
+summary(FSG1)
+summary(FSG2)
+summary(FSG3)
+
+summary(FSG1)$r.sq - summary(FSG2)$r.sq
+summary(FSG2)$r.sq - summary(FSG3)$r.sq
+summary(FSG3)$r.sq
+```
+
+```{r}
+bds %>% filter(project == "ETNP") %>% select(profile, depth, Flux_Smooth) %>% pivot_wider(names_from = profile, values_from = Flux_Smooth)
+```
+
+Something is off. All of the flux profiles are identical.
+Skip this
+```{r}
+cb10 <- c('#a6cee3','#1f78b4','#b2df8a','#33a02c','#fb9a99','#e31a1c','#fdbf6f','#ff7f00','#cab2d6','#6a3d9a')
+plt1 <- bds %>% #filter(DFP > 1) %>% #filter(profile %in% c("stn_043", "p16n_100")) %>%
+  ggplot(aes(y = depth, x = DFP, col = factor(time), shape = factor(time))) + facet_wrap(~project) + geom_point() + scale_y_reverse(limits = c(1000, 0)) + xlim(c(0.5, 1.5))+ geom_vline(xintercept = 1) +
+   scale_color_manual(values = c(rep("black", 5), rep("blue", 5))) + scale_shape_manual(values = rep(1:5, 2))
+
+plotly::ggplotly(plt1)
+```
+
+What the heck is going on with DFP here. Why is it usually > 1 shouldn't it be less than 1 when flux is decreasing?
+This very deep increasing flux seems improbable to me.
+Lets check the smooths. Or only go to 1000m.
+
+Check of actual data for hour
+```{r}
+ggplot(data = bds %>% filter(depth >= PhoticBase, depth <= 500), aes(y = DF/DZ, x = hour(time), col = depth, group = depth)) + geom_point() + geom_line()
+```
+
+### Clara Fig
+For NSF Proposal
+plot_grid(
+  PlotParticlesmany,
+  PlotPSDmany,
+  rel_widths = c(2, 3)
+  )
+```{r fig.height = 8, fig.width = 10}
+
+pgTop <- ggdraw(pltFlxNoLegend 
+       ) +
+  draw_plot(pltFlxZoom, .4, .25, .55, .60) +
+  draw_plot_label(
+    c("","D"),
+    c(.05, 0.55),
+    c(1, 0.85),
+    size = 16
+  )
+
+pgCF <- plot_grid(PlotParticlesmany + ylim(c(1000, 0)),
+                  PlotPSDmany + ylim(c(1000, 0)) +theme(legend.position = "none"),
+                  pgTop + theme(plot.margin = unit(c(0, 0, 0, 0), units = "cm")),
+                    disagFig + theme(plot.margin = unit(c(0, 0, .2, 0), units = "cm")),
+                    ncol = 2, rel_heights = c(4, 4), labels = c("A", "B", "C", "E"), label_size = 16)
+pgCF
+
+ggsave("./figures/UVP_for_zoop_proposal.png", pgCF, width = 10, height = 8, units = "in")
+```
+
+
+P16 Difference from model
+```{r}
+bds %>% filter(project == "P16") %>%
+  ggplot(aes(y = depth, x = ospsDZ)) + facet_wrap(~project) + geom_point() + scale_y_reverse(limits = c(500, 0)) + geom_vline(xintercept = 0)
+```
+
+Trap data tables
+
+```{r}
+trapFlux3
+```
+```{r}
+UVPFluxComb
+```
+
+
+```{r}
+# UVPFluxComb %>%
+#   ggplot(aes(y = depth))  + scale_y_reverse(limits = c(1000, 0)) +
+#   scale_x_continuous(limits = c(0, 200)) +
+#   geom_point(aes(y = Depth, x = C_flux_umol, fill = SampleType, shape = TrapType),
+#              colour = "black", stroke = 1, size = 5, data = fluxMS_distilled_toPlot) +
+#   geom_point(aes(x = Flux), size = 3, shape = 21, color = "white", fill = "black") +
+#   geom_point(aes(x = -1, y = -1, size = "UVP")) + # dummy point for the legend
+# scale_shape_manual(values = c(25, 22))+
+#   scale_size_manual(values = 1, name = "") +
+#   ylab("Depth (m)") + xlab("Flux µmolC/m^2/day") +
+#   guides(fill = guide_legend(override.aes = list(shape = 21))) +
+#   scale_fill_viridis_d() +
+#   theme_cowplot() + 
+#   theme(
+#         legend.position = c(0.5, 0.4),
+#         legend.box.background = element_rect(color = "black", size = 0.5),
+#         legend.margin = margin(-10, 5, 10, 5)
+#   ) +
+#   geom_rect(data = data.frame(project = "ETNP"), aes(xmin = 15, xmax = 32, ymin = 45, ymax = 195), colour = "red", fill = NA, inherit.aes = FALSE)
+#  ggsave("figures/FittedFlux.png")
+#  ggsave("figures/FittedFlux.svg")
+```
+
+# Weber bianchi
+
+
+Plot by station, not used
+```{r}
+ToPlot %>% filter(lb <= 2) %>%  ggplot(aes(x = lb, y = depth, fill = log10(nnparticles), z = log10(nnparticles))) + geom_tile() + scale_fill_viridis_c() + scale_y_reverse() + scale_x_log10()  + facet_wrap(~time) + geom_contour(color = "black")
+```
+
+Average of everything
+
+```{r}
+#meanBese043 <- ToPlot %>% filter(lb <= 2, time == "2017-01-13 11:51:31")
+
+meanBese%>%
+   ggplot(aes(x = lb, y = depth, fill = log10(nnparticles), z = log10(nnparticles))) + geom_tile() + scale_fill_viridis_c() + scale_y_reverse() + scale_x_log10() + geom_contour(color = "black") + geom_hline(yintercept = 160, color = "darkgreen")
+```
+
+
+
+```{r}
+mbGam %>% ggplot(aes(x = psd, y = depth)) + geom_path() + scale_y_reverse() + geom_hline(yintercept = 160, color = "darkgreen") + geom_hline(yintercept =  OMZBase, color = "darkblue")
+```
+
+## Fig 5 WB
+
+bds %>% filter(profile == "stn_043", depth <= 2000) %>% ggplot(aes(x = psd_gam, xmin = psd_gam - psd_seg * 2, xmax = psd_gam + psd_seg * 2, y = depth)) + geom_path(size = 1) + scale_y_reverse() + geom_hline(yintercept = PhoticBase, color = "darkgreen") + geom_hline(yintercept = 950, color = "darkblue") + geom_ribbon(alpha = 0.2) + labs(x = "PSD slope")
+
+All of them
+
+```{r}
+bds %>% filter(profile == "stn_043", depth <= 2000) %>% ggplot(aes(x = psd_gam, xmin = psd_gam - psd_seg * 2, xmax = psd_gam + psd_seg * 2, y = depth)) + geom_path(size = 1) + scale_y_reverse() + geom_hline(yintercept = PhoticBase, color = "darkgreen") + geom_hline(yintercept = 950, color = "darkblue") + geom_ribbon(alpha = 0.2) + labs(x = "PSD slope")
+```
+043 only
+
+```{r}
+bds %>% filter(profile == "stn_043", depth <= 2000, depth > PhoticBase) %>% ggplot(aes(x = small_biovolume, y = depth)) + geom_path(size = 1) + scale_y_reverse() + geom_hline(yintercept = PhoticBase, color = "darkgreen") + geom_hline(yintercept = 950, color = "darkblue") + geom_point()
+```
+
+```{r}
+ubDf0 <- ToPlot %>% mutate(ubiomass = nparticles * lb ^ ag_global)
+ubDf <- ubDf0 %>% group_by(time, depth) %>% summarize(ubiomass = sum(ubiomass)) %>% ungroup %>% group_by(depth)
+photicBiomass <- ubDf %>% filter(depth <= 180, depth >= 160) %>% summarize(ubiomass = mean(ubiomass)) %>% pull(ubiomass)
+ubDf <- ubDf %>% mutate(nbiomass = ubiomass/photicBiomass)
+ubDf %>% ggplot(aes(x = nbiomass, y = depth , group = time, col = time)) + geom_path() + scale_y_reverse() + scale_x_continuous(limits = c(0,1))
+```
+
+
+ 
+```{r}
+ubDf <- ToPlot %>% mutate(ubiomass = nparticles * lb ^ ag_global) %>% group_by(time, depth) %>% summarize(ubiomass = sum(ubiomass)) %>% ungroup %>% group_by(depth)  %>% summarise(ubiomass = mean(ubiomass))
+photicBiomass <- ubDf %>% filter(depth <= 180, depth >= 160) %>% summarize(ubiomass = mean(ubiomass)) %>% pull(ubiomass)
+ubDf <- ubDf %>% mutate(nbiomass = ubiomass/photicBiomass)
+ubDf %>% ggplot(aes(x = nbiomass, y = depth)) + geom_path() + scale_y_reverse() + scale_x_continuous(limits = c(0,1)) + geom_hline(yintercept = PhoticBase, color = "darkgreen")
+```
+
+## All weber bianchi figures combined
+```{r}
+WBColorMap
+pWBPSD
+pWBS
+pWBL
+```
