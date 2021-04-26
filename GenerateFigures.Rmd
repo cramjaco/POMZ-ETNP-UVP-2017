@@ -703,8 +703,10 @@ WBcombined
 ggsave("figures/WBModelValidation.png")
 ```
 
+# Figure S8
 ## P16 Flux 
 
+### Flux
 ```{r fig.width=6, fig.height=4}
 scientific_10 <- function(x) {parse(text=gsub("e\\+*", " %*% 10^", scales::scientific_format()(x))) }
 #https://stackoverflow.com/questions/10762287/how-can-i-format-axis-labels-with-exponents-with-ggplot2-and-scales
@@ -732,6 +734,7 @@ pltFlxP16
 # #plotly::ggplotly(plt1)
 ```
 
+### Rate of change of flux -- fifth root transformed
 ```{r fig.width=6, fig.height=4}
 cb10 <- c('#a6cee3','#1f78b4','#b2df8a','#33a02c','#fb9a99','#e31a1c','#fdbf6f','#ff7f00','#cab2d6','#6a3d9a')
 pltDelta3P16 <- bds %>% filter(project == "P16") %>% #filter(DFP > 1) %>% #filter(profile %in% c("stn_043", "p16n_100")) %>%
@@ -751,6 +754,7 @@ pltDelta3P16
 #plotly::ggplotly(plt1pos)
 ```
 
+### Difference from model
 ```{r fig.width = 6, fig.height = 4}
 osms_p16 <- bds %>% filter(project == "P16") %>%
   ggplot(aes(y = depth, x = pracma::nthroot(ospsDZ, 3), group = factor(time))) + geom_point(size = 3) + geom_path() + scale_y_reverse(limits = c(1000, 0)) +
@@ -762,6 +766,7 @@ plotly::ggplotly(osms_p16)
 
 ```
 
+### Combine everything together
 ```{r fig.width = 8, fig.height=8}
 plot_grid(
   pltFlxP16,
@@ -773,8 +778,10 @@ ggsave("figures/P16FluxRelate.svg")
 ggsave("figures/P16FluxRelate.png")
 ```
 
-# Flux attenuation example
+# Figure S10
+## Flux attenuation example
 
+Take one profile, attenuate it, and show what it looks like
 ```{r}
 source("ModelStuff.R")
 ```
