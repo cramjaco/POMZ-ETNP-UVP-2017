@@ -15,7 +15,7 @@ SmoothDevelopment -- For figuring out how to properly smooth the data for some a
 
 WaterMassEvans2 -- The water mass analyisis
 
-WaterMassAnalysis -- an old version of water mass analysis (Archive
+WaterMassAnalysis -- an old version of water mass analysis (Archive)
 
 P16IntegratedPlots -- Figures about the oxic control station from the P16 transect in 2016
 
@@ -57,7 +57,7 @@ DisagAttemptAlldgedgeAG -- Some experiments with disaggreagation (Archive). Used
 
 GamVsGlmConfedenceQuestion -- A call to stack overflow for help. The answer was that I can use negative binomial distributions in gam functions but not glm functions, even if there are no smooths (Archive)
 
-DisagAttemptNonPowerLaw -- Early version of disaggregation Model.
+DisagAttemptNonPowerLaw -- Early version of disaggregation Model. (Archive)
 
 Notes 24Sep2020 -- Some very isolated notes (Archive)
 
