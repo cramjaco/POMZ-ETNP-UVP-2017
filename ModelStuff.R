@@ -89,7 +89,7 @@ remin_shuffle <- function(abun_in, DFpct, DeltaZ = 10, Cm = m1mm, Cw = w1mm, lbv
  DeltaF = (F1 * DFpct) - F1 # should be negative
  
  #Cr = DeltaF/ (Cm*(1+gamma/alpha) * DeltaZ * (sran + omega));
- Cr = DeltaF/ (Cm*  DeltaZ * ((1+gamma/alpha) * sran + omega)); # Possible correction (latest)
+ #Cr = DeltaF/ (Cm*  DeltaZ * ((1+gamma/alpha) * sran + omega)); # Possible correction (latest)
  Cr = DeltaF/ (Cm*  DeltaZ * (1+gamma/alpha) * (sran + omega)); #J burchfield modification
  #Cr = DeltaF/ (Cm*  DeltaZ * ((1+gamma/alpha) * sran2 + omega)); # Avoid double dip (worse fit)
  #Cr = DeltaF/ (Cm*(1+gamma/alpha) * DeltaZ * (sran)); # Test
