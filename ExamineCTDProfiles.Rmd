@@ -65,6 +65,21 @@ oxyprof <- ctdP2Binned %>% filter(variable == "oxygen") %>%
 oxyprof
 ```
 
+```{r}
+oxyprof <- ctdP2Binned %>% filter(variable == "oxygen") %>%
+  group_by(depthBin) %>% summarize(value = mean(value)) %>%
+  ggplot(aes(y = depthBin, x = value)) +
+  geom_path() + scale_y_reverse(limits = c(1000, 0)) + scale_x_log10()
+oxyprof
+```
+
+```{r}
+ctdP2Binned %>% filter(variable == "oxygen") %>%
+  group_by(depthBin) %>% summarize(value = mean(value)) %>% filter(value < .1) %>% 
+  summarize(shallow = min(depthBin), deep = max(depthBin))
+```
+
+
 # Combined profiles
 ,
              labeller = as_labeller(salinity = "temperature (C)")
