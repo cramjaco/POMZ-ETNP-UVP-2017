@@ -34,40 +34,41 @@ This document exists to describe what the other files in this project do.
 
 ## Files in Main Directory
 
-references.bib -- Bibiography for manuscript
+### Files that generate figures
+
+UVP-2017-proc.R -- Run the main data processing
 
 GenerateFigures.Rmd -- Most of the figures that go in the manuscript, and some data analysis reported in the main text are in this file.
 
-SmoothDevelopment -- For figuring out how to properly smooth the data for some analyses (Archive)
-
-WaterMassEvans2 -- The water mass analyisis
+WaterMassEvans2 -- The water mass analyisis, creates the watermass figure
 
 P16IntegratedPlots -- Figures about the oxic control station from the P16 transect in 2016
+
+ExamineCTDProfiles -- Generates figure 1 with all of the CTD data
+
+### Files that process data
+
+SmoothsAndFluxRevisited.R -- Optimizes fit of UVP data to trap data and saves output. (Keep)
+
+### Libraries of R functions
 
 ModelStuff.R -- The code for running the disaggregation model
 
 UVP_2017_library.r -- Most of the functions for processing my data live here, except for the main disaggregation model functions.
 
-SmoothsAndFluxRevisited.R -- Optimizes fit of UVP data to trap data and saves output. (Keep)
+bring_in_ctd.R -- Functions for loading CTD data (keep)
 
-ExamineCTDProfiles -- Generates figure 1 with all of the CTD data
+### Helper Files
+
+references.bib -- Bibiography for manuscript
 
 .gitignore -- tell git not to save silly stuff
 
-bring_in_ctd.R -- Functions for loading CTD data (keep)
-
-.Rprofile -- Functions that run every time I launch R no matter what
-
-Notes -- Mostly about some presentation I was writing once
-
-README.md -- I shoud make this look nicer and more informative.
-
-UVP-2017-proc.R -- Run the main data processing
-
-DescriptionOfFiles -- This document.
-
+README.md -- This document
 
 ## Files in *archive* directory
+
+figures/ -- Figures that are not in the final analysis
 
 WaterMassAnalysis -- an old version of water mass analysis (Archive)
 
@@ -75,7 +76,6 @@ WaterMassAnalysis -- an old version of water mass analysis (Archive)
 DisagAttemptBivariateSmooth -- Some experiments with disaggreagation (Archive)
 
 DisagModelTests -- Some experiments with disaggreagation (Archive)
-
 
 
 ClaraFig5- Makes one figure that clara needed for a grant proposal (Archive)
@@ -117,6 +117,10 @@ scratch.R -- playing around with stuff, who even knows what I was doing (Archive
 Explore_Quantiles_And_Size_Cutoff -- an early look into whether there were ever so few large particles that I could show there were more zeros than we would expect from chance. There weren't. (Archive)
 
 Explore_Processed_UVP -- My earlist look at the UVP data (Archive)
+
+SmoothDevelopment -- For figuring out how to properly smooth the data for some analyses (Archive)
+
+Notes -- Mostly about some presentation I was writing once (Archive)
 
 ## Directories
   * archive -- Analysis files that I used in early data exploration, model development, and so on that are not part of my primary analysis pipeline, as used in the manuscript. They are maintained for historical purposes
