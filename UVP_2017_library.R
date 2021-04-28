@@ -170,7 +170,7 @@ parse_jac_input2 <- function(x, DepthSummary){
   }
 }
   
-
+## I dont' actually use this for anything,but these twin functions all have common elements, so here's a template
 function_template <- function(x, DepthSummary = NULL){
   x2 <- parse_jac_input2(x, DepthSummary)
   EachSize = x2[[1]]
@@ -381,8 +381,10 @@ calc_psd_gam <- function(x, DepthSummary = NULL){
   
 }
 
+
+# Treat each cast seperately when calculating smooded particle size distributions
+
 calc_psd_gam_multiprofile <- function(x, DepthSummary = NULL){
-  # this currently slushes everything together. I need to nest and run over everything.
   
   x2 <- parse_jac_input2(x, DepthSummary)
   EachSize = x2[[1]]
@@ -498,6 +500,7 @@ BianchiBins <- c(
   seq(from = 2000, to = 5600, by = 200)
 ) %>% unique
 
+## Go from highly resoved, to binned data
 bin_depths <- function(x, DepthSummary = NULL, bins = BianchiBins){
   # Input from twin please.
   #Allow passing in either a two elemet list of Eachsize and DepthSummary, or passing in as two variables.
@@ -612,6 +615,10 @@ sum_profiles <- function(x, DepthSummary = NULL){
 # 
 # safe_double_gam <- safely(my_double_gam)
 
+## The following functions are never used as far as I can tell, but if I delete them, they'll probably turn
+## out to be required somewhere cryptic and break everything, so here they stay.
+## I'm not sure what they do
+
 expand_with_gam <- function(df, mod){
   loc_pred <- predict(mod, type = "link", se.fit = TRUE) %>% as.data.frame %>% mutate(lower = fit - 2 * se.fit, upper = fit + 2 * se.fit) %>% mutate(resp_fit = exp(fit), resp_lower = exp(lower), resp_upper = exp(upper))
   loc_df <- bind_cols(df, loc_pred)
@@ -637,6 +644,8 @@ nnp_size_ggplot_2d <- function(df){
     scale_color_viridis_c() + geom_path() + geom_vline(xintercept = 1) + geom_vline(xintercept = 5)  +
      theme_bw()
 }
+
+##Here's a commented out function. I think a newer version is defined below.
 
 # double_gam_smooth <- function(x, DepthSummary = NULL){
 #   # Input from twin please.
@@ -678,7 +687,9 @@ nnp_size_ggplot_2d <- function(df){
 #   
 # }
 
-## New smooth with profile, from SmoothsAndFluxRevisited
+## Functions for smoothing data, using size and depth informaiton together
+## originally coded in SmoothsAndFluxRevisited
+## I loose at DRY coding, but also if I try to fix this, it will break everything and I'll spend a week fixing things.
 my_double_gam <- function(df){
   gam(TotalParticles ~s(log(lb), log(depth), by = factor(profile)), offset = log(vol * binsize), family = nb(), data = df)
 }
@@ -727,6 +738,8 @@ double_gam_smooth <- function(x, DepthSummary = NULL){
   
 }
 
+## Sometimes I want to run things on just one profile, especially when building functions that I will later
+## run over every profile. This filters out just one profile (aka cast)
 filter_profile <- function(x, DepthSummary = NULL, profile = "stn_043"){
   prof2 <- profile
   x2 <- parse_jac_input2(x, DepthSummary)
@@ -739,6 +752,7 @@ filter_profile <- function(x, DepthSummary = NULL, profile = "stn_043"){
   return(list(ES = EachSize, DS = DepthSummary))
 }
 
+## This calls the eularian prism model and calculates a bunch of relevant parameters
 diagnose_disaggregation_one_profile <- function(x, DepthSummary = NULL){
   ## Preamble
   x2 <- parse_jac_input2(x, DepthSummary)
@@ -839,8 +853,11 @@ diagnose_disaggregation_one_profile <- function(x, DepthSummary = NULL){
   return(list(ES = EachSize_B, DS = DepthSummary_B))
 }
 
+## Sometimes the eularian prism code breaks, in which case, I want to keep running, so I run it "safely"
+## with this purr `safely` function
 diagnose_disaggregation_one_profile_safe <- safely(diagnose_disaggregation_one_profile)
 
+## Run diagnose_disaggregation_one_profile_safe over every profile and keep track of data
 diagnose_disaggregation<- function(x, DepthSummary = NULL){
   ## Preamble
   x2 <- parse_jac_input2(x, DepthSummary)

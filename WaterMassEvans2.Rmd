@@ -4,12 +4,15 @@ output: html_notebook
 ---
 
 From Evans et al. 2020. Appendex 2
+Data about watermasses
 
+R.matlab allows us to port in Natalia Evan's data from her latest manuscript.
 ```{r}
 library(tidyverse)
 library(R.matlab)
 ```
 
+Easy colors for a colorblind person to tell apart
 ```{r}
 wmCols <- c("gray80", "darkorange", "darkgreen", "yellow", "white", "darkblue", "black")
 ```
@@ -41,7 +44,7 @@ Lon = mat_to_tib(evansA2_00$lon, "long")
 WaterMasses = bind_cols(Lat, Lon, Pressure, WaterMasses)
 ```
 
-
+Where were the data collected?
 ```{r}
 evans_LL <- WaterMasses %>%
   select(long, lat) %>% distinct()
@@ -49,6 +52,7 @@ evans_LL %>%
   ggplot(aes(x = long, y = lat)) + geom_point()
 ```
 
+Plot the locations of the samples on a map
 ```{r}
 library("rnaturalearth")
 library("rnaturalearthdata")
@@ -85,6 +89,7 @@ evans_Target_01 <- evans_Target %>%
   mutate(watermass = factor(watermass, levels = wmNames, ordered = TRUE))
 ```
 
+Plot the data
 ```{r}
 evans107Plot <- evans_Target_01 %>%
   arrange(press) %>%
@@ -103,6 +108,7 @@ evans107Plot <- evans_Target_01 %>%
 evans107Plot
 ```
 
+Save the plot
 ```{r}
 ggsave("figures/evans16p5N107W.png", evans107Plot, width = 5, height = 3, dpi = 100)
 ```
