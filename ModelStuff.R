@@ -1,6 +1,10 @@
-## Global Settings
+## Eularian Particle Sinking and Remineralization Functions
+
+## Load in dependency functions
 
 source("UVP_2017_library.R")
+
+## Global Settings
 
 lb_vec <- c(0.102, 0.128, 0.161, 0.203, 0.256, 0.323, 0.406, 0.512, 0.645, 
             0.813, 1.02, 1.29, 1.63, 2.05, 2.58, 3.25, 4.1, 5.16, 6.5, 8.19, 
@@ -12,15 +16,21 @@ binsize_vec <- c(0.026, 0.033, 0.042, 0.053, 0.067, 0.083, 0.106, 0.133, 0.168,
 
 little_lb <- lb_vec[1] - (lb_vec[2] - lb_vec[1])/2 # size of the particle that the UVP can't see anymore. Eg, things actually shrink to this size but then they vanish from the UVP's view. Just leting it be like, the difference in size of the smallest two bins smaller than the smallest bin.
 
-# mass of a 1mm particle
+# properties of a 1mm particle
 m1mm = 3.3 * 10^-6; #%g % Alldgedge 1998 % mass of 1mm particle
 w1mm = 2; #% m/day # Alldredge and Gotschalk, methinks % sinking speed of 1mm particle
-micron = 1e-6;
+micron = 1e-6; # unit conversion
 
 # C_f = 10.51 # for now
 # alpha = .52
 # gamma = .26
 # ag = alpha + gamma
+
+## Describe relationship between particle size and sinking
+# Flux = C_f * D ^ (alpha + gamma)
+# Mass = C_m * D ^ alpha
+# Sinking Speed = C_w * D ^ gamma
+# Where D is sinking speed
 
 C_f_global <- C_f
 alpha_global <- alpha
@@ -29,12 +39,14 @@ ag_global <- ag
 
 Cm = m1mm
 Cw = w1mm
+
+## Vectors of the masses, sinking speed and flux contributions of single particles of different sizes
 m_vec =  Cm * lb_vec ^ alpha;
 w_vec = Cw * lb_vec ^ gamma;
 f_vec = C_f_global * lb_vec ^ alpha;
 
 
-## Disagg functions
+## Functions
 
 #' Apply remineralization dynamics to a particle spectrum, given a flux attenuation
 #'remin_shuffle is the core function that runs particle remineralization. It takes an abundance profile,
