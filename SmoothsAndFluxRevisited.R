@@ -1,4 +1,4 @@
-
+## Optimize trap data to model data and save output
 
 # Setup
 source("UVP_2017_library.R")
@@ -20,7 +20,7 @@ binnedSFR <- bin_depths(twin01)
 bSe <- binnedSFR$ES
 bSd <- binnedSFR$DS
 
-## Temp Library
+## Local Library
 
 
 my_double_gam_v2 <- function(df){
@@ -92,6 +92,9 @@ bSd2 <- test$DS
 # scale_y_reverse() + geom_point() + scale_x_log10(limits = c(10^-8, NA)) + scale_color_viridis_c() + geom_path() +
 # geom_vline(xintercept = 1) + geom_vline(xintercept = 5)  + geom_errorbar(aes(xmin = resp_lower, xmax = resp_upper), width = 10, alpha = 0.5)+ theme_bw()
 
+## Checking smoothed data
+# I'm not sure why this is important, but it happens.
+
 bSe2 %>%
   filter(project == "ETNP") %>%
   #filter(profile == "stn_032") %>%
@@ -119,6 +122,8 @@ bSe2 %>%
 # rationalle being that the flux averages over the week
 # but for analyiss I shoudl show each week, I think.
 
+## Load in trap data, excluding traps that didn't work correctly
+
 trapFlux <- read_csv("dataOut/fluxMS_distilled.csv")
 # There are some low traps in the surface that are anomalously low. How about, if depth is less than 250, and flux is less than 30, remove it
 trapFlux2 <- trapFlux %>%
@@ -134,9 +139,12 @@ trapFlux2 <- trapFlux %>%
 # So we combine, then calculate a smooth (not main smoothing function), then predict out the values where the traps are.
 # Then we run a solver on that data frame to minimize distance from traps, using the strategy from Normalize_UVP_Flux.Rmd
 
+## Subset relevant size data
 forFlux <- binnedSFR %>%  sum_profiles()
 forFlux$ES <- forFlux$ES %>% filter(project == "ETNP")
 forFlux$DS <- forFlux$DS %>% filter(project == "ETNP")
+
+## Smoothing
 
 gamESE <- gam(TotalParticles ~s(log(lb), log(depth)), offset = log(vol * binsize), family = nb(), data = forFlux$ES)
 
@@ -166,7 +174,7 @@ DP <- trapFlux2 %>% select(depth = Depth, tn_flux = C_flux_umol) %>%
 PETE <- list(ES = EP, DS = DP)
 
 
-
+# Fit the flux to the smoothed data
 fit_check_flux(C_f_global, ag_global, ES = PETE$ES, DS = PETE$DS)
 
 opt <- optim(c(C_f_global, ag_global), fc_wrap, ES = PETE$ES, DS = PETE$DS)
@@ -179,7 +187,7 @@ oFF$DS %>% pivot_longer(c(tn_flux, tot_flux2)) %>%
   ggplot(aes(x = value, y = depth, col = name)) + geom_point() + scale_y_reverse()
 
 
-# the tiger is out! Alpha = 2
+# This is good Alpha ~= 2 which conforms to our expectations
 
 ### Data for figure
 
@@ -198,7 +206,8 @@ EPB <- EPB %>%
   mutate(flux = nparticles * (opt$par[1] * lb ^ opt$par[2]))
 
 EDB <- EPB %>% group_by(depth) %>% summarize(Flux = sum(flux))
-  
+
+## Save output
 
 write_csv(EPB, "dataOut/CombinedProfileFluxEst_ED.csv")
 write_csv(EDB, "dataOut/CombinedProfileFluxEst_DS.csv")

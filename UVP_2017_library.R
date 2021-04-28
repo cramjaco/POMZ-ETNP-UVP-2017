@@ -125,7 +125,8 @@ combine_projects <- function(proj1, proj2, name1 = "ETNP", name2 = "P16"){
   bothProj
 }
 
-### 
+## I tend to work with lists of two element. One is the data of each size, and one is the depth summary.
+## The following makes the early instance of that list, on whihc I work.
 
 make_twin_df_list <- function(EachSize){
   
@@ -304,6 +305,7 @@ calc_psd <- function(x, DepthSummary = NULL){
   
 }
 
+# Get the particle size distribution of small particles
 calc_small_psd <- function(x, DepthSummary = NULL){
   
   x2 <- parse_jac_input2(x, DepthSummary)
@@ -329,6 +331,8 @@ calc_small_psd <- function(x, DepthSummary = NULL){
   list(ES = EachSize, DS = DepthSummary2)
 }
 
+
+# Get the particle size distribution of large particles
 calc_big_psd <- function(x, DepthSummary = NULL){
   
   x2 <- parse_jac_input2(x, DepthSummary)
@@ -453,6 +457,8 @@ quantilater <- function(df, niter = 10, q1 = 0.025, q2 = 0.975){
 
   }
 
+## I don't do this analyis in the paper, but it was for deciding whether bins with zero particles are likely from some
+## non power law particle size distribution function or not.
 tp_quantiles <-  function(x, DepthSummary = NULL,  niter = 10){
   
   x2 <- parse_jac_input2(x, DepthSummary)

@@ -124,6 +124,8 @@ Notes -- Mostly about some presentation I was writing once (Archive)
 
 Notes24Sep2020.Rmd -- Another single session notes file. Essentially equivalent to a piece of scratch paper on my desk.
 
+ExplorePAR -- Looking at photosynthetically available radiation.
+
 ## Directories
   * archive -- Analysis files that I used in early data exploration, model development, and so on that are not part of my primary analysis pipeline, as used in the manuscript. They are maintained for historical purposes
   * data -- raw data imported, includes UVP data from the ETNP-POMZ 2017 project, and staion 100 from the P16 project, as well as ctd data. There is also processed data from the EK60.

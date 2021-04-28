@@ -2,7 +2,8 @@
 title: "R Notebook"
 output: html_notebook
 ---
-Just integrated plots for P16
+Weber bianchi stile integrated plots for P16 for use in supplement
+These are for the oxic station, P16
 
 ```{r}
 besE_p16 <- bes %>% filter(project == "P16")
