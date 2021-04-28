@@ -5,6 +5,8 @@ output: html_notebook
 
 Generates figures of EK60 Data
 
+Load in libraries
+
 ```{r}
 library(tidyverse)
 library(lubridate)
