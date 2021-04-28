@@ -14,10 +14,14 @@ Almost all analysis herein was carried out by Jacob Cram
 # To Do
   * Update particle math data to account for Weber and Burchfield's edits
   * Look through each data file to ensure proper commenting
-  
+  * Add description of files, or at least copy out of that other folder.
+  * Move more stuff to archive
+  * Possibly git filter-branch or equivalent out all of the raw files that aren't going in the analysis.
+  * Share the code for processing the EK60 data, though not the actual raw EK60 data which are huge. Those, people can get from UNOLS directly.
 
 # Description of Files
 What follows is a description of the contents of this repository
+Note: I'm using rstudio notebooks, which mean that bost of the .Rmd files, which are plain text and can be read by any text editor, also generate nb.html files, which are readable in a browser and which I am leaving.
 
 ## Files
 
