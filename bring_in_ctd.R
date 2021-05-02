@@ -1,4 +1,5 @@
-
+library(readxl)
+library(lubridate)
 #library(reshape2)
 ctddata <- read.csv("data/skq201617s-combinedctd.csv")
 castdata <- read.csv("data/skq201617s-castinfo.csv")
@@ -21,3 +22,10 @@ pstation <- sapply(castdata$cast, pstationator)
 cast2 <- data.frame(cast = castdata$cast, time = as.POSIXct(castdata$startTime), latitude = castdata$latitude, longitude = castdata$longitude, pstation = pstation)
 
 ctd.m = reshape2::melt(subset(ctddata, select = -X), id = c('cast', 'depth'))
+
+# Also bring in par data
+
+claraData <- read_excel("data/SKQ201617S_CTD_Profile_CF.xlsx", sheet = "PAR")
+claraPAR <- claraData %>% select(Date = `mon/dd/yyyy`, Hr = `hh:mm`, PAR, PARPct, depth = `Pressure [db]`) %>%
+  mutate(Hr = hour(Hr) + minute(Hr)/60) %>%
+  filter(!(Hr > 4 & Hr < 3)) # There was one night cast clara forgot to remove
