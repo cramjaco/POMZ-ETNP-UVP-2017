@@ -23,6 +23,27 @@ alpha_global <- alpha
 gamma_global <- gamma
 ag_global <- ag
 
+# Get the times of the CTD casts
+CTD_Unique <- read_csv("data/SKQ201617S_CTD_Profile.csv") %>%
+  filter(Station == "sta016") %>%
+  mutate(DateJ = mdy(`mon/dd/yyyy`), TimeJ = hms(`hh:mm`), DateTimeJ = DateJ + TimeJ) %>%
+  select(time = DateTimeJ, depth = `Pressure [db]`) %>%
+  group_by(time) %>% summarize(MaxDepth = max(depth))
+
+## Times on the UVP are the time it was switched on, not the time the cast started. I will find the next time of the cast
+Find_Next_Cast <- function(LTime){
+  NextTime <- min(CTD_Unique$time[CTD_Unique$time - LTime > 0]) # Find the next cast
+  NextTime
+}
+
+Find_Next_Cast_2 <- Vectorize(Find_Next_Cast)
+
+Find_Next_Cast_3 <- function(LTimeVec){
+  NextVec <- Find_Next_Cast_2(LTimeVec)
+  attributes(NextVec) <- attributes(LTimeVec)
+  NextVec
+}
+
 bring_in_p2 <- function(){
   
   # bring in metadata that specifies relevant files
@@ -33,7 +54,7 @@ bring_in_p2 <- function(){
   # bring in particle data
   uvp_data_path <- "data/uvpdata"
   particleData <- uvpMetaP2 %>% pull(`Particle filename`) %>%
-    map(~read_tsv(file.path(uvp_data_path, .), locale = locale(encoding = "latin1", tz="Mexico/General"))) %>%
+    map(~read_tsv(file.path(uvp_data_path, .), locale = locale(encoding = "latin1", tz="UTC"))) %>%
     reduce(rbind)
   
   # some initial processing
@@ -41,7 +62,9 @@ bring_in_p2 <- function(){
     select(profile = Profile, time = `yyyy-mm-dd hh:mm`, depth = `Depth [m]`, vol = `Sampled volume[L]`, `LPM (102-128 µm)[#/L]`:`LPM (>26 mm)[#/L]`) %>%
     gather(key = "sizeclass", value = "nparticles", `LPM (102-128 µm)[#/L]`:`LPM (>26 mm)[#/L]`) %>%
     # convert to central time, originals are in UTC
-    mutate(time = lubridate::with_tz(time, tzone = "Mexico/General"))
+    #mutate(time = lubridate::with_tz(time, tzone = "Mexico/General"))
+    mutate(time = Find_Next_Cast_3(time)) %>%
+    pass()
   
   #
   classData <- particleNumbers %>% select(sizeclass) %>% unique() %>%

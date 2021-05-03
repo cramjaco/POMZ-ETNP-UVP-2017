@@ -1,13 +1,15 @@
 ## Bring in data
 
-options(readr.default_locale=readr::locale(tz="Mexico/General"))
+#options(readr.default_locale=readr::locale(tz="Mexico/General"))
 source("UVP_2017_library.R")
 source("ModelStuff.R")
 dataP2 <- bring_in_p2()
 dataP16S100 <- bring_in_p16_s100()
 
-dataBoth <- combine_projects(dataP2, dataP16S100) %>% filter(profile != "stn_041") # Station 041 has only one depth, so remvoed
-
+dataBoth <- combine_projects(dataP2, dataP16S100) %>% 
+  filter(profile != "stn_041") %>% # Station 041 has only one depth, so remvoed
+  mutate(time = lubridate::with_tz(time, tzone = "Mexico/General")) %>% # convert everything to CST, the local time zone (even the hawaii samples, sorry)
+  pass()
   ## We will always have a data with information about each size, and a summary of each depth
 
 twin01 <- make_twin_df_list(dataBoth)
