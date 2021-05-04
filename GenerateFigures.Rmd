@@ -1,6 +1,8 @@
 ---
 title: "R Notebook"
-output: html_notebook
+output:
+  pdf_document: default
+  html_notebook: default
 ---
 
 For generating most, but not all figures in the manuscript.
@@ -408,7 +410,7 @@ pgBottom <- plot_grid(pltDelta3, pltFlxLegend , rel_widths = c(3, 1), labels = c
 I don't know whats going on below here
 
 ```{r fig.height = 9, fig.width = 5}
-pgBottom <- pltDelta3  + geom_rect(aes(xmin = -2, xmax = -1.15, ymin = 170, ymax = 1000), colour = "gray50", fill = NA, inherit.aes = FALSE) + draw_plot(pltFlxLegend , -1.9, -575, .7)
+pgBottom <- pltDelta3  + geom_rect(aes(xmin = -2, xmax = -1.15, ymin = 170, ymax = 1000), colour = "gray50", fill = "white", inherit.aes = FALSE) + draw_plot(pltFlxLegend , -1.9, -575, .7)
 pgBoth <- plot_grid(pgTop + theme(plot.margin = unit(c(0, 0, 0, 0), units = "cm")),
                     pgBottom + theme(plot.margin = unit(c(0, 0, 0, 0), units = "cm")),
                     ncol = 1, rel_heights = c(4, 4), labels = c("A", "C"), label_size = 16)
@@ -431,13 +433,25 @@ DFG2 <- gam(pracma::nthroot(DF/DZ, 5) ~ s(depth, k = 3) + s(Day, k = 3), data = 
 
 DFG3 <- gam(pracma::nthroot(DF/DZ, 5) ~ s(depth, k = 3), data = bdsAddTime %>% filter(depth >= 250 & depth <=500 & project == "ETNP"))
 
-summary(DFG1)
-summary(DFG2)
-summary(DFG3)
+DFG_DayOnly <- gam(pracma::nthroot(DF/DZ, 5) ~  s(Day, k = 3), data = bdsAddTime %>% filter(depth >= 250 & depth <=500 & project == "ETNP"))
 
-summary(DFG1)$r.sq - summary(DFG2)$r.sq
-summary(DFG2)$r.sq - summary(DFG3)$r.sq
-summary(DFG3)$r.sq
+DFG_NoFifth <- gam(pracma::nthroot(DF/DZ, 1)~ s(depth, k = 3) + s(Day, k = 3) + s(Hour, k = 4, bs = "cc"), knots = list(Hour = c(0, 24)), data = bdsAddTime %>% filter(depth >= 250 & depth <=500 & project == "ETNP"))
+
+summary(DFG1)
+
+summary(DFG_DayOnly)
+
+summary(DFG_NoFifth)
+
+
+
+
+# summary(DFG2)
+# summary(DFG3)
+# 
+# summary(DFG1)$r.sq - summary(DFG2)$r.sq
+# summary(DFG2)$r.sq - summary(DFG3)$r.sq
+# summary(DFG3)$r.sq
 ```
 
 There is variability with respect to depth, and day and hour
@@ -522,7 +536,7 @@ OSMSGamPlot <- function(){
 
 OSMSGamPlot()
 
-png(filename = "./figures/OSMSGamPlot.png", width = 10, height = 6, units = "in", res = 200)
+png(filename = "./figures/OSMSGamPlot.png", width = 10, height = 8, units = "in", res = 200)
 OSMSGamPlot()
 
 dev.off()

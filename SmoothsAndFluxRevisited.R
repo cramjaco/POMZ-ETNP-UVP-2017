@@ -209,9 +209,9 @@ EDB <- EPB %>% group_by(depth) %>% summarize(Flux = sum(flux))
 
 ## Save output
 
-write_csv(EPB, "dataOut/CombinedProfileFluxEst_ED.csv")
-write_csv(EDB, "dataOut/CombinedProfileFluxEst_DS.csv")
-write_csv(oFF$DS, "dataOut/ObservedVsExpectedFlux.csv")
+# write_csv(EPB, "dataOut/CombinedProfileFluxEst_ED.csv")
+# write_csv(EDB, "dataOut/CombinedProfileFluxEst_DS.csv")
+# write_csv(oFF$DS, "dataOut/ObservedVsExpectedFlux.csv")
 
 # DP <- EP %>% group_by(depth) %>% summarize() %>% 
 #   mutate(profile = "multiple", project = "ETNP", time = "togetawatch")

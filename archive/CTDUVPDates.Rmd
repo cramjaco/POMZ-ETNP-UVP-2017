@@ -1,0 +1,21 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+I am going to compare the CTD dates and times to the UVP dates and times so I can be sure everything matches.
+
+```{r}
+library(readxl)
+library(tidyverse)
+```
+
+```{r}
+CTD <- read_csv("data/SKQ201617S_CTD_Profile.csv")
+```
+
+```{r}
+CTD_Meta <- CTD %>% filter(Station == "sta016") %>% group_by(`mon/dd/yyyy`, `hh:mm`) %>%
+  summarize(MaxPres = max(`Pressure [db]`))
+CTD_Meta
+```
+

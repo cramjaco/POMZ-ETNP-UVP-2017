@@ -28,4 +28,4 @@ ctd.m = reshape2::melt(subset(ctddata, select = -X), id = c('cast', 'depth'))
 claraData <- read_excel("data/SKQ201617S_CTD_Profile_CF.xlsx", sheet = "PAR")
 claraPAR <- claraData %>% select(Date = `mon/dd/yyyy`, Hr = `hh:mm`, PAR, PARPct, depth = `Pressure [db]`) %>%
   mutate(Hr = hour(Hr) + minute(Hr)/60) %>%
-  filter(!(Hr > 4 & Hr < 3)) # There was one night cast clara forgot to remove
+  filter(!(Hr < 4 & Hr > 3)) # There was one night cast clara forgot to remove

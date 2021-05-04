@@ -5,13 +5,14 @@ title: Particle size and abundance measurements suggest temporally variable biot
 author: "Jacob A. Cram"
 date: "07 April 2021"
 output:
-  word_document:
-    reference_docx: ReferenceTemplate.docx
-  html_document: null
   pdf_document:
     latex_engine: lualatex
+  html_document: null
+  word_document:
+    reference_docx: ReferenceTemplate.docx
   bookdown::pdf_document2: default
 bibliography: ../references.bib
+always_allow_html: true
 ---
 
 #Notes to co-authors:
