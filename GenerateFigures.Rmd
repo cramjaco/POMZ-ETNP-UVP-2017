@@ -21,8 +21,10 @@ cb10 <- c('#a6cee3','#1f78b4','#b2df8a','#33a02c','#fb9a99','#e31a1c','#fdbf6f',
 # Particles Only
 
 # Read In Data
+These read back in in UTC, since write_csv saves everthing into that time zone.
 
 ```{r}
+options(readr.default_locale=readr::locale(tz="Mexico/General"))
 bes<- read_csv("dataOut/binned_EachSize.csv")
 bds <- read_csv("dataOut/binned_DepthSummary.csv")
 ues <- read_csv("dataOut/unbinned_EachSize.csv")
@@ -73,8 +75,9 @@ PlotPSDmany <- uds %>%
   #geom_path(aes(x = psd_gam)) + 
   #geom_ribbon(aes(x = psd_gam, xmin = psd_gam - 2 * psd_seg, xmax = psd_gam + 2 * psd_seg), alpha = 0.1, outline_type = "lower") +
   geom_point(alpha = .6, size = 2, stroke = 1) +
-  scale_y_reverse(limits = c(1200, 0)) + scale_shape_manual(values = c(21:25)) +
-  scale_fill_gradientn(breaks = c(0, 6, 12, 18, 24), colors = c("black", "blue", "white", "orange", "black")) +
+  scale_y_reverse(limits = c(1200, 0)) +
+  scale_shape_manual(name = "Day", values = c(21:25)) +
+  scale_fill_gradientn(name = "Hour",breaks = c(0, 6, 12, 18, 24), labels =  c("0", "6", "12", "18", "24"), colors = c("black", "blue", "white", "orange", "black")) +
   labs(y = "Depth (m)", x = "Particle Size Distribution Slope") + 
   geom_hline(yintercept = PhoticBase, color = "darkgreen") +
   geom_hline(yintercept = OMZBase, color = "darkblue") 
@@ -95,12 +98,13 @@ PlotParticlesmany <- uds %>%
   #scale_x_log_eng()+
   labs(y = "Depth (m)", x = "Particles / L") + 
   geom_hline(yintercept = PhoticBase, color = "darkgreen") +
-  geom_hline(yintercept = OMZBase, color = "darkblue") 
+  geom_hline(yintercept = OMZBase, color = "darkblue") +
+  theme(legend.position = "none")
 
 plot_grid(
   PlotParticlesmany,
   PlotPSDmany,
-  rel_widths = c(2, 3)
+  rel_widths = c(1, 2)
   )
 
 ggsave("figures/ParticlesPSDMany.png")
@@ -233,13 +237,13 @@ mainParticleComponents <- bds %>%
 
 PlotFlx <- mainParticleComponents %>% 
   filter(meas != "psd") %>%
-  ggplot(aes(y = depth, x = value, col = project, shape = project)) + facet_grid(size ~ meas, scales = "free_x") + geom_point(size = 2) + scale_y_reverse(limits = c(1000, 0)) + scale_x_log10() + theme(axis.title.x = element_blank(), legend.position = "none", strip.background.y = element_blank(), strip.text.y = element_blank(), plot.margin = unit(c(7,0,7,7), "pt")) + scale_color_manual(values = c("brown", "gray20")) + scale_shape_manual(values = c(1:5)) + theme(axis.text.x = element_text(angle = 90)) + geom_hline(yintercept = PhoticBase, color = "darkgreen")
+  ggplot(aes(y = depth, x = value, col = project, shape = project)) + facet_grid(size ~ meas, scales = "free_x") + geom_point(size = 2) + scale_y_reverse(limits = c(1000, 0)) + scale_x_log10() + theme(axis.title.x = element_blank(), legend.position = "none", strip.background.y = element_blank(), strip.text.y = element_blank(), plot.margin = unit(c(7,0,7,7), "pt")) + scale_color_manual(values = c(P16 = "brown", ETNP = "gray20")) + scale_shape_manual(values = c(1:5)) + theme(axis.text.x = element_text(angle = 90)) + geom_hline(yintercept = PhoticBase, color = "darkgreen")
 
 PlotPSD <- mainParticleComponents %>% 
   filter(meas == "psd") %>%
   ggplot(aes(y = depth, x = value, col = project, shape = project)) + facet_grid(size~meas, scales = "free_x") + geom_point(size = 2) + scale_y_reverse(limits = c(1000, 0)) +
   theme(axis.title.x = element_blank(), axis.title.y = element_blank(), axis.line.y = element_blank(), axis.text.y = element_blank(), axis.ticks.y = element_blank(), plot.margin = unit(c(7,7,26.5,0), "pt")) +
-  scale_color_manual(values = c("brown", "gray20")) +  scale_shape_manual(values = c(1:5)) +  theme(axis.text.x = element_text(angle = 90)) + geom_hline(yintercept = PhoticBase, color = "darkgreen")
+  scale_color_manual(values = c(P16 = "brown", ETNP = "gray20")) +  scale_shape_manual(values = c(1:5)) +  theme(axis.text.x = element_text(angle = 90)) + geom_hline(yintercept = PhoticBase, color = "darkgreen")
 
 plot_grid(PlotFlx, PlotPSD, rel_widths = c(3, 2))
 
@@ -457,6 +461,39 @@ summary(DFG_NoFifth)
 There is variability with respect to depth, and day and hour
 Depth p = 0.03 R^2 = 0.088. Add affect of day  p = 0.004, extra R^2 = 0.11, Add affect of hour p = 0.02 extra R2 = 0.12
 
+```{r}
+bdsAddTime <- bds %>% 
+  mutate(Hour = hour(time) + minute(time)/60, Day = day(time) + hour(time)/24 + minute(time)/24/60)
+
+DFG1 <- gam(pracma::nthroot(DF/DZ, 5)~ s(depth, k = 3) + s(Day, k = 3) + s(Hour, k = 4, bs = "cc"), knots = list(Hour = c(0, 24)), data = bdsAddTime %>% filter(depth >= 250 & depth <=500 & project == "ETNP"))
+
+DFG2 <- gam(pracma::nthroot(DF/DZ, 5) ~ s(depth, k = 3) + s(Day, k = 3), data = bdsAddTime %>% filter(depth >= 250 & depth <=500 & project == "ETNP"))
+
+DFG3 <- gam(pracma::nthroot(DF/DZ, 5) ~ s(depth, k = 3), data = bdsAddTime %>% filter(depth >= 250 & depth <=500 & project == "ETNP"))
+
+DFG_DayOnly <- gam(pracma::nthroot(DF/DZ, 5) ~  s(Day, k = 3), data = bdsAddTime %>% filter(depth >= 250 & depth <=500 & project == "ETNP"))
+
+DFG_NoFifth <- gam(pracma::nthroot(DF/DZ, 1)~ s(depth, k = 3) + s(Day, k = 3) + s(Hour, k = 4, bs = "cc"), knots = list(Hour = c(0, 24)), data = bdsAddTime %>% filter(depth >= 250 & depth <=500 & project == "ETNP"))
+
+summary(DFG1)
+
+summary(DFG_DayOnly)
+
+summary(DFG_NoFifth)
+
+
+
+
+# summary(DFG2)
+# summary(DFG3)
+# 
+# summary(DFG1)$r.sq - summary(DFG2)$r.sq
+# summary(DFG2)$r.sq - summary(DFG3)$r.sq
+# summary(DFG3)$r.sq
+```
+
+As above, but this time continuous day and hour
+
 Plot of the gams above
 ```{r fig.height = 8, fig.width = 10}
 #plot.new()
@@ -501,8 +538,11 @@ disagFig
 ## Summary statistics
 
 ```{r}
+# bdsAddTime <- bds %>%
+#   mutate(Hour = hour(time), Day = day(time))
+
 bdsAddTime <- bds %>%
-  mutate(Hour = hour(time), Day = day(time))
+  mutate(Hour = hour(time) + minute(time)/60, Day = day(time) + hour(time)/24 + minute(time)/24/60)
 
 OZG1 <- gam(ospsDZ ~ s(depth, k = 3) + s(Day, k = 3) + s(Hour, k = 4, bs = "cc"), knots = list(Hour = c(0, 24)), data = bdsAddTime %>% filter(depth >= PhoticBase & depth <=500 & project == "ETNP"))
 
@@ -640,7 +680,7 @@ A bunch of upfront smoothing
 
 ```{r}
 SameGam <- gam(TotalParticles ~s(log(lb), log(depth), by = factor(time)), offset = log(vol * binsize), family = nb(),
-    data = bes %>% filter(project == "ETNP"))
+    data = bes %>% filter(project == "ETNP", depth <= 2000))
 ```
 
 ```{r}
@@ -663,7 +703,7 @@ ToPlot <- bind_cols(Expanded, nnparticles = Pred) %>% mutate(time = as.character
 meanBese <- ToPlot %>% filter(lb <= 2) %>% group_by(lb, depth) %>% summarize(nparticles = mean(nparticles), nnparticles = mean(nnparticles))
 
 WBColorMap <- meanBese%>%
-   ggplot(aes(x = lb, y = depth, fill = log10(nnparticles), z = log10(nnparticles))) + geom_tile() + scale_fill_viridis_c(name = "log10(number density \n (normalized))") + scale_y_reverse() + scale_x_log10() + geom_contour(color = "black") + geom_hline(yintercept = 160, color = "darkgreen") + geom_hline(yintercept = OMZBase, color = "darkblue")
+   ggplot(aes(x = lb, y = depth, fill = log10(nnparticles), z = log10(nnparticles))) + geom_tile() + scale_fill_viridis_c(name = expression(log[10](Particles/m^3/mm))) + scale_y_reverse() + scale_x_log10() + geom_contour(color = "black") + geom_hline(yintercept = 160, color = "darkgreen") + geom_hline(yintercept = OMZBase, color = "darkblue") + labs(y = "Depth (m)", x = "Size (mm)")
 WBColorMap
 ```
 

@@ -1,0 +1,31 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+#Label end of ggplot color bar, even if no data have that value.
+
+I am trying to a color scale where I label all of the breaks, including the first and last one.
+
+
+```{r}
+irisJ <- iris
+irisJ$Hour <-  sample(0:23, dim(iris)[1], replace = TRUE)
+ggplot(irisJ, aes(x = Petal.Length, y = Petal.Width, fill = Hour)) + geom_point(shape = 21, size = 2) + 
+  scale_fill_gradientn(name = "Hour",breaks = c(0, 6, 12, 18, 24), labels =  c("0", "6", "12", "18", "24"), colors = c("black", "blue", "white", "orange", "black"))
+```
+
+I realize there are no hour 24s in my data set, but I'd really like to plot that 24 at the top of my color bar so that readers can see and understand that the color bar is circular and both 0 and 24 are the darkest black. I know I could stop things at 23, but then the color bar will be a little off center. 
+
+Any suggestions?
+
+## But actually both sides got messed up
+
+```{r}
+Mess <- tibble(x = rnorm(1000), y = rnorm(1000), Hour = sample(c(0,  3,  5,  8,  9, 12, 13, 14, 19, 23), 1000, replace = TRUE))
+```
+
+```{r}
+ggplot(Mess, aes(x = x, y = y, fill = Hour)) + geom_point(shape = 21, size = 2) + 
+  scale_fill_gradientn(name = "Hour",breaks = c(0, 6, 12, 18, 24), labels =  c("0", "6", "12", "18", "24"), colors = c("black", "blue", "white", "orange", "black"))
+```
+

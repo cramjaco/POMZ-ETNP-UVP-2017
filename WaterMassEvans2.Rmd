@@ -73,8 +73,6 @@ mexMap
 
 Unless specified otherwise, measurements were taken on board the R/V Sikuliaq from 07 January 2017 through 13 January 2017 at 16.5°N 106.9°W
 
-I'll pull from the 14N, 107 W station.
-
 ```{r}
 evans_Target <- WaterMasses %>%
   filter(long > -107.1, long < -106.8, lat < 16.6, lat > 16.4)

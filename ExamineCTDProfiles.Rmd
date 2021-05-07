@@ -69,13 +69,22 @@ oxyprof
 oxyprof <- ctdP2Binned %>% filter(variable == "oxygen") %>%
   group_by(depthBin) %>% summarize(value = mean(value)) %>%
   ggplot(aes(y = depthBin, x = value)) +
-  geom_path() + scale_y_reverse(limits = c(1000, 0)) + scale_x_log10()
+  geom_path() + scale_y_reverse(limits = c(1000, 0)) + scale_x_log10() +
+  geom_vline(xintercept = 1) +
+  geom_vline(xintercept = 0.5) +
+  geom_vline(xintercept = 0.1)
 oxyprof
 ```
 
 ```{r}
 ctdP2Binned %>% filter(variable == "oxygen") %>%
   group_by(depthBin) %>% summarize(value = mean(value)) %>% filter(value < .1) %>% 
+  summarize(shallow = min(depthBin), deep = max(depthBin))
+```
+
+```{r}
+ctdP2Binned %>% filter(variable == "oxygen") %>%
+  group_by(depthBin) %>% summarize(value = mean(value)) %>% filter(value < .5) %>% 
   summarize(shallow = min(depthBin), deep = max(depthBin))
 ```
 
@@ -128,7 +137,8 @@ plotTempSalOxy <- function(){
   #axis(side = 2, padj = 1, tcl = 0.5, at = seq(from = 0, to = 1200, by = 200))
   axis(side = 2, padj = .5, tcl = 0.5, las = 2, mgp = c(0, .3, 0))
    mtext("Depth (m)", side = 2, line = 2, cex = 1.25)
-  abline(h = 850, col = "darkblue") 
+  #abline(h = 147, col = "darkblue") 
+  abline(h = 850, col = "darkblue")
   abline(h = 170, col = "darkgreen")
   #text(y = 1050, x = 175, labels = "Bottom of OMZ\n (850 m)")
   par(new = TRUE)
