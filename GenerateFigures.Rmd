@@ -427,36 +427,7 @@ ggsave("figures/FluxDeepDive.svg")
 
 ## Summary stats
 Test for day to day and hourly variability in rate of change of flux (fifth root transformed)
-```{r}
-bdsAddTime <- bds %>% 
-  mutate(Hour = hour(time), Day = day(time))
 
-DFG1 <- gam(pracma::nthroot(DF/DZ, 5)~ s(depth, k = 3) + s(Day, k = 3) + s(Hour, k = 4, bs = "cc"), knots = list(Hour = c(0, 24)), data = bdsAddTime %>% filter(depth >= 250 & depth <=500 & project == "ETNP"))
-
-DFG2 <- gam(pracma::nthroot(DF/DZ, 5) ~ s(depth, k = 3) + s(Day, k = 3), data = bdsAddTime %>% filter(depth >= 250 & depth <=500 & project == "ETNP"))
-
-DFG3 <- gam(pracma::nthroot(DF/DZ, 5) ~ s(depth, k = 3), data = bdsAddTime %>% filter(depth >= 250 & depth <=500 & project == "ETNP"))
-
-DFG_DayOnly <- gam(pracma::nthroot(DF/DZ, 5) ~  s(Day, k = 3), data = bdsAddTime %>% filter(depth >= 250 & depth <=500 & project == "ETNP"))
-
-DFG_NoFifth <- gam(pracma::nthroot(DF/DZ, 1)~ s(depth, k = 3) + s(Day, k = 3) + s(Hour, k = 4, bs = "cc"), knots = list(Hour = c(0, 24)), data = bdsAddTime %>% filter(depth >= 250 & depth <=500 & project == "ETNP"))
-
-summary(DFG1)
-
-summary(DFG_DayOnly)
-
-summary(DFG_NoFifth)
-
-
-
-
-# summary(DFG2)
-# summary(DFG3)
-# 
-# summary(DFG1)$r.sq - summary(DFG2)$r.sq
-# summary(DFG2)$r.sq - summary(DFG3)$r.sq
-# summary(DFG3)$r.sq
-```
 
 There is variability with respect to depth, and day and hour
 Depth p = 0.03 R^2 = 0.088. Add affect of day  p = 0.004, extra R^2 = 0.11, Add affect of hour p = 0.02 extra R2 = 0.12
@@ -492,7 +463,7 @@ summary(DFG_NoFifth)
 # summary(DFG3)$r.sq
 ```
 
-As above, but this time continuous day and hour
+Time is now continuous day and hour
 
 Plot of the gams above
 ```{r fig.height = 8, fig.width = 10}
