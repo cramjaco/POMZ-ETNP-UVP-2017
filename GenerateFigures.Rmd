@@ -647,6 +647,19 @@ ggsave("figures/AllParticleSizes.png")
 # Figure 6
 ## Weber Bianchi Figs
 
+Link time to profile
+```{r}
+ProfileTimes <- bds %>% select(profile, time) %>% unique() %>% mutate(time = as.character(time)) %>%
+  mutate(time2 = paste(day(time), hour(time), sep = "::")) %>% mutate(time2 = factor(time2, levels = time2))
+  
+ProfileTimes
+```
+
+```{r}
+ProfileTimes %>% filter(profile == "stn_043") %>% pull(time)
+```
+
+
 A bunch of upfront smoothing
 profile %in% c("stn_032","stn_043")
 
@@ -654,9 +667,49 @@ profile %in% c("stn_032","stn_043")
 # switched from depth to log depth
 # SameGam0 <- gam(TotalParticles ~s(log(lb), log(depth), by = factor(time)), offset = log(vol * binsize), family = nb(),
 #     data = bes %>% filter(project == "ETNP", depth <= 2000))
-SameGam <- gam(TotalParticles ~te(log(lb), log(depth)) + factor(time), offset = log(vol * binsize), family = nb(),
+SameGam0 <- gam(TotalParticles ~s(log(lb), log(depth), by = factor(time)), offset = log(vol * binsize), family = nb(),
+    data = bes %>% filter(project == "ETNP", depth <= 2000))
+SameGam1 <- gam(TotalParticles ~s(log(lb), log(depth * 1000), by = factor(time)), offset = log(vol * binsize), family = nb(),
+    data = bes %>% filter(project == "ETNP", depth <= 2000))
+
+```
+
+```{r}
+#SameGam <- SameGam1
+SameGam <- gam(TotalParticles ~te(log(lb), (depth), k = 7), offset = log(vol * binsize), family = nb(),
+    data = bes %>% filter(project == "ETNP", depth <= 2000, profile == "stn_043"))
+SameGam <- gam(TotalParticles ~te(log(lb), (depth), k = 7), offset = log(vol * binsize), family = nb(),
     data = bes %>% filter(project == "ETNP", depth <= 2000))
 ```
+
+```{r}
+SameGam <- gam(TotalParticles ~s(log(lb), log(depth)), offset = log(vol * binsize), family = nb(),
+    data = bes %>% filter(project == "ETNP", depth <= 2000, profile == "stn_043")) # Looks good!
+
+SameGam <- gam(TotalParticles ~s(log(lb), log(depth)), offset = log(vol * binsize), family = nb(),
+    data = bes %>% filter(project == "ETNP", depth <= 2000, profile == "stn_032")) # Looks good!
+
+SameGam <- gam(TotalParticles ~s(log(lb), log(depth), by = factor(time)), offset = log(vol * binsize), family = nb(),
+    data = bes %>% filter(project == "ETNP", depth <= 2000, profile %in% c("stn_032", "stn_043")))
+```
+
+```{r}
+# SameGam <- gam(TotalParticles ~s(log(lb), log(depth)), offset = log(vol * binsize), family = nb(),
+#     data = bes %>% filter(project == "ETNP", depth <= 2000, profile == "stn_043")) # Looks good!
+
+SameGam <- gam(TotalParticles ~te(log(lb), log(depth)), offset = log(vol * binsize), family = nb(),
+    data = bes %>% filter(project == "ETNP", depth <= 2000, profile == "stn_032")) # Looks good!
+```
+
+```{r}
+SameGam <- SameGam0
+```
+
+
+```{r}
+gam.check(SameGam)
+```
+
 
 ```{r}
 besE <- bes %>% filter(project == "ETNP")
@@ -670,29 +723,65 @@ lbbs <- tibble(lb = lb_new, ub = ub_new, binsize = binsize_new)
 Expanded <- expand_grid(lb = exp(seq(from = log(0.1), to = log(2), by = 0.05)), depth = seq(from = 20, to = 2000, by = 20), time = as.factor(unique(besE$time))) %>% left_join(lbbs, by = "lb")
 
 Pred <- exp(predict(SameGam, Expanded))
-ToPlot <- bind_cols(Expanded, nnparticles = Pred) %>% mutate(time = as.character(time)) %>% mutate(nparticles = nnparticles * binsize)
+ToPlot <- bind_cols(Expanded, nnparticles = Pred) %>% mutate(time = as.character(time)) %>% mutate(nparticles = nnparticles * binsize) %>%
+  left_join(ProfileTimes, by = "time") # put profiles back on
+```
+
+
+Trim off of things that are too deep
+
+```{r}
+MaxDepths <- bds %>% group_by(profile) %>% summarise(maxDepth = max(depth))
+ToPlot <- ToPlot %>% left_join(MaxDepths) %>% filter(depth <= maxDepth)
+
 ```
 
 
 ```{r}
-meanBese <- ToPlot %>% filter(lb <= 2) %>% group_by(lb, depth) %>% summarize(nparticles = mean(nparticles), nnparticles = mean(nnparticles))
+ToPlot %>% filter(lb <= 2,
+                  profile == "stn_043") %>%
+  ggplot(aes(x = lb, y = depth, fill = log10(nnparticles), z = log10(nnparticles))) + geom_tile() + scale_fill_viridis_c(name = expression(log[10](Particles/m^3/mm))) + scale_y_reverse() + scale_x_log10() + geom_contour(color = "black") + geom_hline(yintercept = 160, color = "darkgreen") + geom_hline(yintercept = OMZBase, color = "darkblue") + labs(y = "Depth (m)", x = "Size (mm)")
+```
 
-WBColorMap <- meanBese%>%
-   ggplot(aes(x = lb, y = depth, fill = log10(nnparticles), z = log10(nnparticles))) + geom_tile() + scale_fill_viridis_c(name = expression(log[10](Particles/m^3/mm))) + scale_y_reverse() + scale_x_log10() + geom_contour(color = "black") + geom_hline(yintercept = 160, color = "darkgreen") + geom_hline(yintercept = OMZBase, color = "darkblue") + labs(y = "Depth (m)", x = "Size (mm)")
-WBColorMap
+```{r}
+ToPlot %>% filter(lb <= 2,
+                  profile == "stn_032") %>%
+  ggplot(aes(x = lb, y = depth, fill = log10(nnparticles), z = log10(nnparticles))) + geom_tile() + scale_fill_viridis_c(name = expression(log[10](Particles/m^3/mm))) + scale_y_reverse(limits = c(2000, 0)) + scale_x_log10() + geom_contour(color = "black") + geom_hline(yintercept = 160, color = "darkgreen") + geom_hline(yintercept = OMZBase, color = "darkblue") + labs(y = "Depth (m)", x = "Size (mm)")
+```
+
+```{r}
+# meanBese <- ToPlot %>% filter(lb <= 2) %>% group_by(lb, depth) %>% summarize(nparticles = mean(nparticles), nnparticles = mean(nnparticles))
+# 
+# WBColorMap <- meanBese%>%
+#    ggplot(aes(x = lb, y = depth, fill = log10(nnparticles), z = log10(nnparticles))) + geom_tile() + scale_fill_viridis_c(name = expression(log[10](Particles/m^3/mm))) + scale_y_reverse() + scale_x_log10() + geom_contour(color = "black") + geom_hline(yintercept = 160, color = "darkgreen") + geom_hline(yintercept = OMZBase, color = "darkblue") + labs(y = "Depth (m)", x = "Size (mm)")
+# WBColorMap
 ```
 
 
 ```{r}
-mbGam <- meanBese %>% group_by(depth)  %>% nest() %>%
+mbGam <- ToPlot %>% group_by(depth, profile)  %>% nest() %>%
   mutate(mod = map(data, ~gam(log(nnparticles) ~ log(lb), family = gaussian(), data = .))) %>% 
-  mutate(psd = map_dbl(mod, ~summary(.)$p.coeff[2]))
+  mutate(psd = map_dbl(mod, ~summary(.)$p.coeff[2])) %>%
+  left_join(ProfileTimes, by = "profile")
 ```
+
+
 
 ## Particle size distribution, smoothed over all stations
 
 ```{r}
-pWBPSD <- mbGam %>% ggplot(aes(x = psd, y = depth)) + geom_path() + scale_y_reverse()  + geom_hline(yintercept = 160, color = "darkgreen") + geom_hline(yintercept =  OMZBase, color = "darkblue")
+pWBPSD <- mbGam %>%
+  filter(profile %in% c("stn_032", "stn_043")) %>%
+  #filter(profile == "stn_043" | depth <= 1000) %>%
+  ggplot(aes(x = psd, y = depth, linetype = time2)) + geom_path() + scale_y_reverse()  + geom_hline(yintercept = 160, color = "darkgreen") + geom_hline(yintercept =  OMZBase, color = "darkblue") + scale_linetype_manual(name = "Day::Hour", values = c("dashed", "solid"))
+pWBPSD
+```
+
+
+
+```{r}
+pWBPSD <- mbGam %>%
+  ggplot(aes(x = psd, y = depth, color = time2)) + geom_path() + scale_y_reverse()  + geom_hline(yintercept = 160, color = "darkgreen") + geom_hline(yintercept =  OMZBase, color = "darkblue")
 pWBPSD
 ```
 
@@ -701,14 +790,30 @@ pWBPSD
 ### Small particles biomass
 
 ```{r}
-PubDf <- ToPlot %>% mutate(ubiomass = nparticles * lb ^ ag_global) %>% filter(lb < 0.5) %>% group_by(time, depth) %>% summarize(ubiomass = sum(ubiomass)) %>% ungroup %>% group_by(depth)  %>% summarise(ubiomass = mean(ubiomass))
+PubDf <- ToPlot %>% mutate(ubiomass = nparticles * lb ^ ag_global) %>% filter(lb < 0.5) %>% group_by(depth, profile) %>% summarize(ubiomass = sum(ubiomass)) %>% ungroup()
 photicBiomass <- PubDf %>% filter(depth <= 165, depth >= 155) %>% summarize(ubiomass = mean(ubiomass)) %>% pull(ubiomass)
 PubDf <- PubDf %>% mutate(nbiomass = ubiomass/photicBiomass)
-pWBS <- PubDf %>% ggplot(aes(x = nbiomass, y = depth)) + geom_path() + scale_y_reverse() + scale_x_continuous(limits = c(0,1.2)) + geom_hline(yintercept = 160, color = "darkgreen") + geom_vline(xintercept = 1, color = "gray50") + geom_vline(xintercept = 0, color = "gray50") + geom_hline(yintercept = OMZBase, color = "darkblue") + labs( x = "Small particle mass (norm.)")
+PubDf <- PubDf %>% left_join(ProfileTimes, by = "profile")
+pWBS <- PubDf %>% filter(profile %in% c("stn_032", "stn_043")) %>%
+  ggplot(aes(x = nbiomass, y = depth, linetype = time2)) + geom_path() + scale_y_reverse() + scale_x_continuous(limits = c(0,1.2)) + geom_hline(yintercept = 160, color = "darkgreen") + geom_vline(xintercept = 1, color = "gray50") + geom_vline(xintercept = 0, color = "gray50") + geom_hline(yintercept = OMZBase, color = "darkblue") + labs( x = "Small particle mass (norm.)") + scale_linetype_manual(name = "Day::Hour", values = c("dashed", "solid"))
 pWBS
 ```
 
+
+
 ## Large Particles Biomass
+
+```{r}
+PubDf <- ToPlot %>% mutate(ubiomass = nparticles * lb ^ ag_global) %>% filter(lb >= 0.5) %>% group_by(depth, profile) %>% summarize(ubiomass = sum(ubiomass)) %>% ungroup()
+photicBiomass <- PubDf %>% filter(depth <= 165, depth >= 155) %>% summarize(ubiomass = mean(ubiomass)) %>% pull(ubiomass)
+PubDf <- PubDf %>% mutate(nbiomass = ubiomass/photicBiomass)
+PubDf <- PubDf %>% left_join(ProfileTimes, by = "profile")
+pWBS <- PubDf %>% filter(profile %in% c("stn_032", "stn_043")) %>%
+  ggplot(aes(x = nbiomass, y = depth, linetype = time2)) + geom_path() + scale_y_reverse() + scale_x_continuous(limits = c(0,1.2)) + geom_hline(yintercept = 160, color = "darkgreen") + geom_vline(xintercept = 1, color = "gray50") + geom_vline(xintercept = 0, color = "gray50") + geom_hline(yintercept = OMZBase, color = "darkblue") + labs( x = "Large particle mass (norm.)") + scale_linetype_manual(name = "Day::Hour", values = c("dashed", "solid"))
+pWBS
+```
+
+
 ```{r}
 LubDf <- ToPlot %>% mutate(ubiomass = nparticles * lb ^ ag_global) %>% filter(lb >= 0.5) %>% group_by(time, depth) %>% summarize(ubiomass = sum(ubiomass)) %>% ungroup %>% group_by(depth)  %>% summarise(ubiomass = mean(ubiomass))
 photicBiomass <- LubDf %>% filter(depth <= 165, depth >=155) %>% summarize(ubiomass = mean(ubiomass)) %>% pull(ubiomass)
