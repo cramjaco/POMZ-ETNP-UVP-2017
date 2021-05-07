@@ -648,9 +648,13 @@ ggsave("figures/AllParticleSizes.png")
 ## Weber Bianchi Figs
 
 A bunch of upfront smoothing
+profile %in% c("stn_032","stn_043")
 
 ```{r}
-SameGam <- gam(TotalParticles ~s(log(lb), log(depth), by = factor(time)), offset = log(vol * binsize), family = nb(),
+# switched from depth to log depth
+# SameGam0 <- gam(TotalParticles ~s(log(lb), log(depth), by = factor(time)), offset = log(vol * binsize), family = nb(),
+#     data = bes %>% filter(project == "ETNP", depth <= 2000))
+SameGam <- gam(TotalParticles ~te(log(lb), log(depth)) + factor(time), offset = log(vol * binsize), family = nb(),
     data = bes %>% filter(project == "ETNP", depth <= 2000))
 ```
 

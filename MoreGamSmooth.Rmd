@@ -1,0 +1,30 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+```{r}
+SameGam0 <- gam(TotalParticles ~te(log(lb), log(depth)), offset = log(vol * binsize), family = nb(),
+     data = bes %>% filter(project == "ETNP", depth <= 2000))
+SameGam0Nl <- gam(TotalParticles ~te(log(lb), (depth)), offset = log(vol * binsize), family = nb(),
+     data = bes %>% filter(project == "ETNP", depth <= 2000))
+```
+
+```{r}
+WBColorMap <- ToPlot%>%
+   ggplot(aes(x = lb, y = depth, fill = log10(nnparticles), z = log10(nnparticles))) + geom_tile() + scale_fill_viridis_c(name = expression(log[10](Particles/m^3/mm))) + scale_y_reverse() + scale_x_log10() + geom_contour(color = "black") + geom_hline(yintercept = 160, color = "darkgreen") + geom_hline(yintercept = OMZBase, color = "darkblue") + labs(y = "Depth (m)", x = "Size (mm)") + facet_wrap(~time)
+WBColorMap
+```
+
+```{r}
+WBColorMap <- meanBese%>%
+   ggplot(aes(x = lb, y = depth, fill = log10(nnparticles), z = log10(nnparticles))) + geom_tile() + scale_fill_viridis_c(name = expression(log[10](Particles/m^3/mm))) + scale_y_log10() + scale_x_log10() + geom_contour(color = "black") + geom_hline(yintercept = 160, color = "darkgreen") + geom_hline(yintercept = OMZBase, color = "darkblue") + labs(y = "Depth (m)", x = "Size (mm)")
+WBColorMap
+```
+
+```{r}
+pWBPSD <- mbGam %>% ggplot(aes(x = psd, y = depth)) + geom_path() + scale_y_log10()  + geom_hline(yintercept = 160, color = "darkgreen") + geom_hline(yintercept =  OMZBase, color = "darkblue")
+pWBPSD
+```
+
+Ok. So it 
