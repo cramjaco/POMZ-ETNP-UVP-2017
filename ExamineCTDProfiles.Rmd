@@ -16,6 +16,13 @@ library(cowplot)
 
 
 ```{r}
+PhoticBase <- 160
+OMZBase <- 900
+OMZTop <- 90
+```
+
+
+```{r}
 ctdP2 <- ctd.m %>% left_join(cast2 %>% select(pstation, cast), by = 'cast') %>% filter(pstation == 'P2')
 # bin by 10 m
 depthBins <- seq(from = 0, to = max(ctdP2$depth), by = 1)
@@ -138,8 +145,8 @@ plotTempSalOxy <- function(){
   axis(side = 2, padj = .5, tcl = 0.5, las = 2, mgp = c(0, .3, 0))
    mtext("Depth (m)", side = 2, line = 2, cex = 1.25)
   #abline(h = 147, col = "darkblue") 
-  abline(h = 850, col = "darkblue")
-  abline(h = 170, col = "darkgreen")
+  abline(h = OMZBase, col = "darkblue")
+  abline(h = PhoticBase, col = "darkgreen")
   #text(y = 1050, x = 175, labels = "Bottom of OMZ\n (850 m)")
   par(new = TRUE)
   plot(plotDataCourse$temperature, plotDataCourse$depth, type = "l", ylim = c(1200, 0), xlim = c(0, 30), col = "firebrick4", lwd = 2, ylab = "", xlab = "", axes = FALSE)
@@ -180,7 +187,7 @@ plotBeamSTOxy <- function(){
   #mtext( "Beam Attenuation (/m)", side = 1, line = .1, adj = 1)
   mtext( "Beam Attenuation (/m)", side = 1, line = 2 + GlobalAdjust)
   abline(h = 160, col = "darkgreen")
-  abline(h = 850, col = "darkblue")
+  abline(h = OMZBase, col = "darkblue")
   legend(x = .11, y = 900, legend = c("Oxygen", "Beam", "σθ"), lty = c("solid", "solid", "dashed"), col = c("slateblue1", "black", "gray40"), lwd = c(8, 3, 5))
   mtext(expression(bold("D")), side = 3, line = 1.3, adj = 0, cex = 2)
 }
@@ -208,6 +215,7 @@ plotFluSTOxy <- function(){
   axis(side = 1, line = 0, padj = GlobalAdjust, tcl = .5)
   mtext("Fluorescence (RFU)", side = 1, line = 1.5)
   abline(h = 160, col = "darkgreen")
+    abline(h = OMZTop, col = "darkblue")
   #text(labels = "Base of\nPhotic Zone\n(160 m)", x = 1.9, y = 215)
   
   legend(x = .6, y = 130, legend = c("Oxygen", "Fluo", "σθ"), lty = c("solid", "solid", "dotted"), col = c("slateblue1", "darkgreen", "gray40"), lwd = c(8, 3, 5))
@@ -252,6 +260,7 @@ plotFluPAROxy <- function(){
   axis(side = 1, line = 0, padj = GlobalAdjust, tcl = .5)
   mtext("Fluorescence (RFU)", side = 1, line = 1.5)
   abline(h = 160, col = "darkgreen")
+  abline(h = OMZTop, col = "darkblue")
   #text(labels = "Base of\nPhotic Zone\n(160 m)", x = 1.9, y = 215)
   
   legend(x = .6, y = 130, legend = c("Oxygen", "Fluo", "PAR"), lty = c("solid", "solid", "solid"), col = c("slateblue1", "darkgreen", "gray20"), lwd = c(8, 3, 2))
@@ -358,7 +367,7 @@ plotBeamST <- function(){
   #mtext( "Beam Attenuation (/m)", side = 1, line = .1, adj = 1)
   mtext( "Beam Attenuation (/m)", side = 1, line = 2 + GlobalAdjust)
   abline(h = 160, col = "darkgreen")
-  abline(h = 850, col = "darkblue")
+  abline(h = OMZBase, col = "darkblue")
   legend(x = .11, y = 900, legend = c("Beam", "σθ"), lty = c("solid", "dashed"), col = c( "black", "gray40"), lwd = c(8, 3, 5))
   mtext(expression(bold("D")), side = 3, line = 1.3, adj = 0, cex = 2)
 }
