@@ -8,7 +8,6 @@ output:
    pdf_document: 
      keep_tex: yes
      latex_engine: lualatex
-     template: agujournaltemplate_mod2.tex
 #   html_document: null
 #   word_document:
 #    reference_docx: ReferenceTemplate.docx
@@ -17,15 +16,7 @@ bibliography: ../references.bib
 #always_allow_html: true
 ---
 
-#Notes to co-authors:
-I plan to target this manuscript to Global Biogeochemcial Cycles, first submitting to the pre-print server ESSOAr. This is not currently formatted for GBC, in part because I find it easier to have references with the authors names in the text when people are editing. There is a cover letter after the supplement.
-
-The following things still need to happen:
-Natalia Evans and I have some additional analyisis to discuss (does SSHA relate to disaggregation/apparent flux increases and others). Tom Weber, is looking over the math for the eularian disaggregation model. I need to format the github repository so that it can be shared, and possibly mirrored to a repository.
-
 # Author list 
-(Putative, order not set, Please suggest others. Please add your middle initial if you want to have one. Please add/confirm your ORCID, if you have one. If you don't have one, please consider creating one.)
-??? Means that is the only ORCID that I could find corresponding to the authors name but no other confirming information.
 
 Jacob A. Cram http://orcid.org/0000-0001-9546-1130,
 
@@ -367,6 +358,7 @@ We think this manuscript will be of interest to readers of GBC because it settle
 Sincerely,
 
 Jacob Cram
+
 
 
 # Suggested Reviewers
