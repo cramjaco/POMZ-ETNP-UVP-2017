@@ -7,7 +7,7 @@
 # Tectonics, Space Weather, Water Resources Research, Geochemistry, Geophysics, 
 # Geosystems, Journal of Advances in Modeling Earth Systems (JAMES),
 # Earth's Future, Earth and Space Science, Geohealth
-journal: "JGR: Atmospheres"
+journal: "Global Biogeochemical Cycles"
 # Use draft to submit a paper
 classoption: "draft,linenumbers"
 # A title should be specific, informative, and brief. Use
@@ -47,7 +47,7 @@ abstract: "A good abstract will begin with a short description of the problem be
 plain_language_summary: "Some journals require a plain language summary. See: https://publications.agu.org/author-resource-center/text-requirements/#abstract"
 output: 
     rticles::agu_article
-bibliography: agutest.bib
+bibliography: agutest2.bib
 header-includes: 
       - \usepackage{soulutf8}  # For UTF8 chars in TrackChanges
 # AGU recommends using the trackchanges LaTeX package in the edition process
@@ -79,7 +79,8 @@ Suggested section heads
 
 # Introduction
 
-The main text should start with an introduction. Except for short manuscripts (such as comments and replies), the text should be divided into sections, each with its own heading.
+The biological pump, in which sinking particles transport carbon from the surface into the deep ocean, is a key part of the global carbon cycle [@neuerOceanBiologicalCarbon2014; @turnerZooplanktonFecalPellets2015]. Organic matter flux into the deep ocean is a function both of export from the photic zone into the mesopelagic (export flux), and the fraction of that flux that crosses through the mesopelagic (transfer efficiency) [@francoisFactorsControllingFlux2002; @passowBiologicalPumpHigh2012; @siegelPredictionExportFate2016]. The transfer efficiency of the biological pump may affect global atmospheric carbon levels [@kwonImpactRemineralizationDepth2009]. Thus, understanding the processes that shape organic matter degradation in the mesopelagic is critical.
+
 
 Headings should be sentence fragments and do not begin with a lowercase letter or number. Capitalize the first letter of each word (except for prepositions, conjunctions, and articles that are three or fewer letters).
 
