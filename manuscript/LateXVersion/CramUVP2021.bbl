@@ -1,0 +1,449 @@
+\ifdefined\DeclarePrefChars\DeclarePrefChars{'’-}\else\fi
+\begin{thebibliography}{}
+
+\bibitem [\protect \citeauthoryear {%
+Ackermann%
+}{%
+Ackermann%
+}{%
+{\protect \APACyear {{\protect \bibnodate {}}}}%
+}]{%
+ackermann5500PhagesExamined2007}
+\APACinsertmetastar {%
+ackermann5500PhagesExamined2007}%
+\begin{APACrefauthors}%
+Ackermann, H\BHBI W.%
+\end{APACrefauthors}%
+\unskip\
+\newblock
+\APACrefYearMonthDay{{\protect \bibnodate {}}}{}{}.
+\newblock
+{\BBOQ}\APACrefatitle {5500 {{Phages}} Examined in the Electron Microscope}
+  {5500 {{Phages}} examined in the electron microscope}.{\BBCQ}
+\newblock
+\APACjournalVolNumPages{}{152}{2}{227--243}.
+\newblock
+\begin{APACrefURL}
+  [{2014-09-11}]\url{http://link.springer.com/10.1007/s00705-006-0849-1}
+  \end{APACrefURL}
+\newblock
+\begin{APACrefDOI} \doi{10.1007/s00705-006-0849-1} \end{APACrefDOI}
+\PrintBackRefs{\CurrentBib}
+
+\bibitem [\protect \citeauthoryear {%
+Agogué%
+, Brink%
+, Dinasquet%
+\BCBL {}\ \BBA {} Herndl%
+}{%
+Agogué%
+, Brink%
+\BCBL {}\ \protect \BOthers {.}}{%
+{\protect \APACyear {{\protect \bibnodate {}}}}%
+}]{%
+agogueMajorGradientsPutatively2008}
+\APACinsertmetastar {%
+agogueMajorGradientsPutatively2008}%
+\begin{APACrefauthors}%
+Agogué, H.%
+, Brink, M.%
+, Dinasquet, J.%
+\BCBL {}\ \BBA {} Herndl, G\BPBI J.%
+\end{APACrefauthors}%
+\unskip\
+\newblock
+\APACrefYearMonthDay{{\protect \bibnodate {}}}{}{}.
+\newblock
+{\BBOQ}\APACrefatitle {Major Gradients in Putatively Nitrifying and
+  Non-Nitrifying {{Archaea}} in the Deep {{North Atlantic}}} {Major gradients
+  in putatively nitrifying and non-nitrifying {{Archaea}} in the deep {{North
+  Atlantic}}}.{\BBCQ}
+\newblock
+\APACjournalVolNumPages{}{456}{7223}{788--791}.
+\newblock
+\begin{APACrefURL}
+  [{2010-03-21}]\url{http://apps.isiknowledge.com.libproxy.usc.edu/full_record.do?product=UA&search_mode=Refine&qid=80&SID=4ED6koDdkMAinJBPDA8&page=1&doc=2&colname=WOS&cacheurlFromRightClick=no}
+  \end{APACrefURL}
+\newblock
+\begin{APACrefDOI} \doi{10.1038/nature07535} \end{APACrefDOI}
+\PrintBackRefs{\CurrentBib}
+
+\bibitem [\protect \citeauthoryear {%
+Agogué%
+, Lamy%
+, Neal%
+, Sogin%
+\BCBL {}\ \BBA {} Herndl%
+}{%
+Agogué%
+, Lamy%
+\BCBL {}\ \protect \BOthers {.}}{%
+{\protect \APACyear {{\protect \bibnodate {}}}}%
+}]{%
+agogueWaterMassspecificityBacterial2011}
+\APACinsertmetastar {%
+agogueWaterMassspecificityBacterial2011}%
+\begin{APACrefauthors}%
+Agogué, H.%
+, Lamy, D.%
+, Neal, P\BPBI R.%
+, Sogin, M\BPBI L.%
+\BCBL {}\ \BBA {} Herndl, G\BPBI J.%
+\end{APACrefauthors}%
+\unskip\
+\newblock
+\APACrefYearMonthDay{{\protect \bibnodate {}}}{}{}.
+\newblock
+{\BBOQ}\APACrefatitle {Water Mass-Specificity of Bacterial Communities in the
+  {{North Atlantic}} Revealed by Massively Parallel Sequencing} {Water
+  mass-specificity of bacterial communities in the {{North Atlantic}} revealed
+  by massively parallel sequencing}.{\BBCQ}
+\newblock
+\APACjournalVolNumPages{}{20}{2}{258--274}.
+\newblock
+\begin{APACrefURL}
+  [{2014-04-30}]\url{http://onlinelibrary.wiley.com/doi/10.1111/j.1365-294X.2010.04932.x/abstract}
+  \end{APACrefURL}
+\newblock
+\begin{APACrefDOI} \doi{10.1111/j.1365-294X.2010.04932.x} \end{APACrefDOI}
+\PrintBackRefs{\CurrentBib}
+
+\bibitem [\protect \citeauthoryear {%
+Agrawal%
+, Imieliński%
+\BCBL {}\ \BBA {} Swami%
+}{%
+Agrawal%
+\ \protect \BOthers {.}}{%
+{\protect \APACyear {{\protect \bibnodate {}}}}%
+}]{%
+agrawalMiningAssociationRules1993}
+\APACinsertmetastar {%
+agrawalMiningAssociationRules1993}%
+\begin{APACrefauthors}%
+Agrawal, R.%
+, Imieliński, T.%
+\BCBL {}\ \BBA {} Swami, A.%
+\end{APACrefauthors}%
+\unskip\
+\newblock
+\APACrefYearMonthDay{{\protect \bibnodate {}}}{}{}.
+\newblock
+{\BBOQ}\APACrefatitle {Mining Association Rules between Sets of Items in Large
+  Databases} {Mining association rules between sets of items in large
+  databases}.{\BBCQ}
+\newblock
+\BIn{} \APACrefbtitle {{{ACM SIGMOD Record}}} {{{ACM SIGMOD Record}}}\
+  (\BVOL~22, \BPGS\ 207--216).
+\newblock
+\begin{APACrefURL} [{2013-02-01}]\url{http://dl.acm.org/citation.cfm?id=170072}
+  \end{APACrefURL}
+\PrintBackRefs{\CurrentBib}
+
+\bibitem [\protect \citeauthoryear {%
+Ahmed%
+\ \protect \BOthers {.}}{%
+Ahmed%
+\ \protect \BOthers {.}}{%
+{\protect \APACyear {{\protect \bibnodate {}}}}%
+}]{%
+ahmedFirstConfirmedDetection2020}
+\APACinsertmetastar {%
+ahmedFirstConfirmedDetection2020}%
+\begin{APACrefauthors}%
+Ahmed, W.%
+, Angel, N.%
+, Edson, J.%
+, Bibby, K.%
+, Bivins, A.%
+, O'Brien, J\BPBI W.%
+\BDBL {}Mueller, J\BPBI F.%
+\end{APACrefauthors}%
+\unskip\
+\newblock
+\APACrefYearMonthDay{{\protect \bibnodate {}}}{}{}.
+\newblock
+{\BBOQ}\APACrefatitle {First Confirmed Detection of {{SARS}}-{{CoV}}-2 in
+  Untreated Wastewater in {{Australia}}: {{A}} Proof of Concept for the
+  Wastewater Surveillance of {{COVID}}-19 in the Community} {First confirmed
+  detection of {{SARS}}-{{CoV}}-2 in untreated wastewater in {{Australia}}:
+  {{A}} proof of concept for the wastewater surveillance of {{COVID}}-19 in the
+  community}.{\BBCQ}
+\newblock
+\APACjournalVolNumPages{}{}{}{138764}.
+\newblock
+\begin{APACrefURL}
+  [{2020-04-23}]\url{http://www.sciencedirect.com/science/article/pii/S0048969720322816}
+  \end{APACrefURL}
+\newblock
+\begin{APACrefDOI} \doi{10.1016/j.scitotenv.2020.138764} \end{APACrefDOI}
+\PrintBackRefs{\CurrentBib}
+
+\bibitem [\protect \citeauthoryear {%
+Albert%
+\ \BBA {} Barabási%
+}{%
+Albert%
+\ \BBA {} Barabási%
+}{%
+{\protect \APACyear {{\protect \bibnodate {}}}}%
+}]{%
+albertStatisticalMechanicsComplex2002}
+\APACinsertmetastar {%
+albertStatisticalMechanicsComplex2002}%
+\begin{APACrefauthors}%
+Albert, R.%
+\BCBT {}\ \BBA {} Barabási, A\BHBI L.%
+\end{APACrefauthors}%
+\unskip\
+\newblock
+\APACrefYearMonthDay{{\protect \bibnodate {}}}{}{}.
+\newblock
+{\BBOQ}\APACrefatitle {Statistical Mechanics of Complex Networks} {Statistical
+  mechanics of complex networks}.{\BBCQ}
+\newblock
+\APACjournalVolNumPages{}{74}{1}{47--97}.
+\newblock
+\begin{APACrefURL}
+  [{2013-02-08}]\url{http://link.aps.org/doi/10.1103/RevModPhys.74.47}
+  \end{APACrefURL}
+\newblock
+\begin{APACrefDOI} \doi{10.1103/RevModPhys.74.47} \end{APACrefDOI}
+\PrintBackRefs{\CurrentBib}
+
+\bibitem [\protect \citeauthoryear {%
+Baird%
+, Christian%
+, Peterson%
+\BCBL {}\ \BBA {} Johnson%
+}{%
+Baird%
+\ \protect \BOthers {.}}{%
+{\protect \APACyear {{\protect \bibnodate {}}}}%
+}]{%
+bairdConsequencesHypoxiaEstuarine2004}
+\APACinsertmetastar {%
+bairdConsequencesHypoxiaEstuarine2004}%
+\begin{APACrefauthors}%
+Baird, D.%
+, Christian, R\BPBI R.%
+, Peterson, C\BPBI H.%
+\BCBL {}\ \BBA {} Johnson, G\BPBI A.%
+\end{APACrefauthors}%
+\unskip\
+\newblock
+\APACrefYearMonthDay{{\protect \bibnodate {}}}{}{}.
+\newblock
+{\BBOQ}\APACrefatitle {Consequences of {{Hypoxia}} on {{Estuarine Ecosystem
+  Function}}: {{Energy Diversion}} from {{Consumers}} to {{Microbes}}}
+  {Consequences of {{Hypoxia}} on {{Estuarine Ecosystem Function}}: {{Energy
+  Diversion}} from {{Consumers}} to {{Microbes}}}.{\BBCQ}
+\newblock
+\APACjournalVolNumPages{}{14}{3}{805--822}.
+\PrintBackRefs{\CurrentBib}
+
+\bibitem [\protect \citeauthoryear {%
+Bakewell%
+\ \BBA {} Lumley%
+}{%
+Bakewell%
+\ \BBA {} Lumley%
+}{%
+{\protect \APACyear {{\protect \bibnodate {}}}}%
+}]{%
+bakewellViscousSublayerAdjacent1967}
+\APACinsertmetastar {%
+bakewellViscousSublayerAdjacent1967}%
+\begin{APACrefauthors}%
+Bakewell, H\BPBI P.%
+\BCBT {}\ \BBA {} Lumley, J\BPBI L.%
+\end{APACrefauthors}%
+\unskip\
+\newblock
+\APACrefYearMonthDay{{\protect \bibnodate {}}}{}{}.
+\newblock
+{\BBOQ}\APACrefatitle {Viscous {{Sublayer}} and {{Adjacent Wall Region}} in
+  {{Turbulent Pipe Flow}}} {Viscous {{Sublayer}} and {{Adjacent Wall Region}}
+  in {{Turbulent Pipe Flow}}}.{\BBCQ}
+\newblock
+\APACjournalVolNumPages{}{10}{9}{1880--1889}.
+\newblock
+\begin{APACrefURL}
+  [{2019-02-11}]\url{https://aip.scitation.org/doi/10.1063/1.1762382}
+  \end{APACrefURL}
+\newblock
+\begin{APACrefDOI} \doi{10.1063/1.1762382} \end{APACrefDOI}
+\PrintBackRefs{\CurrentBib}
+
+\bibitem [\protect \citeauthoryear {%
+Bakken%
+\ \BBA {} Olsen%
+}{%
+Bakken%
+\ \BBA {} Olsen%
+}{%
+{\protect \APACyear {{\protect \bibnodate {}}}}%
+}]{%
+bakkenBuoyantDensitiesDryMatter1983}
+\APACinsertmetastar {%
+bakkenBuoyantDensitiesDryMatter1983}%
+\begin{APACrefauthors}%
+Bakken, L\BPBI R.%
+\BCBT {}\ \BBA {} Olsen, R\BPBI A.%
+\end{APACrefauthors}%
+\unskip\
+\newblock
+\APACrefYearMonthDay{{\protect \bibnodate {}}}{}{}.
+\newblock
+{\BBOQ}\APACrefatitle {Buoyant {{Densities}} and {{Dry}}-{{Matter Contents}} of
+  {{Microorganisms}}: {{Conversion}} of a {{Measured Biovolume}} into
+  {{Biomass}}} {Buoyant {{Densities}} and {{Dry}}-{{Matter Contents}} of
+  {{Microorganisms}}: {{Conversion}} of a {{Measured Biovolume}} into
+  {{Biomass}}}.{\BBCQ}
+\newblock
+\APACjournalVolNumPages{}{45}{4}{1188--1195}.
+\newblock
+\begin{APACrefURL}
+  [{2016-08-05}]\url{http://www.ncbi.nlm.nih.gov/pmc/articles/PMC242437/}
+  \end{APACrefURL}
+\PrintBackRefs{\CurrentBib}
+
+\bibitem [\protect \citeauthoryear {%
+Balch%
+, Bowler%
+, Drapeau%
+, Poulton%
+\BCBL {}\ \BBA {} Holligan%
+}{%
+Balch%
+\ \protect \BOthers {.}}{%
+{\protect \APACyear {{\protect \bibnodate {}}}}%
+}]{%
+balchBiomineralsVerticalFlux2010}
+\APACinsertmetastar {%
+balchBiomineralsVerticalFlux2010}%
+\begin{APACrefauthors}%
+Balch, W\BPBI M.%
+, Bowler, B\BPBI C.%
+, Drapeau, D\BPBI T.%
+, Poulton, A\BPBI J.%
+\BCBL {}\ \BBA {} Holligan, P\BPBI M.%
+\end{APACrefauthors}%
+\unskip\
+\newblock
+\APACrefYearMonthDay{{\protect \bibnodate {}}}{}{}.
+\newblock
+{\BBOQ}\APACrefatitle {Biominerals and the Vertical Flux of Particulate Organic
+  Carbon from the Surface Ocean} {Biominerals and the vertical flux of
+  particulate organic carbon from the surface ocean}.{\BBCQ}
+\newblock
+\APACjournalVolNumPages{}{37}{22}{L22605}.
+\newblock
+\begin{APACrefURL}
+  [{2015-06-24}]\url{http://onlinelibrary.wiley.com/doi/10.1029/2010GL044640/abstract}
+  \end{APACrefURL}
+\newblock
+\begin{APACrefDOI} \doi{10.1029/2010GL044640} \end{APACrefDOI}
+\PrintBackRefs{\CurrentBib}
+
+\bibitem [\protect \citeauthoryear {%
+Barker%
+, Slingsby%
+\BCBL {}\ \BBA {} Tilling%
+}{%
+Barker%
+\ \protect \BOthers {.}}{%
+{\protect \APACyear {{\protect \bibnodate {}}}}%
+}]{%
+barkerTeachingBiologyOutside2002}
+\APACinsertmetastar {%
+barkerTeachingBiologyOutside2002}%
+\begin{APACrefauthors}%
+Barker, S.%
+, Slingsby, D.%
+\BCBL {}\ \BBA {} Tilling, S.%
+\end{APACrefauthors}%
+\unskip\
+\newblock
+\APACrefYearMonthDay{{\protect \bibnodate {}}}{}{}.
+\newblock
+{\BBOQ}\APACrefatitle {Teaching Biology Outside the Classroom} {Teaching
+  biology outside the classroom}.{\BBCQ}
+\newblock
+\APACjournalVolNumPages{}{}{}{14--19}.
+\PrintBackRefs{\CurrentBib}
+
+\bibitem [\protect \citeauthoryear {%
+Bashir%
+\ \protect \BOthers {.}}{%
+Bashir%
+\ \protect \BOthers {.}}{%
+{\protect \APACyear {{\protect \bibnodate {}}}}%
+}]{%
+bashirFunctionalMetagenomicsSpacecraft2016}
+\APACinsertmetastar {%
+bashirFunctionalMetagenomicsSpacecraft2016}%
+\begin{APACrefauthors}%
+Bashir, M.%
+, Ahmed, M.%
+, Weinmaier, T.%
+, Ciobanu, D.%
+, Ivanova, N.%
+, Pieber, T\BPBI R.%
+\BCBL {}\ \BBA {} Vaishampayan, P\BPBI A.%
+\end{APACrefauthors}%
+\unskip\
+\newblock
+\APACrefYearMonthDay{{\protect \bibnodate {}}}{}{}.
+\newblock
+{\BBOQ}\APACrefatitle {Functional {{Metagenomics}} of {{Spacecraft Assembly
+  Cleanrooms}}: {{Presence}} of {{Virulence Factors Associated}} with {{Human
+  Pathogens}}} {Functional {{Metagenomics}} of {{Spacecraft Assembly
+  Cleanrooms}}: {{Presence}} of {{Virulence Factors Associated}} with {{Human
+  Pathogens}}}.{\BBCQ}
+\newblock
+\APACjournalVolNumPages{}{}{}{1321}.
+\newblock
+\begin{APACrefURL}
+  [{2016-10-06}]\url{http://journal.frontiersin.org/article/10.3389/fmicb.2016.01321/full}
+  \end{APACrefURL}
+\newblock
+\begin{APACrefDOI} \doi{10.3389/fmicb.2016.01321} \end{APACrefDOI}
+\PrintBackRefs{\CurrentBib}
+
+\bibitem [\protect \citeauthoryear {%
+Neuer%
+, Iversen%
+\BCBL {}\ \BBA {} Fischer%
+}{%
+Neuer%
+\ \protect \BOthers {.}}{%
+{\protect \APACyear {{\protect \bibnodate {}}}}%
+}]{%
+neuerOceanBiologicalCarbon2014}
+\APACinsertmetastar {%
+neuerOceanBiologicalCarbon2014}%
+\begin{APACrefauthors}%
+Neuer, S.%
+, Iversen, M.%
+\BCBL {}\ \BBA {} Fischer, G.%
+\end{APACrefauthors}%
+\unskip\
+\newblock
+\APACrefYearMonthDay{{\protect \bibnodate {}}}{}{}.
+\newblock
+{\BBOQ}\APACrefatitle {The {{Ocean}}'s {{Biological Carbon}} Pump as Part of
+  the Global {{Carbon Cycle}}} {The {{Ocean}}'s {{Biological Carbon}} pump as
+  part of the global {{Carbon Cycle}}}.{\BBCQ}
+\newblock
+\APACjournalVolNumPages{}{4}{4}{1--51}.
+\newblock
+\begin{APACrefURL}
+  [{2020-03-20}]\url{https://aslopubs.onlinelibrary.wiley.com/doi/abs/10.4319/lol.2014.sneuer.miversen.gfischer.9}
+  \end{APACrefURL}
+\newblock
+\begin{APACrefDOI} \doi{10.4319/lol.2014.sneuer.miversen.gfischer.9}
+  \end{APACrefDOI}
+\PrintBackRefs{\CurrentBib}
+
+\end{thebibliography}

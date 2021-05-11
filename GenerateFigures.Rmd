@@ -35,6 +35,7 @@ Specify the base of the photic zone (which is inside of the OMZ) and the bae of 
 ```{r}
 PhoticBase <- 160
 OMZBase <- 900
+DVMBase <- 600
 ```
 
 
@@ -68,19 +69,7 @@ scale_x_log_eng = function(..., radix=10) {
 }
 
 #theme_set(theme_bw)
-PlotPSDmany <- uds %>% 
-  filter(project == "ETNP") %>%
-  ggplot(aes(x = psd, y = depth, shape = factor(day(time)), fill = hour(time))) +
- 
-  #geom_path(aes(x = psd_gam)) + 
-  #geom_ribbon(aes(x = psd_gam, xmin = psd_gam - 2 * psd_seg, xmax = psd_gam + 2 * psd_seg), alpha = 0.1, outline_type = "lower") +
-  geom_point(alpha = .6, size = 2, stroke = 1) +
-  scale_y_reverse(limits = c(1200, 0)) +
-  scale_shape_manual(name = "Day", values = c(21:25)) +
-  scale_fill_gradientn(name = "Hour",breaks = c(0, 6, 12, 18, 24), labels =  c("0", "6", "12", "18", "24"), colors = c("black", "blue", "white", "orange", "black")) +
-  labs(y = "Depth (m)", x = "Particle Size Distribution Slope") + 
-  geom_hline(yintercept = PhoticBase, color = "darkgreen") +
-  geom_hline(yintercept = OMZBase, color = "darkblue") 
+
 
 #theme_set(theme_cowplot)
 
@@ -92,19 +81,46 @@ PlotParticlesmany <- uds %>%
   #geom_ribbon(aes(x = psd_gam, xmin = psd_gam - 2 * psd_seg, xmax = psd_gam + 2 * psd_seg), alpha = 0.1, outline_type = "lower") +
   geom_point(alpha = .6, size = 2, stroke = 1) +
   scale_y_reverse(limits = c(1200, 0)) + scale_shape_manual(values = c(21:25)) +
-  scale_fill_gradientn(breaks = c(0, 6, 12, 18, 24), colors = c("black", "blue", "white", "orange", "black")) +
+  scale_fill_gradientn(breaks = c(0, 6, 12, 18, 24), colors = c("black", "blue", "white", "orange", "black"), limits = c(0, 24)) +
   scale_x_log10(breaks = c(10, 100, 1000), minor = c(5, 50, 500)) +
   #theme(legend.position = "none") +
   #scale_x_log_eng()+
   labs(y = "Depth (m)", x = "Particles / L") + 
   geom_hline(yintercept = PhoticBase, color = "darkgreen") +
   geom_hline(yintercept = OMZBase, color = "darkblue") +
+  #geom_hline(yintercept = DVMBase, color = "darkgoldenrod", lty = "dashed") +
   theme(legend.position = "none")
+
+PlotPSDmany <- uds %>% 
+  filter(project == "ETNP") %>%
+  ggplot(aes(x = psd, y = depth, shape = factor(day(time)), fill = hour(time))) +
+ 
+  #geom_path(aes(x = psd_gam)) + 
+  #geom_ribbon(aes(x = psd_gam, xmin = psd_gam - 2 * psd_seg, xmax = psd_gam + 2 * psd_seg), alpha = 0.1, outline_type = "lower") +
+  geom_point(alpha = .6, size = 2, stroke = 1) +
+  scale_y_reverse(limits = c(1200, 0)) +
+  scale_shape_manual(name = "Day", values = c(21:25)) +
+  scale_fill_gradientn(name = "Hour",breaks = c(0, 6, 12, 18, 24), labels =  c("0", "6", "12", "18", "24"), colors = c("black", "blue", "white", "orange", "black"), limits = c(0, 24)) +
+  labs(y = "Depth (m)", x = "Particle Size Distribution Slope") + 
+  geom_hline(yintercept = PhoticBase, color = "darkgreen") +
+  geom_hline(yintercept = OMZBase, color = "darkblue") +
+  #geom_hline(yintercept = DVMBase, color = "darkgoldenrod", lty = "dashed") +
+  coord_cartesian(clip = "off") +
+  annotate(geom = "text", x = -2, y = 1100, label = "More large \n particles", inherit.aes = FALSE, size = 6) +
+  annotate(geom = "text", x = -4.5, y = 1100, label = "More small \n particles", inherit.aes = FALSE, size = 6)
+  # annotation_custom(
+  #     grob = textGrob(label = "More big particles", hjust = 0, gp = gpar(cex = 12)),
+  #     ymin = 0,      # Vertical position of the textGrob
+  #     ymax = 0,
+  #     xmin = 0,         # Note: The grobs are positioned outside the plot area
+  #     xmax = 0)
+  
 
 plot_grid(
   PlotParticlesmany,
   PlotPSDmany,
-  rel_widths = c(1, 2)
+  rel_widths = c(1, 2),
+  labels = c("A", "B")
   )
 
 ggsave("figures/ParticlesPSDMany.png")
@@ -329,14 +345,17 @@ pltFlx <- bds %>% filter(project == "ETNP") %>% #filter(DFP > 1) %>% #filter(pro
   scale_x_log10nice()+
   #scale_x_log10() + 
    scale_color_gradient2(low = "darkgreen", mid = "gray80", high = "purple", midpoint = 10) + scale_shape_manual(name = "Day of Month", values = rep(21:25, 2)) + 
-  scale_fill_gradientn(name = "Hour of Day", breaks = c(0, 6, 12, 18, 24), colors = c("black", "blue", "white", "orange", "black")) +
+  scale_fill_gradientn(name = "Hour of Day", breaks = c(0, 6, 12, 18, 24), colors = c("black", "blue", "white", "orange", "black"), limits = c(0, 24)) +
   
   labs(x = bquote(Smoothed~Flux~(µmol~C/m^2/d)), y = "Depth (m)") +
   #labs(x = "moo", y = "Depth (m)") +
   geom_rect(data = data.frame(project = "ETNP"), aes(xmin = 20, xmax = 180, ymin = 75, ymax = 500), colour = "red", fill = NA, inherit.aes = FALSE) +
   theme(axis.text.x = element_text(angle = 90, vjust = .3), legend.spacing = unit(.1, "cm")) +
-   geom_segment(aes(y = 160, yend = 160, x = 20, xend = 500), color = "darkgreen", stroke = 0.5)+
-   geom_segment(aes(y = OMZBase, yend = OMZBase, x = 20, xend = 500), color = "darkblue", stroke = 0.5)#+ geom_hline(yintercept = OMZBase, color = "darkblue")
+   geom_segment(aes(y = PhoticBase, yend = PhoticBase, x = 20, xend = 500), color = "darkgreen", stroke = 0.5)+
+   geom_segment(aes(y = OMZBase, yend = OMZBase, x = 20, xend = 500), color = "darkblue", stroke = 0.5) #+
+  #geom_segment(aes(y = DVMBase, yend = DVMBase, x = 20, xend = 500), color = "darkgoldenrod", lty = "dashed", stroke = 0.5)
+  
+  #+ geom_hline(yintercept = OMZBase, color = "darkblue")
 
 
 
@@ -382,7 +401,9 @@ pltDelta3 <- bds %>% filter(project == "ETNP") %>% #filter(DFP > 1) %>% #filter(
   scale_fill_gradientn(name = "Hour", breaks = c(0, 6, 12, 18, 24), colors = c("black", "blue", "white", "orange", "black")) +
   geom_vline(xintercept = 0) +
   labs(x = bquote((DF/DZ)^{1/5}~(µmolC/m^3/d)^{1/5}), y = "Depth (m)") + theme(legend.pos = "none")+
-  geom_hline(yintercept = 160, color = "darkgreen") + geom_hline(yintercept = OMZBase, color = "darkblue")
+  geom_hline(yintercept = PhoticBase, color = "darkgreen") +
+  geom_hline(yintercept = OMZBase, color = "darkblue") +
+  #geom_hline(yintercept = DVMBase, color = "darkgoldenrod", lty = "dashed")
   #labs(x = "(DF/DZ) ^ 1/5 (µmol C/m^3/d) ^ 1/5")
 
 pltDelta3
@@ -471,10 +492,13 @@ Plot of the gams above
 FluxGamPlot <- function(){
   par(mfrow = c(2,2))
   plot(DFG1)
+  abline(h = 0, col = "gray30", lwd = 2)
   mtext(expression(bold("C")), side = 3, line = 0, adj = 0, cex = 2)
   par(mfg = c(1,1))
+  abline(h = 0, col = "gray30", lwd = 2)
   mtext(expression(bold("A")), side = 3, line = 0, adj = 0, cex = 2)
   par(mfg = c(1,2))
+  abline(h = 0, col = "gray30", lwd = 2)
   mtext(expression(bold("B")), side = 3, line = 0, adj = 0, cex = 2)
 }
 
@@ -498,7 +522,8 @@ disagFig <- bds %>% filter(project == "ETNP") %>%
   geom_vline(xintercept = 0) +   scale_shape_manual(name = "Day of Month", values = rep(21:25, 2)) +
   #labs(x = bquote("Observed - Modeled Small Particle Flux"~(μmol/m^3/day)), y = "Depth (m)") +
   labs(x = paste("Deviation from Model", expression((μmol/m^3/day)))) +
-  scale_fill_gradientn(name = "Hour of Day", breaks = c(0, 6, 12, 18, 24), colors = c("black", "blue", "white", "orange", "black")) + geom_hline(yintercept = PhoticBase, color = "darkgreen") + geom_hline(yintercept = OMZBase, color = "darkblue")
+  scale_fill_gradientn(name = "Hour of Day", breaks = c(0, 6, 12, 18, 24), colors = c("black", "blue", "white", "orange", "black")) + geom_hline(yintercept = PhoticBase, color = "darkgreen") + geom_hline(yintercept = OMZBase, color = "darkblue") #+
+  #geom_hline(yintercept = DVMBase, color = "darkgoldenrod", lty = "dashed")
 disagFig
 #ggsave("..figures/FluxSizeShift.svg"
 
@@ -538,10 +563,13 @@ OSMSGamPlot <- function(){
   plot(OZG1)
   
   par(mfg = c(1,1))
+  abline(h = 0, col = "gray30", lwd = 2)
   mtext(expression(bold("A")), side = 3, line = 0, adj = 0, cex = 2)
   par(mfg = c(1,2))
+  abline(h = 0, col = "gray30", lwd = 2)
   mtext(expression(bold("B")), side = 3, line = 0, adj = 0, cex = 2)
   par(mfg = c(2,1))
+  abline(h = 0, col = "gray30", lwd = 2)
   mtext(expression(bold("C")), side = 3, line = 0, adj = 0, cex = 2)
 }
 
@@ -626,9 +654,13 @@ ggsave("figures/FittedFlux.svg")
 ```{r fig.width= 10}
 TPPlot <- bes %>% filter(profile == "stn_043") %>% group_by(lb) %>% ggplot(aes(x = TotalParticles, y = depth, col = log(lb), group = lb)) + scale_y_reverse(limits = c(1000, 0)) + geom_point() + scale_x_log10() + scale_color_viridis_c() + geom_path() + geom_vline(xintercept = 1) + geom_vline(xintercept = 5) + labs(y = "Depth (m)", x = "TotalParticles Observed (#)")
 
-nnpPlot <- bes %>% filter(profile == "stn_043") %>% group_by(lb) %>% ggplot(aes(x = n_nparticles, y = depth, col = log(lb), group = lb)) + scale_y_reverse(limits = c(1000, 0)) + geom_point() + scale_x_log10() + scale_color_viridis_c() + geom_path() + geom_vline(xintercept = 1) + geom_vline(xintercept = 5) + labs(y = "Depth (m)", x = "Binsize and Volume Normalized Particles (#/L/mm)")
+nnpPlot <- bes %>% filter(profile == "stn_043") %>% group_by(lb) %>% ggplot(aes(x = n_nparticles, y = depth, col = log(lb), group = lb)) + scale_y_reverse(limits = c(1000, 0)) + geom_point() + scale_x_log10() + scale_color_viridis_c() + geom_path() +
+  #geom_vline(xintercept = 1) + geom_vline(xintercept = 5) +
+  labs(y = "Depth (m)", x = "Binsize and Volume Normalized Particles (#/L/mm)")
 
-FitPlot <- bes %>% filter(profile == "stn_043") %>% group_by(lb) %>% ggplot(aes(x = nnp_smooth, xmin = nnp_lower, xmax = nnp_upper, y = depth, col = log(lb), group = lb)) + scale_y_reverse(limits = c(1000, 0)) + geom_point() + scale_x_log10() + scale_color_viridis_c() + geom_path() + geom_vline(xintercept = 1) + geom_vline(xintercept = 5) + labs(y = "Depth (m)", x = "Smoothed - Normalized Particles (#/L/mm)") + geom_errorbar(width = 10, alpha = 0.5)
+FitPlot <- bes %>% filter(profile == "stn_043") %>% group_by(lb) %>% ggplot(aes(x = nnp_smooth, xmin = nnp_lower, xmax = nnp_upper, y = depth, col = log(lb), group = lb)) + scale_y_reverse(limits = c(1000, 0)) + geom_point() + scale_x_log10() + scale_color_viridis_c() + geom_path() +
+  #geom_vline(xintercept = 1) + geom_vline(xintercept = 5) +
+  labs(y = "Depth (m)", x = "Smoothed - Normalized Particles (#/L/mm)") + geom_errorbar(width = 10, alpha = 0.5)
 
 npLegend <- get_legend(FitPlot + theme(legend.box.margin = margin(0, 0, 40, 200)) + labs(col = expression(log[e](Size (mm)))))
 
@@ -636,7 +668,8 @@ plot_grid(
   TPPlot + theme(legend.position = "none"),
   nnpPlot + theme(legend.position = "none"),
   npLegend ,
-  FitPlot + theme(legend.position = "none")
+  FitPlot + theme(legend.position = "none"), 
+  labels = c("A", "B", "", "C")
 )
 
 ggsave("figures/AllParticleSizes.svg")

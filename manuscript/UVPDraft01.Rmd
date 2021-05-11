@@ -3,16 +3,17 @@ title: Particle size and abundance measurements suggest temporally variable biot
   transport and disaggregation in the Eastern Tropical North Pacific Oxygen Minimum Zone
   Zone
 author: "Jacob A. Cram"
-date: "07 April 2021"
+# date: "07 April 2021"
 output:
-  pdf_document:
-    latex_engine: lualatex
-  html_document: null
-  word_document:
-    reference_docx: ReferenceTemplate.docx
-  bookdown::pdf_document2: default
+   pdf_document: 
+     keep_tex: yes
+     latex_engine: lualatex
+#   html_document: null
+#   word_document:
+#    reference_docx: ReferenceTemplate.docx
+#  bookdown::pdf_document2: default
 bibliography: ../references.bib
-always_allow_html: true
+#always_allow_html: true
 ---
 
 #Notes to co-authors:

@@ -1,0 +1,863 @@
+This is pdfTeX, Version 3.14159265-2.6-1.40.18 (TeX Live 2017/Debian) (preloaded format=pdflatex 2020.3.3)  10 MAY 2021 18:35
+entering extended mode
+ restricted \write18 enabled.
+ %&-line parsing enabled.
+**CramUVP2021.tex
+(./CramUVP2021.tex
+LaTeX2e <2017-04-15>
+Babel <3.18> and hyphenation patterns for 84 language(s) loaded.
+(./agujournal2019.cls
+Document Class: agujournal2019 01/14/2019
+(/usr/share/texlive/texmf-dist/tex/latex/graphics/graphicx.sty
+Package: graphicx 2017/06/01 v1.1a Enhanced LaTeX Graphics (DPC,SPQR)
+
+(/usr/share/texlive/texmf-dist/tex/latex/graphics/keyval.sty
+Package: keyval 2014/10/28 v1.15 key=value parser (DPC)
+\KV@toks@=\toks14
+)
+(/usr/share/texlive/texmf-dist/tex/latex/graphics/graphics.sty
+Package: graphics 2017/06/25 v1.2c Standard LaTeX Graphics (DPC,SPQR)
+
+(/usr/share/texlive/texmf-dist/tex/latex/graphics/trig.sty
+Package: trig 2016/01/03 v1.10 sin cos tan (DPC)
+)
+(/usr/share/texlive/texmf-dist/tex/latex/graphics-cfg/graphics.cfg
+File: graphics.cfg 2016/06/04 v1.11 sample graphics configuration
+)
+Package graphics Info: Driver file: pdftex.def on input line 99.
+
+(/usr/share/texlive/texmf-dist/tex/latex/graphics-def/pdftex.def
+File: pdftex.def 2018/01/08 v1.0l Graphics/color driver for pdftex
+))
+\Gin@req@height=\dimen102
+\Gin@req@width=\dimen103
+)
+(/usr/share/texlive/texmf-dist/tex/latex/xcolor/xcolor.sty
+Package: xcolor 2016/05/11 v2.12 LaTeX color extensions (UK)
+
+(/usr/share/texlive/texmf-dist/tex/latex/graphics-cfg/color.cfg
+File: color.cfg 2016/01/02 v1.6 sample color configuration
+)
+Package xcolor Info: Driver file: pdftex.def on input line 225.
+Package xcolor Info: Model `cmy' substituted by `cmy0' on input line 1348.
+Package xcolor Info: Model `hsb' substituted by `rgb' on input line 1352.
+Package xcolor Info: Model `RGB' extended on input line 1364.
+Package xcolor Info: Model `HTML' substituted by `rgb' on input line 1366.
+Package xcolor Info: Model `Hsb' substituted by `hsb' on input line 1367.
+Package xcolor Info: Model `tHsb' substituted by `hsb' on input line 1368.
+Package xcolor Info: Model `HSB' substituted by `hsb' on input line 1369.
+Package xcolor Info: Model `Gray' substituted by `gray' on input line 1370.
+Package xcolor Info: Model `wave' substituted by `hsb' on input line 1371.
+)
+(/usr/share/texlive/texmf-dist/tex/latex/url/url.sty
+\Urlmuskip=\muskip10
+Package: url 2013/09/16  ver 3.4  Verb mode for urls, etc.
+)
+(/usr/share/texlive/texmf-dist/tex/latex/lineno/lineno.sty
+Package: lineno 2005/11/02 line numbers on paragraphs v4.41
+\linenopenalty=\count79
+\output=\toks15
+\linenoprevgraf=\count80
+\linenumbersep=\dimen104
+\linenumberwidth=\dimen105
+\c@linenumber=\count81
+\c@pagewiselinenumber=\count82
+\c@LN@truepage=\count83
+\c@internallinenumber=\count84
+\c@internallinenumbers=\count85
+\quotelinenumbersep=\dimen106
+\bframerule=\dimen107
+\bframesep=\dimen108
+\bframebox=\box26
+LaTeX Info: Redefining \\ on input line 3056.
+)
+(/usr/share/texlive/texmf-dist/tex/latex/tools/indentfirst.sty
+Package: indentfirst 1995/11/23 v1.03 Indent first paragraph (DPC)
+)
+(/usr/share/texlive/texmf-dist/tex/latex/ms/ragged2e.sty
+Package: ragged2e 2009/05/21 v2.1 ragged2e Package (MS)
+
+(/usr/share/texlive/texmf-dist/tex/latex/ms/everysel.sty
+Package: everysel 2011/10/28 v1.2 EverySelectfont Package (MS)
+)
+\CenteringLeftskip=\skip41
+\RaggedLeftLeftskip=\skip42
+\RaggedRightLeftskip=\skip43
+\CenteringRightskip=\skip44
+\RaggedLeftRightskip=\skip45
+\RaggedRightRightskip=\skip46
+\CenteringParfillskip=\skip47
+\RaggedLeftParfillskip=\skip48
+\RaggedRightParfillskip=\skip49
+\JustifyingParfillskip=\skip50
+\CenteringParindent=\skip51
+\RaggedLeftParindent=\skip52
+\RaggedRightParindent=\skip53
+\JustifyingParindent=\skip54
+)
+(/usr/share/texlive/texmf-dist/tex/latex/graphics/rotating.sty
+Package: rotating 2016/08/11 v2.16d rotated objects in LaTeX
+
+(/usr/share/texlive/texmf-dist/tex/latex/base/ifthen.sty
+Package: ifthen 2014/09/29 v1.1c Standard LaTeX ifthen package (DPC)
+)
+\c@r@tfl@t=\count86
+\rotFPtop=\skip55
+\rotFPbot=\skip56
+\rot@float@box=\box27
+\rot@mess@toks=\toks16
+)
+\draftskip=\count87
+\c@section=\count88
+\c@subsection=\count89
+\c@subsubsection=\count90
+\c@paragraph=\count91
+\c@subparagraph=\count92
+\c@figure=\count93
+\c@table=\count94
+\abovecaptionskip=\skip57
+\belowcaptionskip=\skip58
+\c@appendnum=\count95
+\bibindent=\dimen109
+
+(/usr/share/texlive/texmf-dist/tex/latex/apacite/apacite.sty
+Package: apacite 2013/07/21 v6.03 APA citation
+\c@BibCnt=\count96
+\bibleftmargin=\skip59
+\bibindent=\skip60
+\bibparsep=\skip61
+\bibitemsep=\skip62
+\biblabelsep=\skip63
+))
+(./trackchanges.sty
+Package: trackchanges 2009/04/22 v0.7.0 TrackChanges file 
+ (/usr/share/texlive/texmf-dist/tex/latex/tools/calc.sty
+Package: calc 2014/10/28 v4.3 Infix arithmetic (KKT,FJ)
+\calc@Acount=\count97
+\calc@Bcount=\count98
+\calc@Adimen=\dimen110
+\calc@Bdimen=\dimen111
+\calc@Askip=\skip64
+\calc@Bskip=\skip65
+LaTeX Info: Redefining \setlength on input line 80.
+LaTeX Info: Redefining \addtolength on input line 81.
+\calc@Ccount=\count99
+\calc@Cskip=\skip66
+)
+(/usr/share/texlive/texmf-dist/tex/latex/soul/soul.sty
+Package: soul 2003/11/17 v2.4 letterspacing/underlining (mf)
+\SOUL@word=\toks17
+\SOUL@lasttoken=\toks18
+\SOUL@cmds=\toks19
+\SOUL@buffer=\toks20
+\SOUL@token=\toks21
+\SOUL@spaceskip=\skip67
+\SOUL@ttwidth=\dimen112
+\SOUL@uldp=\dimen113
+\SOUL@ulht=\dimen114
+)
+(/usr/share/texlive/texmf-dist/tex/latex/morefloats/morefloats.sty
+Package: morefloats 2015/07/22 v1.0h Raise limit of unprocessed floats (HMM)
+
+(/usr/share/texlive/texmf-dist/tex/latex/oberdiek/kvoptions.sty
+Package: kvoptions 2016/05/16 v3.12 Key value format for package options (HO)
+
+(/usr/share/texlive/texmf-dist/tex/generic/oberdiek/ltxcmds.sty
+Package: ltxcmds 2016/05/16 v1.23 LaTeX kernel commands for general use (HO)
+)
+(/usr/share/texlive/texmf-dist/tex/generic/oberdiek/kvsetkeys.sty
+Package: kvsetkeys 2016/05/16 v1.17 Key value parser (HO)
+
+(/usr/share/texlive/texmf-dist/tex/generic/oberdiek/infwarerr.sty
+Package: infwarerr 2016/05/16 v1.4 Providing info/warning/error messages (HO)
+)
+(/usr/share/texlive/texmf-dist/tex/generic/oberdiek/etexcmds.sty
+Package: etexcmds 2016/05/16 v1.6 Avoid name clashes with e-TeX commands (HO)
+
+(/usr/share/texlive/texmf-dist/tex/generic/oberdiek/ifluatex.sty
+Package: ifluatex 2016/05/16 v1.4 Provides the ifluatex switch (HO)
+Package ifluatex Info: LuaTeX not detected.
+)
+Package etexcmds Info: Could not find \expanded.
+(etexcmds)             That can mean that you are not using pdfTeX 1.50 or
+(etexcmds)             that some package has redefined \expanded.
+(etexcmds)             In the latter case, load this package earlier.
+)))
+Package morefloats Info: Maximum number of possible floats asked for: 36
+(morefloats)             (i.e. 18 more floats).
+(morefloats)             LaTeX might run out of memory before this
+(morefloats)             (in which case it will notify you).
+)
+\c@userid=\count100
+\c@changenumber=\count101
+\c@storefootnote=\count102
+\c@numeditors=\count103
+\c@maxeditors=\count104
+)
+(./CramUVP2021.aux)
+\openout1 = `CramUVP2021.aux'.
+
+LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 68.
+LaTeX Font Info:    ... okay on input line 68.
+LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 68.
+LaTeX Font Info:    ... okay on input line 68.
+LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 68.
+LaTeX Font Info:    ... okay on input line 68.
+LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 68.
+LaTeX Font Info:    ... okay on input line 68.
+LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 68.
+LaTeX Font Info:    ... okay on input line 68.
+LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 68.
+LaTeX Font Info:    ... okay on input line 68.
+
+(/usr/share/texlive/texmf-dist/tex/context/base/mkii/supp-pdf.mkii
+[Loading MPS to PDF converter (version 2006.09.02).]
+\scratchcounter=\count105
+\scratchdimen=\dimen115
+\scratchbox=\box28
+\nofMPsegments=\count106
+\nofMParguments=\count107
+\everyMPshowfont=\toks22
+\MPscratchCnt=\count108
+\MPscratchDim=\dimen116
+\MPnumerator=\count109
+\makeMPintoPDFobject=\count110
+\everyMPtoPDFconversion=\toks23
+) (/usr/share/texlive/texmf-dist/tex/latex/oberdiek/epstopdf-base.sty
+Package: epstopdf-base 2016/05/15 v2.6 Base part for package epstopdf
+
+(/usr/share/texlive/texmf-dist/tex/latex/oberdiek/grfext.sty
+Package: grfext 2016/05/16 v1.2 Manage graphics extensions (HO)
+
+(/usr/share/texlive/texmf-dist/tex/generic/oberdiek/kvdefinekeys.sty
+Package: kvdefinekeys 2016/05/16 v1.4 Define keys (HO)
+))
+(/usr/share/texlive/texmf-dist/tex/generic/oberdiek/pdftexcmds.sty
+Package: pdftexcmds 2018/01/21 v0.26 Utility functions of pdfTeX for LuaTeX (HO
+)
+
+(/usr/share/texlive/texmf-dist/tex/generic/oberdiek/ifpdf.sty
+Package: ifpdf 2017/03/15 v3.2 Provides the ifpdf switch
+)
+Package pdftexcmds Info: LuaTeX not detected.
+Package pdftexcmds Info: \pdf@primitive is available.
+Package pdftexcmds Info: \pdf@ifprimitive is available.
+Package pdftexcmds Info: \pdfdraftmode found.
+)
+Package epstopdf-base Info: Redefining graphics rule for `.eps' on input line 4
+38.
+Package grfext Info: Graphics extension search list:
+(grfext)             [.pdf,.png,.jpg,.mps,.jpeg,.jbig2,.jb2,.PDF,.PNG,.JPG,.JPE
+G,.JBIG2,.JB2,.eps]
+(grfext)             \AppendGraphicsExtensions on input line 456.
+
+(/usr/share/texlive/texmf-dist/tex/latex/latexconfig/epstopdf-sys.cfg
+File: epstopdf-sys.cfg 2010/07/13 v1.3 Configuration of (r)epstopdf for TeX Liv
+e
+))
+ABD: EverySelectfont initializing macros
+LaTeX Info: Redefining \selectfont on input line 68.
+\c@maskedRefs=\count111
+
+(/usr/share/texlive/texmf-dist/tex/latex/apacite/english.apc
+File: english.apc 2013/07/21 v6.03 apacite language file
+LaTeX Info: Redefining \BPBI on input line 129.
+LaTeX Info: Redefining \BHBI on input line 130.
+)
+LaTeX Font Info:    External font `cmex10' loaded for size
+(Font)              <7> on input line 118.
+LaTeX Font Info:    External font `cmex10' loaded for size
+(Font)              <5> on input line 118.
+LaTeX Font Info:    External font `cmex10' loaded for size
+(Font)              <8> on input line 126.
+LaTeX Font Info:    External font `cmex10' loaded for size
+(Font)              <6> on input line 126.
+
+Overfull \hbox (1.7101pt too wide) in paragraph at lines 154--155
+[]\OT1/cmr/m/n/10 The up-per mesopelagic of the olig-otrophic East-ern Trop-i-c
+al North Pa-cific Oxy- 
+ []
+
+
+Overfull \hbox (7.849pt too wide) in paragraph at lines 155--156
+[]\OT1/cmr/m/n/10 Comparison of these ob-ser-va-tions to mod-els sug-gests that
+ the break-down of par- 
+ []
+
+
+Overfull \hbox (6.82132pt too wide) in paragraph at lines 156--157
+[]\OT1/cmr/m/n/10 Zooplankton ap-pear to trans-port or-ganic mat-ter into, and 
+dis-ag-gre-gate par-ti-cles 
+ []
+
+[1{/var/lib/texmf/fonts/map/pdftex/updmap/pdftex.map}]
+Overfull \hbox (38.79352pt too wide) in paragraph at lines 180--182
+\OT1/cmr/m/n/10 Models and ob-ser-va-tions sug-gest that par-ti-cle flux at-ten
+-u-a-tion is lower across the mesopelagic 
+ []
+
+
+Overfull \hbox (1.90462pt too wide) in paragraph at lines 180--182
+\OT1/cmr/m/n/10 zone of anoxic en-vi-ron-ments com-pared to oxic ones. Flux at-
+ten-u-a-tion is con-trolled by 
+ []
+
+
+Overfull \hbox (1.76587pt too wide) in paragraph at lines 180--182
+\OT1/cmr/m/n/10 mi-cro-bial metabolism and ag-gre-ga-tion and dis-ag-gre-ga-tio
+n by zoo-plank-ton, which also 
+ []
+
+
+Overfull \hbox (4.6546pt too wide) in paragraph at lines 180--182
+\OT1/cmr/m/n/10 shape the rel-a-tive abun-dance of dif-fer-ent sized par-ti-cle
+s. Ob-serv-ing and mod-el-ing par- 
+ []
+
+
+Overfull \hbox (20.32124pt too wide) in paragraph at lines 180--182
+\OT1/cmr/m/n/10 ti-cle spec-tra can pro-vide in-for-ma-tion about the con-tri-b
+u-tions of these pro-cesses. We mea- 
+ []
+
+
+Overfull \hbox (7.18231pt too wide) in paragraph at lines 180--182
+\OT1/cmr/m/n/10 sured par-ti-cle size spec-trum pro-files at one sta-tion in th
+e olig-otrophic East-ern Trop-i-cal 
+ []
+
+
+Overfull \hbox (7.46013pt too wide) in paragraph at lines 180--182
+\OT1/cmr/m/n/10 North Pa-cific Oxy-gen De-fi-cient Zone (ETNP ODZ) us-ing an un
+-der-wa-ter vi-sion pro-filer 
+ []
+
+
+Overfull \hbox (25.51564pt too wide) in paragraph at lines 180--182
+\OT1/cmr/m/n/10 (UVP), a high res-o-lu-tion cam-era that counts and sizes par-t
+i-cles. Mea-sure-ments were taken 
+ []
+
+
+Overfull \hbox (19.32123pt too wide) in paragraph at lines 180--182
+\OT1/cmr/m/n/10 at dif-fer-ent times of day, over the course of a week. Com-par
+-ing these data to par-ti-cle flux 
+ []
+
+
+Overfull \hbox (20.32117pt too wide) in paragraph at lines 180--182
+\OT1/cmr/m/n/10 mea-sure-ments from sed-i-ment traps col-lected over the same t
+ime pe-riod al-lowed us to con- 
+ []
+
+
+Overfull \hbox (1.32126pt too wide) in paragraph at lines 180--182
+\OT1/cmr/m/n/10 strain the par-ti-cle size to flux re-la-tion-ship, and to gen-
+er-ate highly re-solved depth and 
+ []
+
+
+Overfull \hbox (4.57127pt too wide) in paragraph at lines 180--182
+\OT1/cmr/m/n/10 time es-ti-mates of par-ti-cle flux rates. We found that par-ti
+-cle flux at-ten-u-ated very lit-tle 
+ []
+
+
+Overfull \hbox (22.90463pt too wide) in paragraph at lines 180--182
+\OT1/cmr/m/n/10 through-out the anoxic wa-ter col-umn, and at some time-points 
+ap-peared to in-crease. Com- 
+ []
+
+
+Overfull \hbox (0.73788pt too wide) in paragraph at lines 180--182
+\OT1/cmr/m/n/10 par-ing our ob-ser-va-tions to model pre-dic-tions sug-gested t
+hat par-ti-cles of all sizes rem- 
+ []
+
+
+Overfull \hbox (9.26563pt too wide) in paragraph at lines 180--182
+\OT1/cmr/m/n/10 iner-al-ize more slowly in the ODZ than in oxic wa-ters, and th
+at large par-ti-cles dis-ag-gre- 
+ []
+
+
+Overfull \hbox (32.68236pt too wide) in paragraph at lines 180--182
+\OT1/cmr/m/n/10 gate into smaller par-ti-cles, pri-mar-ily be-tween the base of
+ the photic zone and 500 m. Acous- 
+ []
+
+
+Overfull \hbox (2.8212pt too wide) in paragraph at lines 180--182
+\OT1/cmr/m/n/10 tic mea-sure-ments of mul-ti-ple size classes of or-gan-isms su
+g-gested that many or-gan-isms 
+ []
+
+
+Overfull \hbox (13.18245pt too wide) in paragraph at lines 180--182
+\OT1/cmr/m/n/10 mi-grated, dur-ing the day, to the re-gion with high par-ti-cle
+ dis-ag-gre-ga-tion. Our data sug- 
+ []
+
+
+Overfull \hbox (17.34915pt too wide) in paragraph at lines 180--182
+\OT1/cmr/m/n/10 gest that diel-migrating or-gan-isms both ac-tively trans-port 
+biomass and dis-ag-gre-gate par- 
+ []
+
+
+LaTeX Font Warning: Font shape `OT1/cmr/m/n' in size <10.5> not available
+(Font)              size <10.95> substituted on input line 184.
+
+
+LaTeX Font Warning: Font shape `OT1/cmr/bx/n' in size <10.5> not available
+(Font)              size <10.95> substituted on input line 184.
+
+
+Overfull \hbox (0.90448pt too wide) in paragraph at lines 185--186
+[]\OT1/cmr/m/n/10 Marine snow are mi-cro-scopic par-ti-cles that form in the su
+r-face of the ocean and 
+ []
+
+
+Overfull \hbox (9.9323pt too wide) in paragraph at lines 185--186
+\OT1/cmr/m/n/10 sink into the deep ocean. Most of these par-ti-cles are the re-
+mains of dead al-gae and fae- 
+ []
+
+
+Overfull \hbox (2.65459pt too wide) in paragraph at lines 185--186
+\OT1/cmr/m/n/10 ces of tiny an-i-mals (zoo-plank-ton). The deeper the par-ti-cl
+es sink into the ocean be-fore 
+ []
+
+
+Overfull \hbox (0.29343pt too wide) in paragraph at lines 185--186
+\OT1/cmr/m/n/10 mi-crobes or an-i-mals eat them, the longer it takes be-fore th
+e car-bon in those par-ti-cles 
+ []
+
+
+Overfull \hbox (22.73787pt too wide) in paragraph at lines 185--186
+\OT1/cmr/m/n/10 can re-turn to the at-mo-sphere. In parts of the ocean where th
+ere is very lit-tle oxy-gen more 
+ []
+
+
+Overfull \hbox (17.37675pt too wide) in paragraph at lines 185--186
+\OT1/cmr/m/n/10 par-ti-cles sink to greater depths for rea-sons that are not we
+ll-understood. We used an un- 
+ []
+
+
+Overfull \hbox (1.15446pt too wide) in paragraph at lines 185--186
+\OT1/cmr/m/n/10 der-wa-ter cam-era to ob-serve ma-rine snow par-ti-cles in a pa
+rt of the ocean (just west of 
+ []
+
+
+Overfull \hbox (9.32123pt too wide) in paragraph at lines 185--186
+\OT1/cmr/m/n/10 Mex-ico) where there is very lim-ited oxy-gen at depth. We com-
+pared the ob-ser-va-tions to 
+ []
+
+
+Overfull \hbox (7.87674pt too wide) in paragraph at lines 185--186
+\OT1/cmr/m/n/10 pre-dic-tions from dif-fer-ent com-puter sim-u-la-tions to see 
+which sim-u-la-tions were most ac- 
+ []
+
+
+Overfull \hbox (8.51564pt too wide) in paragraph at lines 185--186
+\OT1/cmr/m/n/10 cu-rate. Our mea-sure-ments sug-gest that one rea-son that par-
+ti-cles sink to deeper depths 
+ []
+
+
+Overfull \hbox (5.90445pt too wide) in paragraph at lines 185--186
+\OT1/cmr/m/n/10 here is be-cause mi-crobes con-sume the par-ti-cles slowly when
+ there is no oxy-gen. Mean- 
+ []
+
+
+Overfull \hbox (2.21011pt too wide) in paragraph at lines 185--186
+\OT1/cmr/m/n/10 while, tiny an-i-mals break large par-ti-cles into smaller ones
+ and pro-duce fe-cal pel-lets in 
+ []
+
+
+Overfull \hbox (9.79349pt too wide) in paragraph at lines 204--205
+[]\OT1/cmr/m/n/10 The bi-o-log-i-cal pump, in which sink-ing par-ti-cles trans-
+port car-bon from the sur-face 
+ []
+
+
+Overfull \hbox (11.43234pt too wide) in paragraph at lines 204--205
+\OT1/cmr/m/n/10 into the deep ocean, is a key part of the global car-bon cy-cle
+ []Neuer et al.[], n.d.[]). Things  
+ []
+
+Missing character: There is no ‚ in font cmr10!
+Missing character: There is no Ä in font cmr10!
+Missing character: There is no ú in font cmr10!
+Missing character: There is no ‚ in font cmr10!
+Missing character: There is no Ä in font cmr10!
+Missing character: There is no ù in font cmr10!
+
+Overfull \hbox (21.73795pt too wide) in paragraph at lines 206--207
+[]\OT1/cmr/m/n/10 Preston, Christina M., Colleen A. Durkin, and Ke-van M. Yama-
+hara. DNA Metabar- 
+ []
+
+
+Overfull \hbox (5.29352pt too wide) in paragraph at lines 206--207
+\OT1/cmr/m/n/10 cod-ing Re-veals Or-gan-isms Con-tribut-ing to Par-tic-u-late M
+at-ter Flux to Abyssal Depths 
+ []
+
+
+Overfull \hbox (17.73781pt too wide) in paragraph at lines 206--207
+\OT1/cmr/m/n/10 in the North East Pa-cific Ocean. Deep Sea Re-search Part II: T
+op-i-cal Stud-ies in Oceanog- 
+ []
+
+Missing character: There is no √ in font cmr10!
+Missing character: There is no © in font cmr10!
+Missing character: There is no √ in font cmr10!
+Missing character: There is no © in font cmr10!
+Missing character: There is no √ in font cmr10!
+Missing character: There is no ° in font cmr10!
+Missing character: There is no √ in font cmr10!
+Missing character: There is no ° in font cmr10!
+
+Overfull \hbox (13.34917pt too wide) in paragraph at lines 212--214
+[]\OT1/cmr/m/n/10 [@neuerOceanBiologicalCarbon2014; @turn-er-Zoo-plank-tonFe-ca
+lPel-lets2015] (Neuer, 
+ []
+
+
+Overfull \hbox (2.26566pt too wide) in paragraph at lines 212--214
+\OT1/cmr/m/n/10 Iversen, and Fis-cher 2014; Turner 2015). Or-ganic mat-ter flux
+ into the deep ocean is a 
+ []
+
+
+Overfull \hbox (14.71028pt too wide) in paragraph at lines 212--214
+\OT1/cmr/m/n/10 func-tion both of ex-port from the photic zone into the mesopel
+agic (ex-port flux), and the 
+ []
+
+
+Overfull \hbox (4.40459pt too wide) in paragraph at lines 212--214
+\OT1/cmr/m/n/10 frac-tion of that flux that crosses through the mesopelagic (tr
+ans-fer ef-fi-ciency) (Pas-sow 
+ []
+
+
+Overfull \hbox (13.32126pt too wide) in paragraph at lines 212--214
+\OT1/cmr/m/n/10 and Carl-son 2012; Siegel et al. 2016; Fran-cois et al. 2002). 
+The trans-fer ef-fi-ciency of the 
+ []
+
+
+Overfull \hbox (35.21031pt too wide) in paragraph at lines 212--214
+\OT1/cmr/m/n/10 bi-o-log-i-cal pump may af-fect global at-mo-spheric car-bon le
+v-els (Kwon, Primeau, and Sarmiento 
+ []
+
+
+Overfull \hbox (10.04352pt too wide) in paragraph at lines 212--214
+\OT1/cmr/m/n/10 2009). Thus, un-der-stand-ing the pro-cesses that shape or-gani
+c mat-ter degra-da-tion in the 
+ []
+
+
+Overfull \hbox (53.01585pt too wide) in paragraph at lines 212--214
+\OT1/cmr/m/n/10 mesopelagic is crit-i-cal. []Ackermann, n.d.[]; Al-bert & Barab
+si, n.d.[]; Bashir et al.[], n.d.[])[]Ackermann, 
+ []
+
+[2]
+Missing character: There is no ‚ in font cmr10!
+Missing character: There is no Ä in font cmr10!
+Missing character: There is no ú in font cmr10!
+Missing character: There is no ‚ in font cmr10!
+Missing character: There is no Ä in font cmr10!
+Missing character: There is no ù in font cmr10!
+
+Overfull \hbox (21.73795pt too wide) in paragraph at lines 216--217
+[]\OT1/cmr/m/n/10 Preston, Christina M., Colleen A. Durkin, and Ke-van M. Yama-
+hara. DNA Metabar- 
+ []
+
+
+Overfull \hbox (5.29352pt too wide) in paragraph at lines 216--217
+\OT1/cmr/m/n/10 cod-ing Re-veals Or-gan-isms Con-tribut-ing to Par-tic-u-late M
+at-ter Flux to Abyssal Depths 
+ []
+
+
+Overfull \hbox (17.73781pt too wide) in paragraph at lines 216--217
+\OT1/cmr/m/n/10 in the North East Pa-cific Ocean. Deep Sea Re-search Part II: T
+op-i-cal Stud-ies in Oceanog- 
+ []
+
+
+Overfull \hbox (23.79355pt too wide) in paragraph at lines 219--232
+[][]\OT1/cmr/m/n/10 Baird et al.[], n.d.[]; Bakewell & Lum-ley, n.d.[]; Bakken 
+& Olsen, n.d.[]; Balch et al.[], n.d.[])  
+ []
+
+(./CramUVP2021.bbl
+Underfull \hbox (badness 10000) in paragraph at lines 15--32
+[]\OT1/cmr/m/n/10 Ackermann, H.-W.  (n.d.[]).  5500 Phages ex-am-ined in the el
+ec-tron mi-cro-scope. , 
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 15--32
+\OT1/cmr/m/it/10 152\OT1/cmr/m/n/10 (2), 227--243.  Re-trieved 2014-09-11, from
+ $\OT1/cmtt/m/n/10 http :// link [] .springer [] .com / 
+ []
+
+Missing character: There is no √ in font cmr10!
+Missing character: There is no © in font cmr10!
+
+Underfull \hbox (badness 10000) in paragraph at lines 48--70
+[]\OT1/cmr/m/n/10 Agogu, H., Brink, M., Di-nas-quet, J., & Herndl, G. J.  (n.d.
+[]).  Ma-jor gra-di- 
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 48--70
+\OT1/cmr/m/n/10 ents in pu-ta-tively ni-tri-fy-ing and non-nitrifying Ar-chaea 
+in the deep North 
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 48--70
+\OT1/cmr/m/n/10 At-lantic. , \OT1/cmr/m/it/10 456\OT1/cmr/m/n/10 (7223), 788--7
+91.  Re-trieved 2010-03-21, from $\OT1/cmtt/m/n/10 http :// 
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 48--70
+\OT1/cmtt/m/n/10 apps [] .isiknowledge [] .com [] .libproxy [] .usc [] .edu / f
+ull [] []record [] .do [] ?product = 
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 48--70
+\OT1/cmtt/m/n/10 UA&search [] []mode = Refine&qid = 80&SID = 4ED6koDdkMAinJBPDA
+8&page = 1&doc = 
+ []
+
+Missing character: There is no √ in font cmr10!
+Missing character: There is no © in font cmr10!
+
+Underfull \hbox (badness 10000) in paragraph at lines 87--110
+[]\OT1/cmr/m/n/10 Agogu, H., Lamy, D., Neal, P. R., So-gin, M. L., & Herndl, G.
+ J.  (n.d.[]).  Wa-ter 
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 87--110
+\OT1/cmr/m/n/10 mass-specificity of bac-te-rial com-mu-ni-ties in the North At-
+lantic re-vealed by 
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 87--110
+\OT1/cmr/m/n/10 mas-sively par-al-lel se-quenc-ing. , \OT1/cmr/m/it/10 20\OT1/c
+mr/m/n/10 (2), 258--274.  Re-trieved 2014-04-30, from 
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 87--110
+\OT1/cmtt/m/n/10 http :// onlinelibrary [] .wiley [] .com / doi / 10 [] .1111 /
+ j [] .1365 [] -294X [] .2010 [] .04932 [] 
+ []
+
+Missing character: There is no ≈ in font cmr10!
+Missing character: There is no Ñ in font cmr10!
+
+Underfull \hbox (badness 1237) in paragraph at lines 124--142
+\OT1/cmr/m/n/10 of items in large databases.  In \OT1/cmr/m/it/10 ACM SIG-MOD R
+ecord \OT1/cmr/m/n/10 (Vol.[] 22, pp.[] 207--216). 
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 154--181
+[]\OT1/cmr/m/n/10 Ahmed, W., An-gel, N., Ed-son, J., Bibby, K., Bivins, A., O'B
+rien, J. W., ... 
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 154--181
+\OT1/cmr/m/n/10 Mueller, J. F.  (n.d.[]).  First con-firmed de-tec-tion of SARS
+-CoV-2 in un- 
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 154--181
+\OT1/cmr/m/n/10 treated wastew-a-ter in Aus-tralia: A proof of con-cept for the
+ wastew-a-ter surveil- 
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 154--181
+\OT1/cmr/m/n/10 lance of COVID-19 in the com-mu-nity. , 138764.  Re-trieved 202
+0-04-23, from 
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 154--181
+\OT1/cmtt/m/n/10 http :// www [] .sciencedirect [] .com / science / article / p
+ii / S0048969720322816$ 
+ []
+
+Missing character: There is no √ in font cmr10!
+Missing character: There is no ° in font cmr10!
+
+Underfull \hbox (badness 6592) in paragraph at lines 195--213
+[]\OT1/cmr/m/n/10 Albert, R., & Barabsi, A.-L.  (n.d.[]).  Sta-tis-ti-cal me-ch
+an-ics of com-plex net-works. 
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 195--213
+\OT1/cmr/m/n/10 , \OT1/cmr/m/it/10 74\OT1/cmr/m/n/10 (1), 47--97.  Re-trieved 2
+013-02-08, from $\OT1/cmtt/m/n/10 http :// link [] .aps [] .org / doi / 
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 228--244
+\OT1/cmr/m/n/10 of Hy-poxia on Es-tu-ar-ine Ecosys-tem Func-tion: En-ergy Di-ve
+r-sion from Con- 
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 258--277
+[]\OT1/cmr/m/n/10 Bakewell, H. P., & Lum-ley, J. L.  (n.d.[]).  Vis-cous Sub-la
+yer and Ad-ja-cent Wall 
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 258--277
+\OT1/cmr/m/n/10 Re-gion in Tur-bu-lent Pipe Flow. , \OT1/cmr/m/it/10 10\OT1/cmr
+/m/n/10 (9), 1880--1889.  Re-trieved 2019-02- 
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 258--277
+\OT1/cmr/m/n/10 11, from $\OT1/cmtt/m/n/10 https :// aip [] .scitation [] .org 
+/ doi / 10 [] .1063 / 1 [] .1762382$   \OT1/cmr/m/n/10 doi: 
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 291--310
+\OT1/cmr/m/n/10 Mi-croor-gan-isms: Con-ver-sion of a Mea-sured Bio-vol-ume into
+ Biomass. , \OT1/cmr/m/it/10 45\OT1/cmr/m/n/10 (4), 
+ []
+
+
+Underfull \vbox (badness 1019) has occurred while \output is active []
+
+ [3]
+Underfull \hbox (badness 10000) in paragraph at lines 326--348
+[]\OT1/cmr/m/n/10 Balch, W. M., Bowler, B. C., Dra-peau, D. T., Poul-ton, A. J.
+, & Hol-li-gan, P. M. 
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 326--348
+\OT1/cmr/m/n/10 (n.d.[]).  Biomin-er-als and the ver-ti-cal flux of par-tic-u-l
+ate or-ganic car-bon 
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 326--348
+\OT1/cmr/m/n/10 from the sur-face ocean. , \OT1/cmr/m/it/10 37\OT1/cmr/m/n/10 (
+22), L22605.  Re-trieved 2015-06-24, from 
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 326--348
+\OT1/cmtt/m/n/10 http :// onlinelibrary [] .wiley [] .com / doi / 10 [] .1029 /
+ 2010GL044640 / abstract$ 
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 387--413
+[]\OT1/cmr/m/n/10 Bashir, M., Ahmed, M., Wein-maier, T., Ciobanu, D., Ivanova, 
+N., Pieber, T. R., & 
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 387--413
+\OT1/cmr/m/n/10 Clean-rooms: Pres-ence of Vir-u-lence Fac-tors As-so-ci-ated wi
+th Hu-man Pathogens. 
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 387--413
+\OT1/cmr/m/n/10 , 1321.  Re-trieved 2016-10-06, from $\OT1/cmtt/m/n/10 http ://
+ journal [] .frontiersin [] .org / 
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 427--448
+[]\OT1/cmr/m/n/10 Neuer, S., Iversen, M., & Fis-cher, G.  (n.d.[]).  The Ocean'
+s Bi-o-log-i-cal Car- 
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 427--448
+\OT1/cmr/m/n/10 bon pump as part of the global Car-bon Cy-cle. , \OT1/cmr/m/it/
+10 4\OT1/cmr/m/n/10 (4), 1--51.  Re-trieved 
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 427--448
+\OT1/cmr/m/n/10 2020-03-20, from $\OT1/cmtt/m/n/10 https :// aslopubs [] .onlin
+elibrary [] .wiley [] .com / doi / 
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 427--448
+\OT1/cmtt/m/n/10 abs / 10 [] .4319 / lol [] .2014 [] .sneuer [] .miversen [] .g
+fischer [] .9$   \OT1/cmr/m/n/10 doi: $10 [] .4319 / 
+ []
+
+) [4] (./CramUVP2021.aux)
+
+LaTeX Font Warning: Size substitutions with differences
+(Font)              up to 0.45pt have occurred.
+
+ ) 
+Here is how much of TeX's memory you used:
+ 3295 strings out of 492982
+ 46333 string characters out of 6134897
+ 120176 words of memory out of 5000000
+ 6807 multiletter control sequences out of 15000+600000
+ 8922 words of font info for 32 fonts, out of 8000000 for 9000
+ 1147 hyphenation exceptions out of 8191
+ 43i,8n,37p,1705b,327s stack positions out of 5000i,500n,10000p,200000b,80000s
+</usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx10.pfb></us
+r/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx12.pfb></usr/shar
+e/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmr10.pfb></usr/share/texli
+ve/texmf-dist/fonts/type1/public/amsfonts/cm/cmr6.pfb></usr/share/texlive/texmf
+-dist/fonts/type1/public/amsfonts/cm/cmr7.pfb></usr/share/texlive/texmf-dist/fo
+nts/type1/public/amsfonts/cm/cmr8.pfb></usr/share/texlive/texmf-dist/fonts/type
+1/public/amsfonts/cm/cmr9.pfb></usr/share/texlive/texmf-dist/fonts/type1/public
+/amsfonts/cm/cmss8.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfon
+ts/cm/cmsy5.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/c
+mti10.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmti9.p
+fb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmtt10.pfb></u
+sr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmtt9.pfb>
+Output written on CramUVP2021.pdf (4 pages, 177757 bytes).
+PDF statistics:
+ 69 PDF objects out of 1000 (max. 8388607)
+ 49 compressed objects within 1 object stream
+ 0 named destinations out of 1000 (max. 500000)
+ 1 words of extra memory for PDF output out of 10000 (max. 10000000)
+
