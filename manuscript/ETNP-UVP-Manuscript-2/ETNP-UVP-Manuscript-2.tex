@@ -62,7 +62,7 @@
 %
 % ie, \journalname{Water Resources Research}
 
-\journalname{Global Biogeochemical Cycles}
+\journalname{JGR: Atmospheres}
 
 % Pandoc citation processing
 
@@ -182,27 +182,32 @@ Suggested section heads
 
 \section{Introduction}
 
-The biological pump, in which sinking particles transport carbon from
-the surface into the deep ocean, is a key part of the global carbon
-cycle
-\citep{neuerOceanBiologicalCarbon2014, turnerZooplanktonFecalPellets2015}.
-Organic matter flux into the deep ocean is a function both of export
-from the photic zone into the mesopelagic (export flux), and the
-fraction of that flux that crosses through the mesopelagic (transfer
-efficiency)
-\citep{francoisFactorsControllingFlux2002, passowBiologicalPumpHigh2012, siegelPredictionExportFate2016}
-(Passow and Carlson 2012; Siegel et al.~2016; Francois et al.~2002). The
-transfer efficiency of the biological pump may affect global atmospheric
-carbon levels \citep{kwonImpactRemineralizationDepth2009} (Kwon,
-Primeau, and Sarmiento 2009). Thus, understanding the processes that
-shape organic matter degradation in the mesopelagic is critical.
+The main text should start with an introduction. Except for short
+manuscripts (such as comments and replies), the text should be divided
+into sections, each with its own heading.
 
-\subsection{Test for double add}
+Headings should be sentence fragments and do not begin with a lowercase
+letter or number. Capitalize the first letter of each word (except for
+prepositions, conjunctions, and articles that are three or fewer
+letters).
 
-As seen by \citep{weberDeepOceanNutrients2016}
+\subsection{Example one ref}
 
-or even as seen by
-\citep{bianchiBacterialResponseHydrostaticPressure1994}
+As seen by \citep{needhamPronouncedDailySuccession2016}
+
+\subsection{Example of two refs}
+
+Also shown in
+\citep{gasolFrameworkAssessmentTopdown1994, mestreSinkingParticlesPromote2018}
+
+\citep{gasolFrameworkAssessmentTopdown1994}
+
+then
+
+\citep{abrahaoAnalysisTranslationrelatedGene2017, sanudo-wilhelmyRoleVitaminsMarine2014}
+
+With more clicking about
+\citep{smithModelingEffectsOyster2009, williamsMarineMetaproteomicsDeciphering}
 
 \section{Materials and Methods}
 
@@ -218,11 +223,17 @@ for a cleaner LaTeX output.
   Second element
 \end{enumerate}
 
-\citep{weberEfficientParticleTransfer2020}
-
-Actual refs \citep{evansRoleWaterMasses2020}
-
 \subsection{A descriptive heading about methods}
+
+Please use ONLY \textbackslash{}citet and \textbackslash{}citep for
+reference citations. DO NOT use other cite commands (e.g.,
+\textbackslash{}cite, \textbackslash{}citeyear, \textbackslash{}nocite,
+\textbackslash{}citealp, etc.). Example \textbackslash{}citet and
+\textbackslash{}citep: \ldots{}as shown by \citet{Levitus2012},
+\citet{Nuncio2011} and \citet{Raphael2004} \ldots{}as shown by
+\citep{Levitus2012}, \citep{Nuncio2011}, \citep{Raphael2004}.
+\ldots{}has been shown
+\citep[e.g.,][]{Levitus2012, Nuncio2011, Raphael2004}.
 
 \section{Data}
 
@@ -254,7 +265,7 @@ mentioned: DO NOT USE \textbackslash{}psfrag or
 \textbackslash{}def, etc.
 
 \begin{figure}[h]
-\includegraphics{ETNP-Particles_files/figure-latex/unnamed-chunk-2-1} \caption{Please caption every figure}\label{fig:unnamed-chunk-2}
+\includegraphics{ETNP-UVP-Manuscript-2_files/figure-latex/unnamed-chunk-2-1} \caption{Please caption every figure}\label{fig:unnamed-chunk-2}
 \end{figure}
 
 Example table
@@ -283,7 +294,7 @@ AGU prefers the use of \{sidewaystable\} over \{landscapetable\} as it
 causes fewer problems.
 
 \begin{sidewaysfigure}[h]
-\includegraphics{ETNP-Particles_files/figure-latex/unnamed-chunk-3-1} \caption{Please caption every figure}\label{fig:unnamed-chunk-3}
+\includegraphics{ETNP-UVP-Manuscript-2_files/figure-latex/unnamed-chunk-3-1} \caption{Please caption every figure}\label{fig:unnamed-chunk-3}
 \end{sidewaysfigure}
 
 \begin{sidewaystable}

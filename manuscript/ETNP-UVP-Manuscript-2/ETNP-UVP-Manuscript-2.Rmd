@@ -7,7 +7,7 @@
 # Tectonics, Space Weather, Water Resources Research, Geochemistry, Geophysics, 
 # Geosystems, Journal of Advances in Modeling Earth Systems (JAMES),
 # Earth's Future, Earth and Space Science, Geohealth
-journal: "Global Biogeochemical Cycles"
+journal: "JGR: Atmospheres"
 # Use draft to submit a paper
 classoption: "draft,linenumbers"
 # A title should be specific, informative, and brief. Use
@@ -79,13 +79,24 @@ Suggested section heads
 
 # Introduction
 
-The biological pump, in which sinking particles transport carbon from the surface into the deep ocean, is a key part of the global carbon cycle [@neuerOceanBiologicalCarbon2014; @turnerZooplanktonFecalPellets2015]. Organic matter flux into the deep ocean is a function both of export from the photic zone into the mesopelagic (export flux), and the fraction of that flux that crosses through the mesopelagic (transfer efficiency) [@francoisFactorsControllingFlux2002; @passowBiologicalPumpHigh2012; @siegelPredictionExportFate2016] (Passow and Carlson 2012; Siegel et al. 2016; Francois et al. 2002). The transfer efficiency of the biological pump may affect global atmospheric carbon levels [@kwonImpactRemineralizationDepth2009] (Kwon, Primeau, and Sarmiento 2009). Thus, understanding the processes that shape organic matter degradation in the mesopelagic is critical.
+The main text should start with an introduction. Except for short manuscripts (such as comments and replies), the text should be divided into sections, each with its own heading.
 
-## Test for double add
+Headings should be sentence fragments and do not begin with a lowercase letter or number. Capitalize the first letter of each word (except for prepositions, conjunctions, and articles that are three or fewer letters).
 
-As seen by [@weberDeepOceanNutrients2016]
+## Example one ref
+As seen by [@needhamPronouncedDailySuccession2016]
 
-or even as seen by [@bianchiIntensificationOpenoceanOxygen2013]
+## Example of two refs
+
+Also shown in [@gasolFrameworkAssessmentTopdown1994; @mestreSinkingParticlesPromote2018]
+
+[@gasolFrameworkAssessmentTopdown1994]
+
+then
+
+[@abrahaoAnalysisTranslationrelatedGene2017; @sanudo-wilhelmyRoleVitaminsMarine2014]
+
+With more clicking about [@smithModelingEffectsOyster2009; @williamsMarineMetaproteomicsDeciphering]
 
 # Materials and Methods
 
@@ -97,14 +108,14 @@ Do not use bulleted lists; enumerated lists are okay. Use #. for list for a clea
 
 #. Second element
 
-[@weberEfficientParticleTransfer2020]
-
-Actual refs
-[@evansRoleWaterMasses2020]
-
-
 ## A descriptive heading about methods
 
+Please use ONLY \\citet and \\citep for reference citations.
+DO NOT use other cite commands (e.g., \\cite, \\citeyear, \\nocite, \\citealp, etc.).
+Example \\citet and \\citep:
+  ...as shown by \citet{Levitus2012}, \citet{Nuncio2011} and \citet{Raphael2004}
+  ...as shown by \citep{Levitus2012}, \citep{Nuncio2011}, \citep{Raphael2004}.
+  ...has been shown \citep[e.g.,][]{Levitus2012, Nuncio2011, Raphael2004}.
 
 # Data
 
