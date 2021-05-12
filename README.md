@@ -11,13 +11,6 @@ Flux data was provided by Clara Fuchsman.
 CTD data was processed and provide by Al Devol
 Almost all analysis herein was carried out by Jacob Cram
 
-# To Do
-  * Update particle math data to account for Weber and Burchfield's edits
-  * Look through each data file to ensure proper commenting
-  * Add description of files, or at least copy out of that other folder.
-  * Move more stuff to archive
-  * Possibly git filter-branch or equivalent out all of the raw files that aren't going in the analysis.
-  * Share the code for processing the EK60 data, though not the actual raw EK60 data which are huge. Those, people can get from UNOLS directly.
 
 # Description of Files
 What follows is a description of the contents of this repository
@@ -36,35 +29,35 @@ This document exists to describe what the other files in this project do.
 
 ### Files that generate figures
 
-GenerateFigures.Rmd -- Most of the figures that go in the manuscript, and some data analysis reported in the main text are in this file.
+  * GenerateFigures.Rmd -- Most of the figures that go in the manuscript, and some data analysis reported in the main text are in this file.
 
-WaterMassEvans2 -- The water mass analyisis, creates the watermass figure
+  * WaterMassEvans2 -- The water mass analyisis, creates the watermass figure
 
-P16IntegratedPlots -- Figures about the oxic control station from the P16 transect in 2016
+  * P16IntegratedPlots -- Figures about the oxic control station from the P16 transect in 2016
 
-ExamineCTDProfiles -- Generates figure 1 with all of the CTD data
+  * ExamineCTDProfiles -- Generates figure 1 with all of the CTD data
 
 ### Files that process data
 
-UVP-2017-proc.R -- Run the main data processing
+  * UVP-2017-proc.R -- Run the main data processing
 
-SmoothsAndFluxRevisited.R -- Optimizes fit of UVP data to trap data and saves output. (Keep)
+  * SmoothsAndFluxRevisited.R -- Optimizes fit of UVP data to trap data and saves output. (Keep)
 
 ### Libraries of R functions
 
-ModelStuff.R -- The code for running the disaggregation model
+  * ModelStuff.R -- The code for running the disaggregation model
 
-UVP_2017_library.r -- Most of the functions for processing my data live here, except for the main disaggregation model functions.
+  * UVP_2017_library.r -- Most of the functions for processing my data live here, except for the main disaggregation model functions.
 
-bring_in_ctd.R -- Functions for loading CTD data (keep)
+  * bring_in_ctd.R -- Functions for loading CTD data (keep)
 
 ### Helper Files
 
-references.bib -- Bibiography for manuscript
+  * references.bib -- Bibiography for manuscript
 
-.gitignore -- tell git not to save silly stuff
+  * .gitignore -- tell git not to save silly stuff
 
-README.md -- This document
+  * README.md -- This document
 
 
 ## Directories
@@ -79,7 +72,6 @@ README.md -- This document
 ## Sub Structure of Directories
 
   * Archive
-
     * figures/ -- Figures that are not in the final analysis
     * WaterMassAnalysis -- an old version of water mass analysis (Archive)
     * DisagAttemptBivariateSmooth -- Some experiments with disaggreagation (Archive)
