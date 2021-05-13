@@ -1,10 +1,12 @@
-# POMZ-UVP
+# POMZ-ETNP-UVP-2017
 
 Author: Jacob Cram
 Email: jcram@umces.edu
 
 
 Particle size data from the 2016-2017 POMZ Cruise to the Eastern Tropical North Pacific Oxygen Minimum Zone, from the RV Sikuliaq.
+
+This fork is for sharing with the public and avoids sharing data files that are not actually part of the project.
 
 This project focuses specifically on one station, Station P2, which we surveyed over the course of a week Rachael Lekanoff ran the UVP, Gabrielle Rocap was the chief scientist in charge of the CTD ops. Jessica Pretty processed the UVP data. Andrew McDonnell lead the UVP processing operations. Data from the P16 cruise was provided by Andrew McDonnell and Jessica Pretty.
 Flux data was provided by Clara Fuchsman.
@@ -111,6 +113,9 @@ This document exists to describe what the other files in this project do.
     * FilesToRemoveFromHistory.txt -- A list of those files.
     * GenerateFigures_files -- At one point, I was using latex and these got created
       * {Contents of directory not listed}
+  * MinistryOfTruth -- I had to remove some files that were not actually used in this project. They are all available upon request. I used the files in this directory to do this removal using `git filter-repo`.
+    * FilesToRemoveFromHistory.txt -- The files that I removed
+    * Identify_Files_to_Remove_From_History.R -- Goes into the UVP metadata and identifies which files to remove. I added a file containing all of the P16 data to the FilesToRemoveFromHistory.txt file as well. 
   * data
     * uvpdata -- the particle abundance data for all stations on the P16 cruise
       * export_detailed_20190304_23_14_Export_metadata_summary.tsv -- Metadata file
