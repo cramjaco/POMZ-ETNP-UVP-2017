@@ -5,6 +5,7 @@ library(tidyverse)
 library(mgcv)
 library(broom)
 library(furrr)
+library(lubridate)
 pass <- function(x, ...) {x}
 
 ParticleSizeCutoff <- 0.5
@@ -26,7 +27,8 @@ ag_global <- ag
 # Get the times of the CTD casts
 CTD_Unique <- read_csv("data/SKQ201617S_CTD_Profile.csv") %>%
   filter(Station == "sta016") %>%
-  mutate(DateJ = mdy(`mon/dd/yyyy`), TimeJ = hms(`hh:mm`), DateTimeJ = DateJ + TimeJ) %>%
+  mutate(DateJ = mdy(`mon/dd/yyyy`), TimeJ = hms(`hh:mm`))  %>%
+  mutate(DateTimeJ = mdy_hms(paste(`mon/dd/yyyy`, `hh:mm`))) %>%
   select(time = DateTimeJ, depth = `Pressure [db]`) %>%
   group_by(time) %>% summarize(MaxDepth = max(depth))
 
