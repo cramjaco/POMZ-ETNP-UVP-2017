@@ -36,6 +36,7 @@ Specify the base of the photic zone (which is inside of the OMZ) and the bae of 
 PhoticBase <- 160
 OMZBase <- 900
 DVMBase <- 600
+OMZTop <- 90
 ```
 
 
@@ -68,6 +69,10 @@ scale_x_log_eng = function(..., radix=10) {
                      minor_breaks=log_breaks(FALSE, radix))
 }
 
+ybreaks = seq(from = 1200, to = 0, by = -50)
+ylabels = ybreaks
+ylabels[c(FALSE, TRUE, TRUE, TRUE)] <- ""
+
 #theme_set(theme_bw)
 
 
@@ -80,7 +85,10 @@ PlotParticlesmany <- uds %>%
   #geom_path(aes(x = psd_gam)) + 
   #geom_ribbon(aes(x = psd_gam, xmin = psd_gam - 2 * psd_seg, xmax = psd_gam + 2 * psd_seg), alpha = 0.1, outline_type = "lower") +
   geom_point(alpha = .6, size = 2, stroke = 1) +
-  scale_y_reverse(limits = c(1200, 0)) + scale_shape_manual(values = c(21:25)) +
+  scale_y_reverse(limits = c(1200, 0),
+                  breaks = ybreaks,
+                  labels = ylabels) +
+  scale_shape_manual(values = c(21:25)) +
   scale_fill_gradientn(breaks = c(0, 6, 12, 18, 24), colors = c("black", "blue", "white", "orange", "black"), limits = c(0, 24)) +
   scale_x_log10(breaks = c(10, 100, 1000), minor = c(5, 50, 500)) +
   #theme(legend.position = "none") +
@@ -88,6 +96,7 @@ PlotParticlesmany <- uds %>%
   labs(y = "Depth (m)", x = "Particles / L") + 
   geom_hline(yintercept = PhoticBase, color = "darkgreen") +
   geom_hline(yintercept = OMZBase, color = "darkblue") +
+  geom_hline(yintercept = OMZTop, color = "darkblue") +
   #geom_hline(yintercept = DVMBase, color = "darkgoldenrod", lty = "dashed") +
   theme(legend.position = "none")
 
@@ -98,12 +107,13 @@ PlotPSDmany <- uds %>%
   #geom_path(aes(x = psd_gam)) + 
   #geom_ribbon(aes(x = psd_gam, xmin = psd_gam - 2 * psd_seg, xmax = psd_gam + 2 * psd_seg), alpha = 0.1, outline_type = "lower") +
   geom_point(alpha = .6, size = 2, stroke = 1) +
-  scale_y_reverse(limits = c(1200, 0)) +
+  scale_y_reverse(limits = c(1200, 0), breaks = ybreaks, labels = ylabels) +
   scale_shape_manual(name = "Day", values = c(21:25)) +
   scale_fill_gradientn(name = "Hour",breaks = c(0, 6, 12, 18, 24), labels =  c("0", "6", "12", "18", "24"), colors = c("black", "blue", "white", "orange", "black"), limits = c(0, 24)) +
   labs(y = "Depth (m)", x = "Particle Size Distribution Slope") + 
   geom_hline(yintercept = PhoticBase, color = "darkgreen") +
   geom_hline(yintercept = OMZBase, color = "darkblue") +
+  geom_hline(yintercept = OMZTop, color = "darkblue") +
   #geom_hline(yintercept = DVMBase, color = "darkgoldenrod", lty = "dashed") +
   coord_cartesian(clip = "off") +
   annotate(geom = "text", x = -2, y = 1100, label = "More large \n particles", inherit.aes = FALSE, size = 6) +
