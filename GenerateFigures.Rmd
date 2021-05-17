@@ -351,7 +351,7 @@ cb10 <- c('#a6cee3','#1f78b4','#b2df8a','#33a02c','#fb9a99','#e31a1c','#fdbf6f',
 pltFlx <- bds %>% filter(project == "ETNP") %>% #filter(DFP > 1) %>% #filter(profile %in% c("stn_043", "p16n_100")) %>%
   ggplot(aes(y = depth, x = Flux_Smooth, shape = factor(day(time)), fill = hour(time), group = factor(time)))  + geom_point(size = 2, stroke = 1)+
   #geom_path() +
-  scale_y_reverse(limits = c(1000, 0))+
+  scale_y_reverse(limits = c(1000, 0), breaks = ybreaks, labels = ylabels) +
   scale_x_log10nice()+
   #scale_x_log10() + 
    scale_color_gradient2(low = "darkgreen", mid = "gray80", high = "purple", midpoint = 10) + scale_shape_manual(name = "Day of Month", values = rep(21:25, 2)) + 
@@ -362,7 +362,8 @@ pltFlx <- bds %>% filter(project == "ETNP") %>% #filter(DFP > 1) %>% #filter(pro
   geom_rect(data = data.frame(project = "ETNP"), aes(xmin = 20, xmax = 180, ymin = 75, ymax = 500), colour = "red", fill = NA, inherit.aes = FALSE) +
   theme(axis.text.x = element_text(angle = 90, vjust = .3), legend.spacing = unit(.1, "cm")) +
    geom_segment(aes(y = PhoticBase, yend = PhoticBase, x = 20, xend = 500), color = "darkgreen", stroke = 0.5)+
-   geom_segment(aes(y = OMZBase, yend = OMZBase, x = 20, xend = 500), color = "darkblue", stroke = 0.5) #+
+   geom_segment(aes(y = OMZBase, yend = OMZBase, x = 20, xend = 500), color = "darkblue", stroke = 0.5) +
+   geom_segment(aes(y = OMZTop, yend = OMZTop, x = 20, xend = 500), color = "darkblue", stroke = 0.5)
   #geom_segment(aes(y = DVMBase, yend = DVMBase, x = 20, xend = 500), color = "darkgoldenrod", lty = "dashed", stroke = 0.5)
   
   #+ geom_hline(yintercept = OMZBase, color = "darkblue")
@@ -379,18 +380,33 @@ pltFlx
 ## Figure 5B
 Zooming in on where the action is happening
 ```{r fig.width=6, fig.height=4}
+ylabels_fine <- ybreaks
+ylabels_fine[c(FALSE, TRUE)] <- ""
+#xbreaks_fine <- c(seq(from = 20, to = 50, by = 10), seq(from = 60, to = 180, by = 20))
+xbreaks_fine <- seq(from = 20, to = 180, by = 10)
+xlabels_fine <- xbreaks_fine
+toss <- c(rep(FALSE, 5), rep(c(TRUE, FALSE), 6))
+xlabels_fine[toss] <- ""
+xlabels_fine[xlabels_fine %in% c(120, 160)] <- ""
+
+#lenx <- length(xlabels_fine)
+#xlabels_fine[c(lenx, lenx-2)] <- ""
 cb10 <- c('#a6cee3','#1f78b4','#b2df8a','#33a02c','#fb9a99','#e31a1c','#fdbf6f','#ff7f00','#cab2d6','#6a3d9a')
 pltFlxZoom <- bds %>% filter(project == "ETNP" & depth <= 500 & depth >= 75) %>% #filter(profile %in% c("stn_043", "p16n_100")) %>%
   ggplot(aes(y = depth, x = Flux_Smooth, shape = factor(day(time)), fill = hour(time), group = factor(time))) + geom_point(size = 2, stroke = 1)+
   #geom_path() +
-  scale_y_reverse()+
+  scale_y_reverse(limits = c(500, 75), breaks = ybreaks, labels = ylabels_fine) +
   #scale_x_log10() +
-  scale_x_log10(breaks = c(seq(from = 20, to = 50, by = 10), seq(from = 60, to = 180, by = 20)), limits = c(20, 180)) +
+  scale_x_log10(breaks = xbreaks_fine,
+                labels = xlabels_fine,
+                limits = c(20, 180)) +
    scale_color_gradient2(low = "darkgreen", mid = "gray80", high = "purple", midpoint = 10) + scale_shape_manual(values = rep(21:25, 2)) + 
   scale_fill_gradientn(breaks = c(0, 6, 12, 18, 24), colors = c("black", "blue", "white", "orange", "black")) +
   theme(axis.text.x = element_text(angle = 90)) +
 labs(x = "Smoothed Flux", y = "Depth") + theme(legend.position = "none")+
-geom_hline(yintercept = 160, color = "darkgreen")
+geom_hline(yintercept = PhoticBase, color = "darkgreen") +
+  geom_hline(yintercept = OMZTop, color = "darkblue") +
+  theme(axis.text.x = element_text(vjust = .5))
 
 pltFlxZoom
 #plotly::ggplotly(plt1)
@@ -404,7 +420,7 @@ cb10 <- c('#a6cee3','#1f78b4','#b2df8a','#33a02c','#fb9a99','#e31a1c','#fdbf6f',
 pltDelta3 <- bds %>% filter(project == "ETNP") %>% #filter(DFP > 1) %>% #filter(profile %in% c("stn_043", "p16n_100")) %>%
   ggplot(aes(y = depth, x = pracma::nthroot(DF/DZ, 5), shape = factor(day(time)), fill = hour(time), group = factor(time)))  + geom_point(size = 2, stroke = 1)+
   #geom_path() +
-  scale_y_reverse(limits = c(1000, 0))+
+  scale_y_reverse(limits = c(1000, 0), breaks = ybreaks, labels = ylabels) +
   scale_x_continuous(limits = c(-2.1, .6), breaks = seq(from = -2, to = .75, by = 0.5)) +
   #scale_x_log10() +
    scale_color_gradient2(low = "darkgreen", mid = "gray80", high = "purple", midpoint = 10) + scale_shape_manual(name = "Day of Month", values = rep(21:25, 2)) + 
@@ -412,7 +428,8 @@ pltDelta3 <- bds %>% filter(project == "ETNP") %>% #filter(DFP > 1) %>% #filter(
   geom_vline(xintercept = 0) +
   labs(x = bquote((DF/DZ)^{1/5}~(µmolC/m^3/d)^{1/5}), y = "Depth (m)") + theme(legend.pos = "none")+
   geom_hline(yintercept = PhoticBase, color = "darkgreen") +
-  geom_hline(yintercept = OMZBase, color = "darkblue") 
+  geom_hline(yintercept = OMZBase, color = "darkblue") +
+  geom_hline(yintercept = OMZTop, color = "darkblue")
   #geom_hline(yintercept = DVMBase, color = "darkgoldenrod", lty = "dashed")
   #labs(x = "(DF/DZ) ^ 1/5 (µmol C/m^3/d) ^ 1/5")
 
@@ -527,12 +544,16 @@ dev.off()
 (u mol C / m^3 / day)
 ```{r fig.width = 6, fig.height = 4}
 disagFig <- bds %>% filter(project == "ETNP") %>%
-  ggplot(aes(y = depth, x = pracma::nthroot(ospsDZ, 3), shape = factor(day(time)), fill = hour(time), group = factor(time))) + geom_point(size = 2) + scale_y_reverse(limits = c(1000, 0)) +
+  ggplot(aes(y = depth, x = pracma::nthroot(ospsDZ, 3), shape = factor(day(time)), fill = hour(time), group = factor(time))) + geom_point(size = 2) +
+  scale_y_reverse(limits = c(1000, 0), breaks = ybreaks, labels = ylabels) +
   scale_x_continuous(limits = c(-1, 1)) +
   geom_vline(xintercept = 0) +   scale_shape_manual(name = "Day of Month", values = rep(21:25, 2)) +
   #labs(x = bquote("Observed - Modeled Small Particle Flux"~(μmol/m^3/day)), y = "Depth (m)") +
   labs(x = paste("Deviation from Model", expression((μmol/m^3/day)))) +
-  scale_fill_gradientn(name = "Hour of Day", breaks = c(0, 6, 12, 18, 24), colors = c("black", "blue", "white", "orange", "black")) + geom_hline(yintercept = PhoticBase, color = "darkgreen") + geom_hline(yintercept = OMZBase, color = "darkblue") #+
+  scale_fill_gradientn(name = "Hour of Day", breaks = c(0, 6, 12, 18, 24), colors = c("black", "blue", "white", "orange", "black")) +
+  geom_hline(yintercept = PhoticBase, color = "darkgreen") +
+  geom_hline(yintercept = OMZBase, color = "darkblue") +
+  geom_hline(yintercept = OMZTop, color = "darkblue") #+
   #geom_hline(yintercept = DVMBase, color = "darkgoldenrod", lty = "dashed")
 disagFig
 #ggsave("..figures/FluxSizeShift.svg"
