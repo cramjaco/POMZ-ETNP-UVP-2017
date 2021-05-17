@@ -43,7 +43,7 @@ OMZTop <- 90
 # Figure 4
 ## Total Particle numbers and particle size distribution slope
 
-```{r fig.width = 12}
+```{r fig.width = 10, fig.height = 7}
 library(scales)
 #https://stackoverflow.com/questions/30179442/plotting-minor-breaks-on-a-log-scale-with-ggplot
 log_breaks = function(maj, radix=10) {
@@ -84,7 +84,7 @@ PlotParticlesmany <- uds %>%
  
   #geom_path(aes(x = psd_gam)) + 
   #geom_ribbon(aes(x = psd_gam, xmin = psd_gam - 2 * psd_seg, xmax = psd_gam + 2 * psd_seg), alpha = 0.1, outline_type = "lower") +
-  geom_point(alpha = .6, size = 2, stroke = 1) +
+  geom_point(alpha = .6, size = 1.5, stroke = .5) +
   scale_y_reverse(limits = c(1200, 0),
                   breaks = ybreaks,
                   labels = ylabels) +
@@ -98,7 +98,11 @@ PlotParticlesmany <- uds %>%
   geom_hline(yintercept = OMZBase, color = "darkblue") +
   geom_hline(yintercept = OMZTop, color = "darkblue") +
   #geom_hline(yintercept = DVMBase, color = "darkgoldenrod", lty = "dashed") +
-  theme(legend.position = "none")
+  theme(legend.position = "none") +
+  theme(axis.title = element_text(size = 16),
+        legend.title = element_text(size = 16),
+        axis.text = element_text(size = 16),
+        legend.text = element_text(size = 16))
 
 PlotPSDmany <- uds %>% 
   filter(project == "ETNP") %>%
@@ -106,7 +110,7 @@ PlotPSDmany <- uds %>%
  
   #geom_path(aes(x = psd_gam)) + 
   #geom_ribbon(aes(x = psd_gam, xmin = psd_gam - 2 * psd_seg, xmax = psd_gam + 2 * psd_seg), alpha = 0.1, outline_type = "lower") +
-  geom_point(alpha = .6, size = 2, stroke = 1) +
+  geom_point(alpha = .6, size = 1.5, stroke = .5) +
   scale_y_reverse(limits = c(1200, 0), breaks = ybreaks, labels = ylabels) +
   scale_shape_manual(name = "Day", values = c(21:25)) +
   scale_fill_gradientn(name = "Hour",breaks = c(0, 6, 12, 18, 24), labels =  c("0", "6", "12", "18", "24"), colors = c("black", "blue", "white", "orange", "black"), limits = c(0, 24)) +
@@ -117,7 +121,12 @@ PlotPSDmany <- uds %>%
   #geom_hline(yintercept = DVMBase, color = "darkgoldenrod", lty = "dashed") +
   coord_cartesian(clip = "off") +
   annotate(geom = "text", x = -2, y = 1100, label = "More large \n particles", inherit.aes = FALSE, size = 6) +
-  annotate(geom = "text", x = -4.5, y = 1100, label = "More small \n particles", inherit.aes = FALSE, size = 6)
+  annotate(geom = "text", x = -4.5, y = 1100, label = "More small \n particles", inherit.aes = FALSE, size = 6) +
+  theme(axis.title.y = element_blank(),
+        axis.title.x = element_text(size = 16),
+        legend.title = element_text(size = 16),
+        axis.text = element_text(size = 16),
+        legend.text = element_text(size = 16))
   # annotation_custom(
   #     grob = textGrob(label = "More big particles", hjust = 0, gp = gpar(cex = 12)),
   #     ymin = 0,      # Vertical position of the textGrob
@@ -549,7 +558,7 @@ disagFig <- bds %>% filter(project == "ETNP") %>%
   scale_x_continuous(limits = c(-1, 1)) +
   geom_vline(xintercept = 0) +   scale_shape_manual(name = "Day of Month", values = rep(21:25, 2)) +
   #labs(x = bquote("Observed - Modeled Small Particle Flux"~(μmol/m^3/day)), y = "Depth (m)") +
-  labs(x = paste("Deviation from Model", expression((μmol/m^3/day)))) +
+  labs(x = paste("Deviation from Model", expression((μmol/m^3/day))), y = "Depth (m)") +
   scale_fill_gradientn(name = "Hour of Day", breaks = c(0, 6, 12, 18, 24), colors = c("black", "blue", "white", "orange", "black")) +
   geom_hline(yintercept = PhoticBase, color = "darkgreen") +
   geom_hline(yintercept = OMZBase, color = "darkblue") +
