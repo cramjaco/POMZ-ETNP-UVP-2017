@@ -12,6 +12,13 @@ library(tidyverse)
 library(R.matlab)
 ```
 
+```{r}
+PhoticBase <- 160
+OMZBase <- 900
+DVMBase <- 600
+OMZTop <- 90
+```
+
 Easy colors for a colorblind person to tell apart
 ```{r}
 wmCols <- c("gray80", "darkorange", "darkgreen", "yellow", "white", "darkblue", "black")
@@ -101,7 +108,8 @@ evans107Plot <- evans_Target_01 %>%
   #scale_y_reverse() +
   scale_x_continuous(limits = c(0, 1)) +
   scale_fill_manual(values = c(`13CW` = "Yellow", NEPIW = "Blue", AAIW = "Black")) + scale_shape_manual(values = c(21:25, 21:25)) +
-  geom_hline(yintercept = 160, color = "darkgreen") +
+  geom_hline(yintercept = PhoticBase, color = "darkgreen") +
+  geom_hline(yintercept = OMZTop, color = "darkblue") +
   theme_bw()
 evans107Plot
 ```

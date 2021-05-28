@@ -222,7 +222,8 @@ scale_y_reverse(limits = c(1000, 0)) + scale_x_log10() + scale_color_manual(valu
   scale_shape_manual(values = c(1:5)) +
   geom_hline(yintercept = PhoticBase, color = "darkgreen") +
   geom_hline(yintercept = 200, color = "darkgreen") +
-  geom_hline(yintercept = OMZBase, color = "darkblue") 
+  geom_hline(yintercept = OMZBase, color = "darkblue") +
+  geom_hline(yintercept = OMZTop, color = "darkblue")
 
 PlotNParticlesEP
 ```
@@ -241,7 +242,8 @@ scale_y_reverse(limits = c(1000, 0)) + scale_color_manual(values = c("gray20", "
   scale_shape_manual(values = c(1:5)) + labs(y = "", x = "Particle Size Distribution Slope") +
   geom_hline(yintercept = PhoticBase, color = "darkgreen") +
   geom_hline(yintercept = 200, color = "darkgreen") +
-  geom_hline(yintercept = OMZBase, color = "darkblue") 
+  geom_hline(yintercept = OMZBase, color = "darkblue") +
+  geom_hline(yintercept = OMZTop, color = "darkblue")
 
 PlotPSDEP
 ```
@@ -272,13 +274,20 @@ mainParticleComponents <- bds %>%
 
 PlotFlx <- mainParticleComponents %>% 
   filter(meas != "psd") %>%
-  ggplot(aes(y = depth, x = value, col = project, shape = project)) + facet_grid(size ~ meas, scales = "free_x") + geom_point(size = 2) + scale_y_reverse(limits = c(1000, 0)) + scale_x_log10() + theme(axis.title.x = element_blank(), legend.position = "none", strip.background.y = element_blank(), strip.text.y = element_blank(), plot.margin = unit(c(7,0,7,7), "pt")) + scale_color_manual(values = c(P16 = "brown", ETNP = "gray20")) + scale_shape_manual(values = c(1:5)) + theme(axis.text.x = element_text(angle = 90)) + geom_hline(yintercept = PhoticBase, color = "darkgreen")
+  ggplot(aes(y = depth, x = value, col = project, shape = project)) + facet_grid(size ~ meas, scales = "free_x") + geom_point(size = 2) + scale_y_reverse(limits = c(1000, 0)) + scale_x_log10() + theme(axis.title.x = element_blank(), legend.position = "none", strip.background.y = element_blank(), strip.text.y = element_blank(), plot.margin = unit(c(7,0,7,7), "pt")) + scale_color_manual(values = c(P16 = "brown", ETNP = "gray20")) + scale_shape_manual(values = c(1:5)) + theme(axis.text.x = element_text(angle = 90)) + geom_hline(yintercept = PhoticBase, color = "darkgreen") +
+  geom_hline(yintercept = 200, color = "darkgreen") +
+  geom_hline(yintercept = OMZBase, color = "darkblue") +
+  geom_hline(yintercept = OMZTop, color = "darkblue")
 
 PlotPSD <- mainParticleComponents %>% 
   filter(meas == "psd") %>%
   ggplot(aes(y = depth, x = value, col = project, shape = project)) + facet_grid(size~meas, scales = "free_x") + geom_point(size = 2) + scale_y_reverse(limits = c(1000, 0)) +
   theme(axis.title.x = element_blank(), axis.title.y = element_blank(), axis.line.y = element_blank(), axis.text.y = element_blank(), axis.ticks.y = element_blank(), plot.margin = unit(c(7,7,26.5,0), "pt")) +
-  scale_color_manual(values = c(P16 = "brown", ETNP = "gray20")) +  scale_shape_manual(values = c(1:5)) +  theme(axis.text.x = element_text(angle = 90)) + geom_hline(yintercept = PhoticBase, color = "darkgreen")
+  scale_color_manual(values = c(P16 = "brown", ETNP = "gray20")) +  scale_shape_manual(values = c(1:5)) +  theme(axis.text.x = element_text(angle = 90)) + geom_hline(yintercept = PhoticBase, color = "darkgreen") +
+    geom_hline(yintercept = PhoticBase, color = "darkgreen") +
+  geom_hline(yintercept = 200, color = "darkgreen") +
+  geom_hline(yintercept = OMZBase, color = "darkblue") +
+  geom_hline(yintercept = OMZTop, color = "darkblue")
 
 plot_grid(PlotFlx, PlotPSD, rel_widths = c(3, 2))
 
@@ -673,6 +682,9 @@ scale_shape_manual(values = c(25, 22))+
   xlab(expression(paste("Flux (µ mol C/", m^2, "/day)"))) +
   
   guides(fill = guide_legend(override.aes = list(shape = 21))) +
+  geom_hline(yintercept = PhoticBase, color = "darkgreen") +
+  geom_hline(yintercept = OMZBase, color = "darkblue") +
+  geom_hline(yintercept = OMZTop, color = "darkblue")
   theme_cowplot() + 
   theme(
         legend.position = c(0.5, 0.4),
@@ -692,15 +704,24 @@ ggsave("figures/FittedFlux.svg")
 ## Example particle size distribution
 
 ```{r fig.width= 10}
-TPPlot <- bes %>% filter(profile == "stn_043") %>% group_by(lb) %>% ggplot(aes(x = TotalParticles, y = depth, col = log(lb), group = lb)) + scale_y_reverse(limits = c(1000, 0)) + geom_point() + scale_x_log10() + scale_color_viridis_c() + geom_path() + geom_vline(xintercept = 1) + geom_vline(xintercept = 5) + labs(y = "Depth (m)", x = "TotalParticles Observed (#)")
+TPPlot <- bes %>% filter(profile == "stn_043") %>% group_by(lb) %>% ggplot(aes(x = TotalParticles, y = depth, col = log(lb), group = lb)) + scale_y_reverse(limits = c(1000, 0)) + geom_point() + scale_x_log10() + scale_color_viridis_c() + geom_path() + geom_vline(xintercept = 1) + geom_vline(xintercept = 5) + labs(y = "Depth (m)", x = "TotalParticles Observed (#)") +
+  geom_hline(yintercept = PhoticBase, color = "darkgreen") +
+  geom_hline(yintercept = OMZBase, color = "darkblue") +
+  geom_hline(yintercept = OMZTop, color = "darkblue")
 
 nnpPlot <- bes %>% filter(profile == "stn_043") %>% group_by(lb) %>% ggplot(aes(x = n_nparticles, y = depth, col = log(lb), group = lb)) + scale_y_reverse(limits = c(1000, 0)) + geom_point() + scale_x_log10() + scale_color_viridis_c() + geom_path() +
   #geom_vline(xintercept = 1) + geom_vline(xintercept = 5) +
-  labs(y = "Depth (m)", x = "Binsize and Volume Normalized Particles (#/L/mm)")
+  labs(y = "Depth (m)", x = "Binsize and Volume Normalized Particles (#/L/mm)") +
+  geom_hline(yintercept = PhoticBase, color = "darkgreen") +
+  geom_hline(yintercept = OMZBase, color = "darkblue") +
+  geom_hline(yintercept = OMZTop, color = "darkblue")
 
 FitPlot <- bes %>% filter(profile == "stn_043") %>% group_by(lb) %>% ggplot(aes(x = nnp_smooth, xmin = nnp_lower, xmax = nnp_upper, y = depth, col = log(lb), group = lb)) + scale_y_reverse(limits = c(1000, 0)) + geom_point() + scale_x_log10() + scale_color_viridis_c() + geom_path() +
   #geom_vline(xintercept = 1) + geom_vline(xintercept = 5) +
-  labs(y = "Depth (m)", x = "Smoothed - Normalized Particles (#/L/mm)") + geom_errorbar(width = 10, alpha = 0.5)
+  labs(y = "Depth (m)", x = "Smoothed - Normalized Particles (#/L/mm)") + geom_errorbar(width = 10, alpha = 0.5) +
+  geom_hline(yintercept = PhoticBase, color = "darkgreen") +
+  geom_hline(yintercept = OMZBase, color = "darkblue") +
+  geom_hline(yintercept = OMZTop, color = "darkblue")
 
 npLegend <- get_legend(FitPlot + theme(legend.box.margin = margin(0, 0, 40, 200)) + labs(col = expression(log[e](Size (mm)))))
 
@@ -754,7 +775,7 @@ ToPlot <- bind_cols(Expanded, nnparticles = Pred) %>% mutate(time = as.character
 
 ```{r}
 WBColorMap <- ToPlot %>% filter(lb <= 2) %>%
-  ggplot(aes(x = lb, y = depth, fill = log10(nnparticles), z = log10(nnparticles))) + geom_tile() + scale_fill_viridis_c(name = expression(log[10](Particles/m^3/mm))) + scale_y_reverse() + scale_x_log10() + geom_contour(color = "black") + geom_hline(yintercept = 160, color = "darkgreen") + geom_hline(yintercept = OMZBase, color = "darkblue") + labs(y = "Depth (m)", x = "Size (mm)")
+  ggplot(aes(x = lb, y = depth, fill = log10(nnparticles), z = log10(nnparticles))) + geom_tile() + scale_fill_viridis_c(name = expression(log[10](Particles/m^3/mm))) + scale_y_reverse() + scale_x_log10() + geom_contour(color = "black") + geom_hline(yintercept = 160, color = "darkgreen") + geom_hline(yintercept = OMZBase, color = "darkblue") + labs(y = "Depth (m)", x = "Size (mm)") + geom_hline(yintercept = OMZTop, color = "darkblue")
 WBColorMap
 ```
 
@@ -770,7 +791,7 @@ mbGam <- ToPlot %>% group_by(depth)  %>% nest() %>%
 
 ```{r}
 pWBPSD <- mbGam %>%
-  ggplot(aes(x = psd, y = depth)) + geom_path() + scale_y_reverse()  + geom_hline(yintercept = 160, color = "darkgreen") + geom_hline(yintercept =  OMZBase, color = "darkblue") + labs(y = "Depth (m)", x = "Particle Size Distribution Slope")
+  ggplot(aes(x = psd, y = depth)) + geom_path() + scale_y_reverse()  + geom_hline(yintercept = 160, color = "darkgreen") + geom_hline(yintercept =  OMZBase, color = "darkblue") + labs(y = "Depth (m)", x = "Particle Size Distribution Slope") + geom_hline(yintercept = OMZTop, color = "darkblue")
 pWBPSD
 ```
 
@@ -780,7 +801,7 @@ PubDf <- ToPlot %>% mutate(ubiomass = nparticles * lb ^ ag_global) %>% filter(lb
 photicBiomass <- PubDf %>% filter(depth <= 165, depth >= 155) %>% summarize(ubiomass = mean(ubiomass)) %>% pull(ubiomass)
 PubDf <- PubDf %>% mutate(nbiomass = ubiomass/photicBiomass)
 pWBS <- PubDf %>% 
-  ggplot(aes(x = nbiomass, y = depth)) + geom_path() + scale_y_reverse() + scale_x_continuous(limits = c(0,1.2)) + geom_hline(yintercept = 160, color = "darkgreen") + geom_vline(xintercept = 1, color = "gray50") + geom_vline(xintercept = 0, color = "gray50") + geom_hline(yintercept = OMZBase, color = "darkblue") + labs( x = "Small particle mass (norm.)")  + theme(axis.title.y = element_blank())
+  ggplot(aes(x = nbiomass, y = depth)) + geom_path() + scale_y_reverse() + scale_x_continuous(limits = c(0,1.2)) + geom_hline(yintercept = 160, color = "darkgreen") + geom_vline(xintercept = 1, color = "gray50") + geom_vline(xintercept = 0, color = "gray50") + geom_hline(yintercept = OMZBase, color = "darkblue") + labs( x = "Small particle mass (norm.)")  + theme(axis.title.y = element_blank()) 
 pWBS
 ```
 
@@ -789,7 +810,7 @@ pWBS
 LubDf <- ToPlot %>% mutate(ubiomass = nparticles * lb ^ ag_global) %>% filter(lb >= 0.5) %>% group_by(time, depth) %>% summarize(ubiomass = sum(ubiomass)) %>% ungroup %>% group_by(depth)  %>% summarise(ubiomass = mean(ubiomass))
 photicBiomass <- LubDf %>% filter(depth <= 165, depth >=155) %>% summarize(ubiomass = mean(ubiomass)) %>% pull(ubiomass)
 LubDf <- LubDf %>% mutate(nbiomass = ubiomass/photicBiomass)
-pWBL <- LubDf %>% ggplot(aes(x = nbiomass, y = depth)) + geom_path() + scale_y_reverse() + scale_x_continuous(limits = c(0,1)) + geom_hline(yintercept = 160, color = "darkgreen") + labs( x = "Large particle mass (norm.)") + geom_vline(xintercept = 1, color = "gray50") + geom_vline(xintercept = 0, color = "gray50") + geom_hline(yintercept = OMZBase, color = "darkblue") + theme(axis.title.y = element_blank())
+pWBL <- LubDf %>% ggplot(aes(x = nbiomass, y = depth)) + geom_path() + scale_y_reverse() + scale_x_continuous(limits = c(0,1)) + geom_hline(yintercept = 160, color = "darkgreen") + labs( x = "Large particle mass (norm.)") + geom_vline(xintercept = 1, color = "gray50") + geom_vline(xintercept = 0, color = "gray50") + geom_hline(yintercept = OMZBase, color = "darkblue") + theme(axis.title.y = element_blank()) 
 pWBL
 ```
 

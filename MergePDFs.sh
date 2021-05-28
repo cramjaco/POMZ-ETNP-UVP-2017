@@ -1,0 +1,3 @@
+#!/bin/bash
+
+pdftk manuscript/ParticleSizePOMZ2017_20May2020.pdf manuscript/Cram_Supplement_20May2021.pdf EularianPRiSM_Math/DeltaNjMathV2020.pdf cat output manuscript/CombinedParticleSizePOMz2017_24May2021.pdf
