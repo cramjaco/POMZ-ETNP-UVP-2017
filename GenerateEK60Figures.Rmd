@@ -23,15 +23,16 @@ OMZTop <- 90
 
 Read in the data,
 I processed these data elsewhere, so as to avoid overloading this directory with intermediate files.
+03 October 2021 -- Specify that times are in UTC (not local time relative to the person using the code)
 ```{r}
-dataBinned <- read_csv("data/backscatter_table_go7.csv")
+dataBinned <- read_csv("data/backscatter_table_go7.csv") #, locale = locale(encoding = "latin1", tz="UTC"))
 ```
 
 
-Convet to correct time zone
+Convet to local time zone
 ```{r}
 dataBinned_01 <- dataBinned %>%
-  mutate(timeMex = with_tz(time_bin, tzone = "US/Central") )
+  mutate(timeMex = with_tz(time_bin, tzone = "Mexico/General"))
 ```
 
 Some upfront calculations
@@ -41,6 +42,32 @@ endDay <- dataBinned_01$timeMex %>% na.omit %>% max %>% ceiling_date(unit = "day
 timeBreaks <- seq(from = startDay, to = endDay, by = "12 hours")
 timeLabels <- format(timeBreaks)
 ```
+
+```{r}
+library(suncalc)
+SunTime <- getSunlightPosition(date = unique(dataBinned_01$timeMex), lat = 16.6, lon = -106.9, keep = "altitude") %>%
+  filter(!is.na(date)) %>%
+  rename(timeMex = date) %>%
+  arrange(timeMex)
+```
+
+```{r}
+SunTime %>% ggplot(aes(x = timeMex, col = altitude > 0)) + geom_line(aes(y = altitude), size = 2)
+```
+
+
+
+Adding cast times
+
+```{r}
+bes<- read_csv("dataOut/binned_EachSize.csv")
+castTimes <- bes %>% filter(project == "ETNP") %>% group_by(time) %>% summarise(depth = max(depth)) %>% mutate(depth = if_else(depth > 1000, 1000, depth))
+castTimes
+```
+
+
+
+
 
 Plot the 18kHz data (largish animals)
 ```{r}
@@ -64,11 +91,23 @@ plot18k <- dataBinned_01 %>% filter(frequency == 18000) %>% ggplot(aes(x = timeM
   #geom_hline(yintercept = 600, color = "darkgoldenrod", lty = "dashed") +
   geom_shadowtext(data = plotLetters, aes(x = timeMex - 12 * 60^2, y = depth_bin, label = letter),  inherit.aes = FALSE, size = 6, bg.color = "white", color = "black") +
   geom_segment(data = plotLetters, inherit.aes = FALSE, aes(x = timeMex - 9 * 60^2, xend = timeMex, y = depth_bin, yend = depth_bin), arrow = arrow(length = unit(0.03, "npc")), color = "white", size = 1.5) + 
-  geom_segment(data = plotLetters, inherit.aes = FALSE, aes(x = timeMex - 9 * 60^2, xend = timeMex, y = depth_bin, yend = depth_bin), arrow = arrow(length = unit(0.03, "npc")))
+  geom_segment(data = plotLetters, inherit.aes = FALSE, aes(x = timeMex - 9 * 60^2, xend = timeMex, y = depth_bin, yend = depth_bin), arrow = arrow(length = unit(0.03, "npc"))) +
+  # sunlight times
+  geom_point(aes(x = timeMex + 60^2, col = altitude > 0), y = -1, size = 2, data = SunTime, inherit.aes = FALSE, shape = 15) + scale_color_manual(values = c("black", "yellow")) +
+  # cast times
+  geom_point(data = castTimes, aes(x = time, y = depth),  inherit.aes = FALSE, shape = 23, color = "white", fill = "black", size = 4) # confirm timezones
 plot18k
 
 ggsave("figures/stationP2_EK60_18kOnly.png")
 ```
+
+I added the day night bar to the top, but it still looks a little off center. I recall the zooplankton surfacing exactly when solar angle was zero.
+I've temporarily added one hour, which centers things (indicating I'm somehow off by one hour with the solar angle function), but also the days are too short, relative to the zooplantkon.
+
+
+
+
+To do, add cast times.
 
 Plot all of the other sizes of things
 
