@@ -110,6 +110,7 @@ evans107Plot <- evans_Target_01 %>%
   scale_fill_manual(values = c(`13CW` = "Yellow", NEPIW = "Blue", AAIW = "Black")) + scale_shape_manual(values = c(21:25, 21:25)) +
   geom_hline(yintercept = PhoticBase, color = "darkgreen") +
   geom_hline(yintercept = OMZTop, color = "darkblue") +
+  labs(y = "Depth (m)", x = "Relative Contribution") +
   theme_bw()
 evans107Plot
 ```

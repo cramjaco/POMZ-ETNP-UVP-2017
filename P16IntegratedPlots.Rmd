@@ -45,15 +45,15 @@ WBPSD_P16
 PubDf_P16 <- ToPlot_P16 %>% mutate(ubiomass = nparticles * lb ^ ag_global) %>% filter(lb < 0.5) %>% group_by(time, depth) %>% summarize(ubiomass = sum(ubiomass)) %>% ungroup %>% group_by(depth)  %>% summarise(ubiomass = mean(ubiomass))
 photicBiomass <- PubDf_P16 %>% filter(depth <= 165, depth >= 155) %>% summarize(ubiomass = mean(ubiomass)) %>% pull(ubiomass)
 PubDf_P16 <- PubDf_P16 %>% mutate(nbiomass = ubiomass/photicBiomass)
-pWBS_P16 <- PubDf_P16 %>% ggplot(aes(x = nbiomass, y = depth)) + geom_path() + scale_y_reverse() + scale_x_continuous(limits = c(0,1.2)) + geom_hline(yintercept = 200, color = "darkgreen") + geom_vline(xintercept = 1, color = "gray50") + geom_vline(xintercept = 0, color = "gray50")  + labs( x = "Small particle mass (norm.)")
+pWBS_P16 <- PubDf_P16 %>% ggplot(aes(x = nbiomass, y = depth)) + geom_path() + scale_y_reverse() + scale_x_continuous(limits = c(0,1.2)) + geom_hline(yintercept = 200, color = "darkgreen") + geom_vline(xintercept = 1, color = "gray50") + geom_vline(xintercept = 0, color = "gray50")  + labs( x = "<500 μm particle mass (norm.)")
 pWBS_P16
 ```
 
 ```{r}
-LubDf_P16 <- ToPlot %>% mutate(ubiomass = nparticles * lb ^ ag_global) %>% filter(lb >= 0.5) %>% group_by(time, depth) %>% summarize(ubiomass = sum(ubiomass)) %>% ungroup %>% group_by(depth)  %>% summarise(ubiomass = mean(ubiomass))
+LubDf_P16 <- ToPlot_P16 %>% mutate(ubiomass = nparticles * lb ^ ag_global) %>% filter(lb >= 0.5) %>% group_by(time, depth) %>% summarize(ubiomass = sum(ubiomass)) %>% ungroup %>% group_by(depth)  %>% summarise(ubiomass = mean(ubiomass))
 photicBiomass_P16 <- LubDf_P16 %>% filter(depth <= 165, depth >=155) %>% summarize(ubiomass = mean(ubiomass)) %>% pull(ubiomass)
 LubDf_P16 <- LubDf_P16 %>% mutate(nbiomass = ubiomass/photicBiomass_P16)
-pWBL_P16 <- LubDf_P16 %>% ggplot(aes(x = nbiomass, y = depth)) + geom_path() + scale_y_reverse() + scale_x_continuous(limits = c(0,1)) + geom_hline(yintercept = 200, color = "darkgreen") + labs( x = "Large particle mass (norm.)") + geom_vline(xintercept = 1, color = "gray50") + geom_vline(xintercept = 0, color = "gray50") 
+pWBL_P16 <- LubDf_P16 %>% ggplot(aes(x = nbiomass, y = depth)) + geom_path() + scale_y_reverse() + scale_x_continuous(limits = c(0,1)) + geom_hline(yintercept = 200, color = "darkgreen") + labs( x = "≥500 μm particle mass (norm.)") + geom_vline(xintercept = 1, color = "gray50") + geom_vline(xintercept = 0, color = "gray50") 
 pWBL_P16
 ```
 
@@ -62,13 +62,13 @@ WBFigSX <- plot_grid(WBPSD_P16, pWBS_P16,pWBL_P16, nrow = 1, labels = c("B", "C"
 WBFigSX
 ```
 
-```{r fig.height = 6, fig.width = 8}
+```{r fig.height = 6, fig.width = 8.5}
 WBcombined_P16 <- plot_grid(WBColorMap_P16 + theme(plot.margin = unit(c(0,3,0, 3), "cm")), WBFigSX, ncol = 1, labels = c("A", ""))
 WBcombined_P16
 ```
 
 ```{r}
-ggsave("figures/WBModelValidation_Oxic.png", width = 8, height = 6)
+ggsave("figures/WBModelValidation_Oxic.png", width = 8.5, height = 6)
 ```
 
 ```{r}

@@ -120,8 +120,8 @@ PlotPSDmany <- uds %>%
   geom_hline(yintercept = OMZTop, color = "darkblue") +
   #geom_hline(yintercept = DVMBase, color = "darkgoldenrod", lty = "dashed") +
   coord_cartesian(clip = "off") +
-  annotate(geom = "text", x = -2, y = 1100, label = "More large \n particles", inherit.aes = FALSE, size = 6) +
-  annotate(geom = "text", x = -4.5, y = 1100, label = "More small \n particles", inherit.aes = FALSE, size = 6) +
+  annotate(geom = "text", x = -2, y = 1100, label = "Proportionally \n fewer small \n particles", inherit.aes = FALSE, size = 6) +
+  annotate(geom = "text", x = -4.2, y = 1100, label = "Proportionally \n more small \n particles", inherit.aes = FALSE, size = 6) +
   theme(axis.title.y = element_blank(),
         axis.title.x = element_text(size = 16),
         legend.title = element_text(size = 16),
@@ -270,7 +270,10 @@ mainParticleComponents <- bds %>%
   pivot_longer(cols = -c("project", "profile", "depth")) %>%
   separate(name, c("size", "meas")) %>%
   mutate(meas = recode(meas, nparticles = "particles/L")) %>%
-  mutate(meas = factor(meas, levels = c("particles/L", "flux", "psd")))
+  mutate(meas = factor(meas, levels = c("particles/L", "flux", "psd"))) %>%
+  mutate(size = factor(size, levels = c("small", "big", "tot"))) %>%
+  mutate(size = recode(size, small = "micro-\naggregates \n < 500 μm", big = "marine\nsnow \n > 500 μm", tot = "total")) %>%
+  pass()
 
 PlotFlx <- mainParticleComponents %>% 
   filter(meas != "psd") %>%
@@ -289,7 +292,7 @@ PlotPSD <- mainParticleComponents %>%
   geom_hline(yintercept = OMZBase, color = "darkblue") +
   geom_hline(yintercept = OMZTop, color = "darkblue")
 
-plot_grid(PlotFlx, PlotPSD, rel_widths = c(3, 2))
+plot_grid(PlotFlx, PlotPSD, rel_widths = c(7, 5))
 
 ggsave("figures/BigVsSmall.svg")
 ggsave("figures/BigVsSmall.png")
@@ -444,7 +447,7 @@ pltDelta3 <- bds %>% filter(project == "ETNP") %>% #filter(DFP > 1) %>% #filter(
    scale_color_gradient2(low = "darkgreen", mid = "gray80", high = "purple", midpoint = 10) + scale_shape_manual(name = "Day of Month", values = rep(21:25, 2)) + 
   scale_fill_gradientn(name = "Hour", breaks = c(0, 6, 12, 18, 24), colors = c("black", "blue", "white", "orange", "black")) +
   geom_vline(xintercept = 0) +
-  labs(x = bquote((DF/DZ)^{1/5}~(µmolC/m^3/d)^{1/5}), y = "Depth (m)") + theme(legend.pos = "none")+
+  labs(x = bquote((DF/DZ)^{1/5}~(µmol~C/m^3/d)^{1/5}), y = "Depth (m)") + theme(legend.pos = "none")+
   geom_hline(yintercept = PhoticBase, color = "darkgreen") +
   geom_hline(yintercept = OMZBase, color = "darkblue") +
   geom_hline(yintercept = OMZTop, color = "darkblue")
@@ -795,22 +798,22 @@ pWBPSD <- mbGam %>%
 pWBPSD
 ```
 
-# Large Particle Biomass
+# Small Particle Biomass
 ```{r}
 PubDf <- ToPlot %>% mutate(ubiomass = nparticles * lb ^ ag_global) %>% filter(lb < 0.5) %>% group_by(depth) %>% summarize(ubiomass = sum(ubiomass)) %>% ungroup()
 photicBiomass <- PubDf %>% filter(depth <= 165, depth >= 155) %>% summarize(ubiomass = mean(ubiomass)) %>% pull(ubiomass)
 PubDf <- PubDf %>% mutate(nbiomass = ubiomass/photicBiomass)
 pWBS <- PubDf %>% 
-  ggplot(aes(x = nbiomass, y = depth)) + geom_path() + scale_y_reverse() + scale_x_continuous(limits = c(0,1.2)) + geom_hline(yintercept = 160, color = "darkgreen") + geom_vline(xintercept = 1, color = "gray50") + geom_vline(xintercept = 0, color = "gray50") + geom_hline(yintercept = OMZBase, color = "darkblue") + labs( x = "Small particle mass (norm.)")  + theme(axis.title.y = element_blank()) 
+  ggplot(aes(x = nbiomass, y = depth)) + geom_path() + scale_y_reverse() + scale_x_continuous(limits = c(0,1.2)) + geom_hline(yintercept = 160, color = "darkgreen") + geom_vline(xintercept = 1, color = "gray50") + geom_vline(xintercept = 0, color = "gray50") + geom_hline(yintercept = OMZBase, color = "darkblue") + labs( x = "<500 μm particle mass (norm.)")  + theme(axis.title.y = element_blank()) 
 pWBS
 ```
 
-#Small Particle Biomass
+#Large Particle Biomass
 ```{r}
 LubDf <- ToPlot %>% mutate(ubiomass = nparticles * lb ^ ag_global) %>% filter(lb >= 0.5) %>% group_by(time, depth) %>% summarize(ubiomass = sum(ubiomass)) %>% ungroup %>% group_by(depth)  %>% summarise(ubiomass = mean(ubiomass))
 photicBiomass <- LubDf %>% filter(depth <= 165, depth >=155) %>% summarize(ubiomass = mean(ubiomass)) %>% pull(ubiomass)
 LubDf <- LubDf %>% mutate(nbiomass = ubiomass/photicBiomass)
-pWBL <- LubDf %>% ggplot(aes(x = nbiomass, y = depth)) + geom_path() + scale_y_reverse() + scale_x_continuous(limits = c(0,1)) + geom_hline(yintercept = 160, color = "darkgreen") + labs( x = "Large particle mass (norm.)") + geom_vline(xintercept = 1, color = "gray50") + geom_vline(xintercept = 0, color = "gray50") + geom_hline(yintercept = OMZBase, color = "darkblue") + theme(axis.title.y = element_blank()) 
+pWBL <- LubDf %>% ggplot(aes(x = nbiomass, y = depth)) + geom_path() + scale_y_reverse() + scale_x_continuous(limits = c(0,1)) + geom_hline(yintercept = 160, color = "darkgreen") + labs( x = "≥500 particle mass (norm.)") + geom_vline(xintercept = 1, color = "gray50") + geom_vline(xintercept = 0, color = "gray50") + geom_hline(yintercept = OMZBase, color = "darkblue") + theme(axis.title.y = element_blank()) 
 pWBL
 ```
 

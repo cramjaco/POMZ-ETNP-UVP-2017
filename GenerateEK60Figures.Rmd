@@ -10,6 +10,7 @@ Load in libraries
 ```{r}
 library(tidyverse)
 library(lubridate)
+library(oce)
 ```
 
 ```{r}
@@ -25,14 +26,15 @@ Read in the data,
 I processed these data elsewhere, so as to avoid overloading this directory with intermediate files.
 03 October 2021 -- Specify that times are in UTC (not local time relative to the person using the code)
 ```{r}
-dataBinned <- read_csv("data/backscatter_table_go7.csv") #, locale = locale(encoding = "latin1", tz="UTC"))
+dataBinned <- read_csv("data/backscatter_table_go7.csv", locale = locale(encoding = "latin1", tz="UTC"))
 ```
 
 
 Convet to local time zone
 ```{r}
 dataBinned_01 <- dataBinned %>%
-  mutate(timeMex = with_tz(time_bin, tzone = "Mexico/General"))
+    mutate(time_bin_corrected = time_bin - 60^2) %>% # the data appear to be "off" by an hour from my lab book observations, I don't know why. Correcting that  ##
+  mutate(timeMex = with_tz(time_bin_corrected, tzone = "Mexico/General"))
 ```
 
 Some upfront calculations
@@ -55,6 +57,17 @@ SunTime <- getSunlightPosition(date = unique(dataBinned_01$timeMex), lat = 16.6,
 SunTime %>% ggplot(aes(x = timeMex, col = altitude > 0)) + geom_line(aes(y = altitude), size = 2)
 ```
 
+## Strange reslts, trying oce::SunAngle
+
+```{r}
+SunTime2 <- sunAngle(unique(dataBinned_01$timeMex), lat = 16.6, lon = -106.9)
+SunTime2 <- bind_cols(SunTime2) %>% na.omit() %>%
+  mutate(isDay = if_else(altitude >=0, "Day", "Night"))
+```
+
+```{r}
+ggplot(SunTime2, aes(x = time, y = altitude, color = altitude > 0)) + geom_point()
+```
 
 
 Adding cast times
@@ -67,7 +80,8 @@ castTimes
 
 
 
-
+# 06 October 2021 
+The EK60 data appear to be off by one hour, they should be shifted one hour earlier, or I should find why they are shifted back by an hour.
 
 Plot the 18kHz data (largish animals)
 ```{r}
@@ -75,11 +89,11 @@ Plot the 18kHz data (largish animals)
 # Position of letters
 plotLetters <- tribble(
   ~letter, ~depth_bin, ~timeMex,
-  "A", 350, as.POSIXct("2017-01-07 13:00:00"),
-  "B", 200, as.POSIXct("2017-01-09 23:00:00"),
-  "C", 150, as.POSIXct("2017-01-08 13:00:00"),
-  "D", 625, as.POSIXct("2017-01-12 07:00:00"),
-  "E", 750, as.POSIXct("2017-01-10 02:00:00")
+  "A", 350, as.POSIXct("2017-01-07 12:00:00"),
+  "B", 200, as.POSIXct("2017-01-09 22:00:00"),
+  "C", 150, as.POSIXct("2017-01-08 12:00:00"),
+  "D", 625, as.POSIXct("2017-01-12 06:00:00"),
+  "E", 750, as.POSIXct("2017-01-10 01:00:00")
   
 )
 
@@ -93,9 +107,14 @@ plot18k <- dataBinned_01 %>% filter(frequency == 18000) %>% ggplot(aes(x = timeM
   geom_segment(data = plotLetters, inherit.aes = FALSE, aes(x = timeMex - 9 * 60^2, xend = timeMex, y = depth_bin, yend = depth_bin), arrow = arrow(length = unit(0.03, "npc")), color = "white", size = 1.5) + 
   geom_segment(data = plotLetters, inherit.aes = FALSE, aes(x = timeMex - 9 * 60^2, xend = timeMex, y = depth_bin, yend = depth_bin), arrow = arrow(length = unit(0.03, "npc"))) +
   # sunlight times
-  geom_point(aes(x = timeMex + 60^2, col = altitude > 0), y = -1, size = 2, data = SunTime, inherit.aes = FALSE, shape = 15) + scale_color_manual(values = c("black", "yellow")) +
+  # geom_point(aes(x = timeMex + 60^2, col = altitude > 0), y = -1, size = 2, data = SunTime, inherit.aes = FALSE, shape = 15) +
+  scale_color_manual(values = c(Night = "black", Day = "gray90"), guide = guide_legend(title = NULL)) +
+  geom_point(aes(x = time, col = isDay), y = 15, size = 2, data = SunTime2, inherit.aes = FALSE, shape = 15) +  # -12
   # cast times
-  geom_point(data = castTimes, aes(x = time, y = depth),  inherit.aes = FALSE, shape = 23, color = "white", fill = "black", size = 4) # confirm timezones
+  geom_point(data = castTimes, aes(x = time, y = depth, alpha = "Cast Depth"),  inherit.aes = FALSE, shape = 23, color = "white", fill = "black", size = 4) +# confirm timezones
+  scale_alpha_manual(values = 1, guide = guide_legend(title = NULL)) +
+  guides(size = guide_legend(override.aes = list(shape = 18, color = "black")),
+         color = guide_legend(override.aes = list(shape = 15), title = NULL))
 plot18k
 
 ggsave("figures/stationP2_EK60_18kOnly.png")
